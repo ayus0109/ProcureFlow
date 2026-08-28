@@ -1,5 +1,5 @@
 # Stage 1: Build the React Frontend
-FROM node:24-alpine AS frontend-builder
+FROM node:24-slim AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
@@ -7,24 +7,22 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Production Server Environment
-FROM node:24-alpine
+FROM node:24-slim
 WORKDIR /app
 
-# Copy backend package and install dependencies
+# Copy backend package and install production dependencies
 COPY backend/package*.json ./backend/
-RUN cd backend && npm install --production
+RUN cd backend && npm install --omit=dev
 
 # Copy backend source code
 COPY backend/ ./backend/
 
-# Copy built frontend assets from builder stage
+# Copy built frontend assets
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Seed initial APMC demonstration data
 RUN cd backend && node db/seed.js
 
-# Expose standard production port
-ENV PORT=4000
 ENV NODE_ENV=production
 EXPOSE 4000
 
