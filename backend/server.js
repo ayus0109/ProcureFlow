@@ -53,9 +53,11 @@ const FRONTEND_DIST = path.join(__dirname, '../frontend/dist');
 // If built frontend exists, serve it (production / deployed mode)
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+    }
+    next();
   });
 } else {
   /** Friendly API index if frontend is not built yet */
