@@ -1,0 +1,29 @@
+{
+  "name": "procureflow",
+  "version": "1.0.0",
+  "description": "Smart Digital Agricultural Procurement & Queue Management Platform",
+  "private": true,
+  "main": "backend/server.js",
+  "scripts": {
+    "postinstall": "npm run install:all",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix frontend run build && npm --prefix backend run seed",
+    "seed": "npm --prefix backend run seed",
+    "start": "node backend/server.js",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test": "node backend/demo-check.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "agritech",
+    "govtech",
+    "procurement",
+    "queue-management",
+    "smart-india-hackathon"
+  ],
+  "author": "ProcureFlow Team",
+  "license": "MIT"
+}

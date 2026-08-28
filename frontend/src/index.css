@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f7f4;
+  color: #16241c;
+  /* Nirmala UI ships with Windows and renders Devanagari properly, which
+     matters because the UI switches to Hindi and Marathi. */
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Nirmala UI',
+    'Noto Sans Devanagari', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* If the device asks for reduced motion, honour it — our transitions are
+   decorative, so nothing is lost by switching them off. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
