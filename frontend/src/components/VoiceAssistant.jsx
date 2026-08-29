@@ -233,14 +233,19 @@ export default function VoiceAssistant() {
     [lang, stopAll, addMessage]
   );
 
-  // User Listening Turn
+  const [micError, setMicError] = useState('');
+
+  // User Listening Turn with explicit permission & error diagnosis
   const startUserTurn = useCallback(
-    (onTextHeard) => {
+    async (onTextHeard) => {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
+        setMicError('Speech recognition is not supported in this browser. Please use Google Chrome or Edge.');
         setTurnState('IDLE');
         return;
       }
+
+      setMicError('');
 
       // Stop speech synth so it never hears itself
       window.speechSynthesis?.cancel();
@@ -250,6 +255,19 @@ export default function VoiceAssistant() {
         try {
           recognitionRef.current.abort();
         } catch {}
+      }
+
+      // Explicitly request mic permission if needed
+      if (navigator.mediaDevices?.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Release track immediately after permission check so SpeechRecognition can take exclusive control
+          stream.getTracks().forEach((track) => track.stop());
+        } catch (err) {
+          setMicError('Microphone access blocked. Click the lock/settings icon 🔒 in your browser URL bar and set Microphone to "Allow".');
+          setTurnState('IDLE');
+          return;
+        }
       }
 
       const recognition = new SR();
@@ -262,6 +280,7 @@ export default function VoiceAssistant() {
       recognition.onstart = () => {
         setTurnState('USER_LISTENING');
         setLiveHeardTranscript('');
+        setMicError('');
       };
 
       recognition.onresult = (event) => {
@@ -283,8 +302,17 @@ export default function VoiceAssistant() {
         }
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (e) => {
         setTurnState('IDLE');
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          setMicError('Microphone access denied. Click the lock icon 🔒 in your browser address bar and enable Microphone.');
+        } else if (e.error === 'no-speech') {
+          setMicError('No voice detected. Please speak closer to your microphone or tap an option below.');
+        } else if (e.error === 'network') {
+          setMicError('Network issue connecting to voice recognition. Please check internet or tap an option below.');
+        } else if (e.error === 'audio-capture') {
+          setMicError('No microphone hardware detected on your device.');
+        }
       };
 
       recognition.onend = () => {
@@ -293,7 +321,7 @@ export default function VoiceAssistant() {
 
       try {
         recognition.start();
-      } catch {
+      } catch (err) {
         setTurnState('IDLE');
       }
     },
@@ -755,6 +783,19 @@ export default function VoiceAssistant() {
                       "{liveHeardTranscript}"
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Explicit Microphone / Speech Diagnostics Error Notice */}
+              {micError && (
+                <div className="flex items-start gap-2.5 rounded-2xl bg-amber-50 p-3.5 border border-amber-300 text-xs font-semibold text-amber-950">
+                  <span className="text-base shrink-0">⚠️</span>
+                  <div>
+                    <p>{micError}</p>
+                    <p className="mt-1 text-[11px] text-amber-800 font-normal">
+                      💡 Tip: You can also tap any of the options below to continue immediately.
+                    </p>
+                  </div>
                 </div>
               )}
 
