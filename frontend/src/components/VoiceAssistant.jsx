@@ -637,20 +637,49 @@ export default function VoiceAssistant() {
   const askSlot = useCallback(
     (centre, cropKey, qtyNum, dateObj) => {
       setStep('SLOT');
-      setTimeout(() => {
-        botSpeakAndPrompt(script.askSlot, () => {
-          startUserTurn((heard) => {
-            const slotMatch = findMatchingSlot(heard, availableSlots);
-            if (slotMatch) {
-              handleSelectSlot(slotMatch, centre, cropKey, qtyNum, dateObj);
-            } else {
-              botSpeakAndPrompt(script.notUnderstoodSlot, () => {});
-            }
-          });
+      api(`/centres/${centre.id}/slots?date=${dateObj.iso}`)
+        .then((rows) => {
+          const openSlots = (rows || []).filter((s) => !s.full && s.left > 0);
+          setAvailableSlots(openSlots);
+
+          if (openSlots.length === 0) {
+            const noSlotText =
+              lang === 'hi'
+                ? `क्षमा करें, ${dateObj.label} को इस केंद्र पर कोई स्लॉट खाली नहीं है। कृपया दूसरी तारीख चुनें।`
+                : lang === 'mr'
+                ? `माफ करा, ${dateObj.label} रोजी या केंद्रावर कोणताही स्लॉट शिल्लक नाही. कृपया दुसरी तारीख निवडा.`
+                : `Sorry, there are no open slots available on ${dateObj.label}. Please choose another date.`;
+            botSpeakAndPrompt(noSlotText, () => askDate(centre, cropKey, qtyNum));
+            return;
+          }
+
+          // Mention only the active available slot times
+          const slotSpeechList = openSlots.slice(0, 3).map((s) => formatSlotForSpeech(s.slot, lang)).join(', ');
+          const promptText =
+            lang === 'hi'
+              ? `उपलब्ध खुले स्लॉट हैं: ${slotSpeechList}। आप कौन सा समय पसंद करेंगे?`
+              : lang === 'mr'
+              ? `उपलब्ध खुले स्लॉट आहेत: ${slotSpeechList}. तुम्हाला कोणता वेळ सोयीचा आहे?`
+              : `Available open slots are: ${slotSpeechList}. Which time slot suits you?`;
+
+          setTimeout(() => {
+            botSpeakAndPrompt(promptText, () => {
+              startUserTurn((heard) => {
+                const slotMatch = findMatchingSlot(heard, openSlots);
+                if (slotMatch) {
+                  handleSelectSlot(slotMatch, centre, cropKey, qtyNum, dateObj);
+                } else {
+                  botSpeakAndPrompt(script.notUnderstoodSlot, () => {});
+                }
+              });
+            });
+          }, 200);
+        })
+        .catch(() => {
+          botSpeakAndPrompt(script.notUnderstoodSlot, () => {});
         });
-      }, 300);
     },
-    [availableSlots, script, botSpeakAndPrompt, startUserTurn]
+    [lang, script, botSpeakAndPrompt, startUserTurn, askDate]
   );
 
   const handleSelectSlot = (slotObj, centre, cropKey, qtyNum, dateObj) => {
@@ -698,9 +727,9 @@ export default function VoiceAssistant() {
 
   const submitBooking = useCallback(
     async (centre, cropKey, qtyNum, dateObj, slotObj) => {
-      setStep('BOOKING');
+      // 1. Forcefully kill any ongoing utterance or audio before submitting
       stopAll();
-      botSpeakAndPrompt(script.booking);
+      setStep('BOOKING');
 
       try {
         const res = await api('/bookings', {
@@ -717,13 +746,17 @@ export default function VoiceAssistant() {
         const token = res?.token || res?.booking?.token || 'PF-1025';
         setBookedToken(token);
         setStep('DONE');
+
+        // 2. Play ONLY single non-overlapping final confirmation
         const doneText = script.done.replace('{token}', token);
-        botSpeakAndPrompt(doneText, () => {
-          setTimeout(() => {
-            setOpen(false);
-            navigate('/farmer', { replace: true });
-          }, 4000);
-        });
+        setTimeout(() => {
+          botSpeakAndPrompt(doneText, () => {
+            setTimeout(() => {
+              setOpen(false);
+              navigate('/farmer', { replace: true });
+            }, 3500);
+          });
+        }, 150);
       } catch (err) {
         setStep('ERROR');
         botSpeakAndPrompt(script.error);
@@ -1098,7 +1131,7 @@ export default function VoiceAssistant() {
                 {/* Step 5: Slot */}
                 {step === 'SLOT' && (
                   <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
-                    {availableSlots.map((s) => (
+                    {availableSlots.filter((s) => !s.full && s.left > 0).map((s) => (
                       <button
                         key={s.slot}
                         type="button"
@@ -1106,7 +1139,7 @@ export default function VoiceAssistant() {
                         className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-left hover:border-emerald-500 hover:bg-emerald-50 transition"
                       >
                         <span className="font-mono text-xs font-bold text-slate-900">⏰ {s.slot}</span>
-                        <span className="block text-[10px] text-emerald-700">{s.left} slots left</span>
+                        <span className="block text-[10px] text-emerald-700 font-bold">{s.left} slots available</span>
                       </button>
                     ))}
                   </div>
