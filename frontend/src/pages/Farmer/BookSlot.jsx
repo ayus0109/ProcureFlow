@@ -175,12 +175,20 @@ export default function BookSlot() {
                     </p>
                   </div>
 
-                  {/* Capacity Bar */}
-                  <div className="mt-3 border-t border-slate-100 pt-2 text-xs">
+                  {/* Capacity Bar & Quota Details */}
+                  <div className="mt-3 border-t border-slate-100 pt-2 text-xs space-y-1">
                     <div className="flex justify-between font-semibold text-slate-700">
                       <span>Wait: ~{c.waitLabel}</span>
-                      <span className="text-emerald-800">{c.slotsLeft} slots remaining</span>
+                      <span className="text-emerald-800 font-bold">{c.slotsLeft} slots remaining</span>
                     </div>
+
+                    <div className="flex justify-between text-[11px] text-slate-500 font-medium">
+                      <span>🎯 Target: {c.daily_target_qtl || 500} qtl</span>
+                      <span className="font-semibold text-emerald-900 bg-emerald-100/70 px-1.5 py-0.2 rounded">
+                        Max {c.max_qty_per_farmer || 50} qtl/farmer
+                      </span>
+                    </div>
+
                     <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
@@ -225,19 +233,36 @@ export default function BookSlot() {
 
           <div className="mt-4 flex flex-wrap items-end gap-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60">
             <div className="w-full max-w-xs">
-              <FormField
-                id="quantity"
-                label={t('book.quantity')}
-                type="number"
-                inputMode="decimal"
-                min="0.5"
-                max="200"
-                step="0.5"
-                placeholder="e.g. 20"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                required
-              />
+              {(() => {
+                const selectedC = centres.find((c) => String(c.id) === centreId);
+                const maxAllowed = selectedC?.max_qty_per_farmer || 50;
+                const isOverLimit = Number(quantity) > maxAllowed;
+
+                return (
+                  <div>
+                    <FormField
+                      id="quantity"
+                      label={t('book.quantity')}
+                      type="number"
+                      inputMode="decimal"
+                      min="0.5"
+                      max={maxAllowed}
+                      step="0.5"
+                      placeholder={`Max ${maxAllowed} quintals`}
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      required
+                    />
+                    {selectedC && (
+                      <p className={`mt-1 text-[11px] font-semibold ${isOverLimit ? 'text-rose-700' : 'text-slate-500'}`}>
+                        {isOverLimit
+                          ? `⚠️ Exceeds ${selectedC.name} maximum limit of ${maxAllowed} quintals!`
+                          : `ℹ️ ${selectedC.name} allows up to ${maxAllowed} quintals per booking.`}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {estimatedGross && (

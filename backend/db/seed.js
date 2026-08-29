@@ -20,13 +20,13 @@ const { todayISO, nowStamp } = require('../utils/dates');
 
 const TODAY = todayISO();
 
-// name, district, capacity, active counters, total counters, avg min, delay min
+// name, district, capacity, active counters, total counters, avg min, delay min, max_qty_per_farmer, daily_target_qtl, slot_capacity
 const CENTRES = [
-  ['Pune Procurement Center', 'Pune', 120, 2, 3, 4, 0],
-  ['Nashik Procurement Center', 'Nashik', 100, 3, 3, 5, 0],
-  ['Nagpur Procurement Center', 'Nagpur', 90, 2, 3, 6, 10],
-  ['Aurangabad Procurement Center', 'Aurangabad', 110, 3, 3, 4, 0],
-  ['Kolhapur Procurement Center', 'Kolhapur', 80, 2, 2, 5, 5],
+  ['Pune Procurement Center', 'Pune', 120, 2, 3, 4, 0, 50, 1500, 15],
+  ['Nashik Procurement Center', 'Nashik', 100, 3, 3, 5, 0, 40, 1200, 12],
+  ['Nagpur Procurement Center', 'Nagpur', 90, 2, 3, 6, 10, 30, 900, 10],
+  ['Aurangabad Procurement Center', 'Aurangabad', 110, 3, 3, 4, 0, 50, 1400, 14],
+  ['Kolhapur Procurement Center', 'Kolhapur', 80, 2, 2, 5, 5, 25, 600, 10],
 ];
 
 // Farmer 1 is the demo account and is intentionally left booking-free.
@@ -74,8 +74,8 @@ function reset() {
 function seed() {
   const insCentre = db.prepare(`
     INSERT INTO centres
-      (name, district, daily_capacity, active_counters, total_counters, avg_processing_min, delay_min)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`);
+      (name, district, daily_capacity, active_counters, total_counters, avg_processing_min, delay_min, max_qty_per_farmer, daily_target_qtl, slot_capacity)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
   CENTRES.forEach((c) => insCentre.run(...c));
 
   const insFarmer = db.prepare(

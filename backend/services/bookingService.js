@@ -39,12 +39,12 @@ function windowCapacity(dailyCapacity) {
 /** Every window for a centre on a date, with how much room is left in each. */
 function slotAvailability(centreId, date) {
   const centre = db
-    .prepare('SELECT id, daily_capacity FROM centres WHERE id = ?')
+    .prepare('SELECT id, daily_capacity, slot_capacity FROM centres WHERE id = ?')
     .get(Number(centreId));
   if (!centre) throw httpError(404, 'Centre not found');
 
   const day = date || todayISO();
-  const capacity = windowCapacity(centre.daily_capacity);
+  const capacity = centre.slot_capacity || windowCapacity(centre.daily_capacity);
 
   const rows = db
     .prepare(
@@ -216,7 +216,7 @@ function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTi
   }
 
   const centre = db
-    .prepare('SELECT id, name, daily_capacity FROM centres WHERE id = ?')
+    .prepare('SELECT id, name, daily_capacity, max_qty_per_farmer FROM centres WHERE id = ?')
     .get(Number(centreId));
   if (!centre) throw httpError(400, 'Please choose a procurement centre');
 
@@ -224,7 +224,11 @@ function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTi
 
   const qty = Number(quantityQtl);
   if (!qty || qty <= 0) throw httpError(400, 'Please enter the quantity in quintals');
-  if (qty > 200) throw httpError(400, 'Quantity per booking cannot be more than 200 quintals');
+
+  const maxLimit = centre.max_qty_per_farmer || 200;
+  if (qty > maxLimit) {
+    throw httpError(400, `${centre.name} has a maximum quota limit of ${maxLimit} quintals per booking.`);
+  }
 
   if (!SLOT_WINDOWS.includes(slotTime)) throw httpError(400, 'Please choose a time slot');
   if (!bookableDates().includes(slotDate)) {

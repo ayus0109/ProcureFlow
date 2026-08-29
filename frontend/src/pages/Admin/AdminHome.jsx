@@ -132,6 +132,15 @@ export default function AdminHome() {
   const [gradeFactors, setGradeFactors] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [quotaModal, setQuotaModal] = useState(false);
+  const [quotaForm, setQuotaForm] = useState({
+    daily_target_qtl: 500,
+    max_qty_per_farmer: 50,
+    daily_capacity: 120,
+    slot_capacity: 15,
+    active_counters: 2,
+  });
+  const [quotaSaving, setQuotaSaving] = useState(false);
 
   useEffect(() => {
     api('/reference')
@@ -212,14 +221,33 @@ export default function AdminHome() {
 
       {/* Centre Cockpit Overview */}
       <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-emerald-700" />
             <h2 className="text-sm font-bold tracking-wider text-slate-800 uppercase">
               {t('admin.today')}
             </h2>
           </div>
-          {centre && <CongestionBadge level={centre.congestion} />}
+          <div className="flex items-center gap-2">
+            {centre && <CongestionBadge level={centre.congestion} />}
+            <button
+              type="button"
+              onClick={() => {
+                setQuotaForm({
+                  daily_target_qtl: centre?.daily_target_qtl || 500,
+                  max_qty_per_farmer: centre?.max_qty_per_farmer || 50,
+                  daily_capacity: centre?.daily_capacity || 120,
+                  slot_capacity: centre?.slot_capacity || 15,
+                  active_counters: centre?.active_counters || 2,
+                });
+                setQuotaModal(true);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/80 px-3 py-1 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>⚙️ Centre Capacity & Quotas</span>
+            </button>
+          </div>
         </div>
 
         {message && (
@@ -231,12 +259,32 @@ export default function AdminHome() {
         {loading && !centre && <p className="mt-3 text-xs text-slate-500 animate-pulse">{t('common.loading')}</p>}
 
         {centre && (
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatCard label={t('admin.bookedToday')} value={centre.booked_today} sub="Total slots reserved" icon={Calendar} />
-            <StatCard label={t('admin.inQueue')} value={centre.in_queue} sub="Waiting for counter" icon={Users} />
-            <StatCard label={t('admin.wait')} value={centre.waitLabel} sub="Based on active counters" icon={Clock} />
-            <StatCard label={t('admin.slotsLeft')} value={centre.slotsLeft} sub={`Capacity: ${centre.daily_capacity} / day`} icon={Layers} />
-          </div>
+          <>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <StatCard label={t('admin.bookedToday')} value={centre.booked_today} sub="Total slots reserved" icon={Calendar} />
+              <StatCard label={t('admin.inQueue')} value={centre.in_queue} sub="Waiting for counter" icon={Users} />
+              <StatCard label={t('admin.wait')} value={centre.waitLabel} sub="Based on active counters" icon={Clock} />
+              <StatCard label={t('admin.slotsLeft')} value={centre.slotsLeft} sub={`Capacity: ${centre.daily_capacity} / day`} icon={Layers} />
+            </div>
+
+            {/* Live Configured Requirements Strip */}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-slate-50 p-3 text-xs border border-slate-200/80">
+              <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                <span>🎯 Target Requirement:</span>
+                <span className="font-mono text-emerald-800">{centre.daily_target_qtl || 500} Quintals</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                <span>⚖️ Max Quota per Farmer:</span>
+                <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-emerald-950">
+                  {centre.max_qty_per_farmer || 50} qtl
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                <span>⏰ Per-Slot Quota:</span>
+                <span className="font-mono text-slate-800">{centre.slot_capacity || 15} farmers/hour</span>
+              </div>
+            </div>
+          </>
         )}
       </section>
 
@@ -329,6 +377,159 @@ export default function AdminHome() {
 
       {/* Payments Ledger Panel */}
       <PaymentsPanel />
+
+      {/* Centre Capacity & Quota Management Modal */}
+      {quotaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl text-slate-900 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-2xl bg-emerald-100 text-emerald-800">
+                  <SlidersHorizontal className="h-5 w-5" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900">Centre Capacity & Quota Management</h3>
+                  <p className="text-[11px] text-slate-500">Configure daily requirements, farmer limits & slot quotas</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQuotaModal(false)}
+                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setQuotaSaving(true);
+                try {
+                  const updated = await api(`/centres/${user.centre_id}`, {
+                    method: 'PATCH',
+                    body: quotaForm,
+                  });
+                  setData((prev) => (prev ? { ...prev, centre: { ...prev.centre, ...updated } } : prev));
+                  setQuotaModal(false);
+                } catch (err) {
+                  setActionError(err.message);
+                } finally {
+                  setQuotaSaving(false);
+                }
+              }}
+              className="mt-4 space-y-4 text-xs"
+            >
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    🎯 Daily Target Requirement (Quintals)
+                  </label>
+                  <input
+                    type="number"
+                    min="10"
+                    max="10000"
+                    step="10"
+                    value={quotaForm.daily_target_qtl}
+                    onChange={(e) => setQuotaForm((f) => ({ ...f, daily_target_qtl: Number(e.target.value) }))}
+                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                    required
+                  />
+                  <p className="mt-0.5 text-[10px] text-slate-500">Total grain procurement target for this APMC centre</p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    ⚖️ Max Limit per Farmer (Quintals)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="500"
+                    step="1"
+                    value={quotaForm.max_qty_per_farmer}
+                    onChange={(e) => setQuotaForm((f) => ({ ...f, max_qty_per_farmer: Number(e.target.value) }))}
+                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                    required
+                  />
+                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum quintals a single farmer is allowed to bring (e.g. 10 or 50)</p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    👥 Daily Total Capacity (Farmers)
+                  </label>
+                  <input
+                    type="number"
+                    min="10"
+                    max="500"
+                    value={quotaForm.daily_capacity}
+                    onChange={(e) => setQuotaForm((f) => ({ ...f, daily_capacity: Number(e.target.value) }))}
+                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                    required
+                  />
+                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum booking slots allowed across the entire day</p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    ⏰ Slot Window Capacity (Farmers/Hour)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={quotaForm.slot_capacity}
+                    onChange={(e) => setQuotaForm((f) => ({ ...f, slot_capacity: Number(e.target.value) }))}
+                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                    required
+                  />
+                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum farmers permitted in any single 1-hour slot</p>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    ⏱️ Active Weighbridge Counters
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4].map((cnt) => (
+                      <button
+                        key={cnt}
+                        type="button"
+                        onClick={() => setQuotaForm((f) => ({ ...f, active_counters: cnt }))}
+                        className={`flex-1 rounded-xl py-2 font-bold transition border ${
+                          quotaForm.active_counters === cnt
+                            ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {cnt} {cnt === 1 ? 'Counter' : 'Counters'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-2 border-t border-slate-100 pt-3">
+                <button
+                  type="submit"
+                  disabled={quotaSaving}
+                  className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 py-3 text-xs font-bold text-white shadow-md transition hover:brightness-110 disabled:opacity-60"
+                >
+                  {quotaSaving ? 'Saving…' : 'Save Centre Quotas'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuotaModal(false)}
+                  className="rounded-2xl border border-slate-200 px-5 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

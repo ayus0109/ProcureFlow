@@ -20,5 +20,10 @@ const db = new DatabaseSync(DB_PATH);
 db.exec('PRAGMA foreign_keys = ON');
 db.exec(SCHEMA_SQL);
 
+// Safe column migrations for existing databases
+try { db.exec('ALTER TABLE centres ADD COLUMN max_qty_per_farmer REAL DEFAULT 50'); } catch {}
+try { db.exec('ALTER TABLE centres ADD COLUMN daily_target_qtl REAL DEFAULT 500'); } catch {}
+try { db.exec('ALTER TABLE centres ADD COLUMN slot_capacity INTEGER DEFAULT 6'); } catch {}
+
 module.exports = db;
 module.exports.DB_PATH = DB_PATH;

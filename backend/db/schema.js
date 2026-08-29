@@ -22,7 +22,10 @@ CREATE TABLE IF NOT EXISTS centres (
   active_counters    INTEGER NOT NULL DEFAULT 2,
   total_counters     INTEGER NOT NULL DEFAULT 2,
   avg_processing_min INTEGER NOT NULL DEFAULT 4,
-  delay_min          INTEGER NOT NULL DEFAULT 0
+  delay_min          INTEGER NOT NULL DEFAULT 0,
+  max_qty_per_farmer REAL    NOT NULL DEFAULT 50,
+  daily_target_qtl   REAL    NOT NULL DEFAULT 500,
+  slot_capacity      INTEGER NOT NULL DEFAULT 6
 );
 
 CREATE TABLE IF NOT EXISTS farmers (

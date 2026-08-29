@@ -368,19 +368,35 @@ export default function VoiceAssistant() {
   const askQty = useCallback(
     (centre, cropKey) => {
       setStep('QTY');
-      botSpeakAndPrompt(script.askQty, () => {
+      const maxLimit = centre?.max_qty_per_farmer || 50;
+      const promptText =
+        lang === 'hi'
+          ? `${centre.name} में अधिकतम ${maxLimit} क्विंटल की सीमा है। आप कितने क्विंटल अनाज लाना चाहते हैं?`
+          : lang === 'mr'
+          ? `${centre.name} मध्ये जास्तीत जास्त ${maxLimit} क्विंटल मर्यादा आहे. तुम्ही किती क्विंटल धान्य आणणार आहात?`
+          : `${centre.name} accepts up to ${maxLimit} quintals. How many quintals would you like to book?`;
+
+      botSpeakAndPrompt(promptText, () => {
         startUserTurn((heard) => {
           const match = heard.match(/[\d.]+/);
           const val = match ? parseFloat(match[0]) : null;
-          if (val && val > 0 && val <= 200) {
+          if (val && val > 0 && val <= maxLimit) {
             handleSelectQty(val, centre, cropKey);
+          } else if (val && val > maxLimit) {
+            const overText =
+              lang === 'hi'
+                ? `यह संख्या इस केंद्र की ${maxLimit} क्विंटल सीमा से अधिक है। कृपया ${maxLimit} या उससे कम बताएं।`
+                : lang === 'mr'
+                ? `ही संख्या ${maxLimit} क्विंटल मर्यादेपेक्षा जास्त आहे. कृपया ${maxLimit} किंवा कमी सांगा.`
+                : `That exceeds the ${maxLimit} quintal limit for this centre. Please choose ${maxLimit} or less.`;
+            botSpeakAndPrompt(overText, () => askQty(centre, cropKey));
           } else {
             botSpeakAndPrompt(script.notUnderstood, () => {});
           }
         });
       });
     },
-    [script, botSpeakAndPrompt, startUserTurn]
+    [lang, script, botSpeakAndPrompt, startUserTurn]
   );
 
   const handleSelectQty = (qtyNum, centre, cropKey) => {
@@ -805,22 +821,41 @@ export default function VoiceAssistant() {
                 {/* Step 3: Quantity */}
                 {step === 'QTY' && (
                   <div className="space-y-2">
-                    <div className="flex gap-1.5">
-                      {[10, 20, 50, 100].map((q) => (
-                        <button
-                          key={q}
-                          type="button"
-                          onClick={() => handleSelectQty(q, selectedCentre, selectedCrop?.key)}
-                          className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-1.5 text-xs font-bold text-slate-800 hover:border-emerald-500 hover:bg-emerald-50 transition text-center"
-                        >
-                          {q} qtl
-                        </button>
-                      ))}
-                    </div>
+                    {(() => {
+                      const maxL = selectedCentre?.max_qty_per_farmer || 50;
+                      const options = [
+                        Math.max(1, Math.min(maxL, Math.round(maxL * 0.2))),
+                        Math.max(2, Math.min(maxL, Math.round(maxL * 0.5))),
+                        Math.max(5, Math.min(maxL, Math.round(maxL * 0.8))),
+                        maxL,
+                      ].filter((v, i, a) => a.indexOf(v) === i && v > 0);
+
+                      return (
+                        <>
+                          <div className="flex justify-between items-center text-[10px] text-slate-500 font-semibold px-0.5">
+                            <span>Centre: {selectedCentre?.name}</span>
+                            <span className="text-emerald-800 font-bold">Max Limit: {maxL} qtl</span>
+                          </div>
+
+                          <div className="flex gap-1.5">
+                            {options.map((q) => (
+                              <button
+                                key={q}
+                                type="button"
+                                onClick={() => handleSelectQty(q, selectedCentre, selectedCrop?.key)}
+                                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-1.5 text-xs font-bold text-slate-800 hover:border-emerald-500 hover:bg-emerald-50 transition text-center"
+                              >
+                                {q} qtl
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    })()}
                     <div className="flex gap-2">
                       <input
                         type="number"
-                        placeholder="Or enter quintals..."
+                        placeholder={`Max ${selectedCentre?.max_qty_per_farmer || 50} quintals...`}
                         value={customQtyInput}
                         onChange={(e) => setCustomQtyInput(e.target.value)}
                         className="h-8 flex-1 rounded-xl border border-slate-200 px-3 text-xs outline-none focus:border-emerald-600"
@@ -828,7 +863,15 @@ export default function VoiceAssistant() {
                       {customQtyInput && (
                         <button
                           type="button"
-                          onClick={() => handleSelectQty(parseFloat(customQtyInput), selectedCentre, selectedCrop?.key)}
+                          onClick={() => {
+                            const val = parseFloat(customQtyInput);
+                            const maxL = selectedCentre?.max_qty_per_farmer || 50;
+                            if (val > maxL) {
+                              alert(`Maximum allowed limit for this centre is ${maxL} quintals.`);
+                            } else {
+                              handleSelectQty(val, selectedCentre, selectedCrop?.key);
+                            }
+                          }}
                           className="rounded-xl bg-emerald-700 px-3 text-xs font-bold text-white hover:bg-emerald-800"
                         >
                           OK
