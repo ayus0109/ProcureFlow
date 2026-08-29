@@ -19,14 +19,6 @@ export default function AppShell({ title, subtitle, children }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-emerald-950/5 via-slate-50 to-slate-100 text-slate-900">
-      {/* Top GovTech Sub-header Strip */}
-      <div className="border-b border-emerald-900/10 bg-emerald-900 px-4 py-1 text-center text-[11px] font-medium text-emerald-100/90 shadow-xs sm:text-xs">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>National Digital Agricultural Procurement System • Ministry of Agriculture & Farmers Welfare Compliant</span>
-        </span>
-      </div>
-
       {/* Main Header */}
       <header className="sticky top-0 z-40 border-b border-emerald-100/80 bg-white/95 shadow-xs backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">

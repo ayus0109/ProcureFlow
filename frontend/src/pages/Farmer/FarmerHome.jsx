@@ -563,9 +563,6 @@ export default function FarmerHome() {
 
       <SeasonTracker />
 
-      {/* Dedicated Kisan Helpline & Support Card (No weather or mandi comparison) */}
-      <KisanHelplineCard />
-
       {/* 👤 ENLARGED Farmer Profile Summary with Simple, Clear Typography */}
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
@@ -662,6 +659,9 @@ export default function FarmerHome() {
           )}
         </dl>
       </section>
+
+      {/* Dedicated Kisan Helpline & Support Card positioned under Your details */}
+      <KisanHelplineCard />
 
       {/* Bank Details Modal */}
       {showBankModal && (
