@@ -97,13 +97,27 @@ async function main() {
     `${b1.arriveBy} outside ${open[0].slot}`
   );
 
-  // one active booking per farmer
-  const dupe = await post(
+  // up to 3 active bookings per farmer
+  const b2 = await post(
     '/bookings',
-    { centreId: pune.id, crop: 'WHEAT', quantityQtl: 5, slotDate: TODAY, slotTime: open[0].slot },
+    { centreId: pune.id, crop: 'PADDY', quantityQtl: 10, slotDate: TODAY, slotTime: open[1]?.slot || open[0].slot },
     fTok
   );
-  check('a second booking is refused', dupe.status === 409, String(dupe.status));
+  check('a second booking is allowed (up to 3 slots)', b2.status === 201, String(b2.status));
+
+  const b3 = await post(
+    '/bookings',
+    { centreId: pune.id, crop: 'SOYBEAN', quantityQtl: 15, slotDate: TODAY, slotTime: open[2]?.slot || open[0].slot },
+    fTok
+  );
+  check('a third booking is allowed (up to 3 slots)', b3.status === 201, String(b3.status));
+
+  const b4 = await post(
+    '/bookings',
+    { centreId: pune.id, crop: 'COTTON', quantityQtl: 20, slotDate: TODAY, slotTime: open[0].slot },
+    fTok
+  );
+  check('a 4th booking is refused (max 3 slots)', b4.status === 409, String(b4.status));
 
   // ---- 4. the admin takes over -----------------------------------------
   console.log('\n4. Centre admin signs in');
@@ -180,7 +194,7 @@ async function main() {
   // ---- 8. the farmer's receipt ----------------------------------------
   console.log('\n8. Farmer sees the receipt');
   const receipt = (await call('/bookings/mine', { token: fTok })).data;
-  const p = receipt.procurement;
+  const p = receipt.recentCompleted?.procurement || receipt.procurement || receipt.allBookings?.find((b) => b.id === bookingId)?.procurement;
   check('receipt reaches the farmer', Boolean(p), JSON.stringify(receipt).slice(0, 120));
   console.log(`   -> Rs ${p.total_amount} · ${p.quality_grade} · ${p.moisture_pct}% · ${p.payment_status} · ${p.txn_ref}`);
   check('payment starts as PROCESSING', p.payment_status === 'PROCESSING', p.payment_status);
@@ -200,7 +214,8 @@ async function main() {
   check('paying twice is refused', again.status === 409, String(again.status));
 
   const finalReceipt = (await call('/bookings/mine', { token: fTok })).data;
-  check('farmer receipt now reads PAID', finalReceipt.procurement.payment_status === 'PAID', finalReceipt.procurement.payment_status);
+  const finalP = finalReceipt.recentCompleted?.procurement || finalReceipt.procurement || finalReceipt.allBookings?.find((b) => b.id === bookingId)?.procurement;
+  check('farmer receipt now reads PAID', finalP.payment_status === 'PAID', finalP.payment_status);
   const finalAlerts = await call('/notifications', { token: fTok });
   const paidAlert = finalAlerts.data.items.find((i) => /has been paid/.test(i.message));
   check('farmer is told they were paid', Boolean(paidAlert), finalAlerts.data.items[0].message.slice(0, 80));

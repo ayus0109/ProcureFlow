@@ -169,22 +169,50 @@ function decorateReceipt(receipt, crop) {
   };
 }
 
-/** The farmer's current booking, or today's closed one, or null. */
+/** The farmer's current active bookings (up to 3) and today's closed sales, or null. */
 function activeBooking(farmerId) {
-  const row =
-    db.prepare(ACTIVE_BOOKING_SQL).get(farmerId, ...ACTIVE_QUEUE_STATUSES) ||
-    db.prepare(CLOSED_TODAY_SQL).get(farmerId, todayISO(), STATUS.CONFIRMED, STATUS.REJECTED);
-  return row ? decorateBooking(row) : null;
+  const activeRows = db
+    .prepare(
+      `${BOOKING_SELECT}
+       WHERE b.farmer_id = ? AND b.status IN (${ACTIVE_PLACEHOLDERS})
+       ORDER BY b.slot_date, b.slot_time, b.id
+       LIMIT 3`
+    )
+    .all(farmerId, ...ACTIVE_QUEUE_STATUSES);
+
+  const closedRows = db
+    .prepare(
+      `${BOOKING_SELECT}
+       WHERE b.farmer_id = ? AND b.slot_date = ? AND b.status IN (?, ?)
+       ORDER BY b.id DESC`
+    )
+    .all(farmerId, todayISO(), STATUS.CONFIRMED, STATUS.REJECTED);
+
+  const activeDecorated = (activeRows || []).map(decorateBooking);
+  const closedDecorated = (closedRows || []).map(decorateBooking);
+  const allDecorated = [...activeDecorated, ...closedDecorated];
+
+  if (allDecorated.length === 0) return null;
+
+  const primary = activeDecorated[0] || closedDecorated[0];
+
+  return {
+    ...primary,
+    activeCount: activeDecorated.length,
+    closedCount: closedDecorated.length,
+    allBookings: allDecorated,
+    recentCompleted: closedDecorated[0] || null,
+  };
 }
 
 function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTime }) {
-  // One active booking per farmer — otherwise a farmer holds several tokens
-  // and every queue position behind them is wrong.
-  const existing = db
-    .prepare(`SELECT token FROM bookings WHERE farmer_id = ? AND status IN (${ACTIVE_PLACEHOLDERS})`)
-    .get(farmerId, ...ACTIVE_QUEUE_STATUSES);
-  if (existing) {
-    throw httpError(409, `You already have an active booking (${existing.token}).`);
+  // A farmer can hold up to 3 active bookings concurrently (e.g. different crops/dates/slots)
+  const activeRows = db
+    .prepare(`SELECT id, token FROM bookings WHERE farmer_id = ? AND status IN (${ACTIVE_PLACEHOLDERS})`)
+    .all(farmerId, ...ACTIVE_QUEUE_STATUSES);
+
+  if (activeRows.length >= 3) {
+    throw httpError(409, `You already have ${activeRows.length} active bookings. Maximum 3 slots allowed per farmer.`);
   }
 
   const centre = db

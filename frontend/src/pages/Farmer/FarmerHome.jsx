@@ -314,8 +314,13 @@ function EmptyState({ t }) {
 export default function FarmerHome() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
 
   const { data: booking, error, loading } = usePoll(() => api('/bookings/mine'), 4000, []);
+
+  const allBookings = booking?.allBookings || (booking ? [booking] : []);
+  const activeCount = booking?.activeCount || (booking && booking.status !== 'CONFIRMED' && booking.status !== 'REJECTED' ? 1 : 0);
+  const currentBooking = allBookings[selectedSlotIdx] || allBookings[0] || booking;
 
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
@@ -327,8 +332,35 @@ export default function FarmerHome() {
         </div>
       )}
 
+      {/* Multi-Slot Switcher Tabs (when farmer holds multiple bookings) */}
+      {allBookings.length > 1 && (
+        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-1.5">
+          <div className="flex gap-1.5 overflow-x-auto">
+            {allBookings.map((b, idx) => (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => setSelectedSlotIdx(idx)}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  selectedSlotIdx === idx
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                }`}
+              >
+                <span className="font-mono">{b.token}</span>
+                <span className="text-[10px] opacity-80">({t(`crop.${b.crop}`)})</span>
+              </button>
+            ))}
+          </div>
+
+          <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 shrink-0">
+            {activeCount}/3 Slots
+          </span>
+        </div>
+      )}
+
       {/* High-priority announcement when called */}
-      {booking?.status === 'CALLED' && (
+      {currentBooking?.status === 'CALLED' && (
         <div
           role="status"
           className="flex items-start gap-4 rounded-3xl bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white shadow-lg ring-4 ring-amber-300/50 animate-bounce"
@@ -343,9 +375,20 @@ export default function FarmerHome() {
         </div>
       )}
 
-      {!loading && !error && (booking ? <BookingCard booking={booking} t={t} /> : <EmptyState t={t} />)}
+      {!loading && !error && (currentBooking ? <BookingCard booking={currentBooking} t={t} /> : <EmptyState t={t} />)}
 
-      {booking && !booking.procurement && (
+      {/* Multi-Slot Action: Add another slot when < 3 */}
+      {currentBooking && activeCount < 3 && (
+        <Link
+          to="/farmer/book"
+          className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100/70"
+        >
+          <CalendarPlus className="h-4 w-4 text-emerald-700" />
+          <span>+ Book Another Slot ({activeCount}/3 slots active)</span>
+        </Link>
+      )}
+
+      {currentBooking && !currentBooking.procurement && (
         <div className="flex items-center justify-between px-2 text-xs font-medium text-slate-500">
           <span className="flex items-center gap-1.5">
             <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin" aria-hidden="true" />
