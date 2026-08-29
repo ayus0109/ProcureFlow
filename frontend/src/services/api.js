@@ -19,14 +19,19 @@ export function setToken(token) {
 export async function api(path, { method = 'GET', body } = {}) {
   const token = getToken();
 
-  const response = await fetch(`/api${path}`, {
-    method,
-    headers: {
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  try {
+    response = await fetch(`/api${path}`, {
+      method,
+      headers: {
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (netErr) {
+    throw new Error('Cannot connect to server. Please ensure the backend service is running on port 4000.');
+  }
 
   const data = await response.json().catch(() => ({}));
 

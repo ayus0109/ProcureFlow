@@ -90,8 +90,11 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
-  if (status >= 500) console.error('[ProcureFlow]', err);
-  res.status(status).json({ error: status >= 500 ? 'Server error' : err.message });
+  console.error(`[ProcureFlow Error] ${req.method} ${req.originalUrl} (${status}):`, err.message);
+  if (status >= 500 && err.stack) console.error(err.stack);
+  res.status(status).json({
+    error: err.message || 'An unexpected error occurred. Please try again.',
+  });
 });
 
 const PORT = process.env.PORT || 4000;
