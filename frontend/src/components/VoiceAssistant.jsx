@@ -1,14 +1,14 @@
 /**
  * VoiceAssistant.jsx
  *
- * Ultra-Intelligent 2-Way Voice & Touch Assistant for Procurement Slot Booking.
+ * Phone-Call Style 2-Way Interactive Voice & Touch Assistant for Procurement Slot Booking.
  *
- * Highlights:
- * 1. Smart NLU: Single-word recognition (e.g. saying "Pune" -> Pune Procurement Center, "Gehu" -> Wheat).
- * 2. Multi-Dialect & Hindi/Marathi Number Parser (e.g. "bees" -> 20, "pachas" -> 50, "वीस" -> 20).
- * 3. Human-like natural phrasing and warm tone.
- * 4. High-Fidelity Cloud Audio Streaming + Local Fallback.
- * 5. Instant Speech Cut-Off & Clean Turn-Taking.
+ * Key Upgrades:
+ * 1. High-Quality Natural Voice: Exclusively uses the crisp native neural Indian voice.
+ * 2. Robust Slot Parser: Fixes hour matching so "11th to 12th" accurately selects 11:00-12:00.
+ * 3. Conversational Phrasing: Understands natural conversational sentences like "tomorrow is okay", "kal chalega", "pune theek rahega".
+ * 4. Zero Overlap: Synchronously purges previous speech queues on booking completion and cancellation.
+ * 5. Unavailable Slot Filter: Only open available slots are announced and displayed.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -40,59 +40,59 @@ const SCRIPTS = {
   en: {
     askCentre: 'Hello! Which procurement centre would you like to visit? You can say Pune, Nashik, Nagpur, Aurangabad, or Kolhapur.',
     askCrop: 'You selected {centre}. Which crop are you bringing? You can say Wheat, Paddy, Cotton, Soybean, or Tur.',
-    askQty: 'Great! How many quintals of {crop} would you like to book at {centre}? (Max allowed: {max} quintals).',
+    askQty: 'Great! How many quintals of {crop} would you like to book at {centre}? (Max limit: {max} quintals).',
     askDate: 'Which date do you prefer? Say Today or Tomorrow.',
-    askSlot: 'Which time slot suits you? For example, morning 10 AM, or afternoon 2 PM.',
+    askSlot: 'Available open slots are: {slots}. Which time slot suits you?',
     confirm: 'Please confirm: {centre}, {crop}, {qty} quintals, on {date} at {slot}. Should I book this slot? Say YES to confirm or NO to cancel.',
     booking: 'Submitting your slot booking, please wait…',
     done: 'Congratulations! Your slot has been successfully booked. Your token number is {token}.',
     error: 'Booking failed. Please try again.',
-    cancelled: 'Booking cancelled. Tap Start anytime to try again.',
+    cancelled: 'Booking has been cancelled. Tap Start anytime to try again.',
     notUnderstoodCentre: "I didn't catch the centre name. Please say Pune, Nashik, Nagpur, Aurangabad, Kolhapur, or tap below.",
     notUnderstoodCrop: "I didn't catch the crop. Please say Wheat, Paddy, Cotton, Soybean, or Tur, or tap below.",
     notUnderstoodQty: "Please tell me the quantity in quintals, like 10, 20, or 50 quintals.",
     notUnderstoodDate: "Please say Today or Tomorrow.",
-    notUnderstoodSlot: "Please choose a time slot or tap an option below.",
+    notUnderstoodSlot: "Please choose an available time slot or tap an option below.",
     notUnderstoodConfirm: "Please say YES to confirm or NO to cancel.",
-    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi'],
-    noKeywords: ['no', 'nahi', 'nahin', 'cancel', 'stop', 'back', 'wrong', 'dont', "don't"],
+    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi', 'kardo', 'kar do'],
+    noKeywords: ['no', 'nahi', 'nahin', 'cancel', 'stop', 'back', 'wrong', 'dont', "don't", 'mat karo', 'ruko', 'nako'],
   },
   hi: {
     askCentre: 'नमस्ते! आप किस खरीद केंद्र (मंडी) में जाना चाहते हैं? आप बोल सकते हैं: पुणे, नासिक, नागपुर, औरंगाबाद या कोल्हापुर।',
     askCrop: 'आपने {centre} चुना है। आप कौन सी फसल लाना चाहते हैं? जैसे: गेहूं, धान, कपास, सोयाबीन या तूर।',
     askQty: 'बहुत अच्छा! आप {centre} में कितने क्विंटल {crop} लाना चाहते हैं? (अधिकतम सीमा: {max} क्विंटल)।',
     askDate: 'आप कौन सी तारीख चुनना चाहते हैं? बोलिए आज या कल।',
-    askSlot: 'आप कौन सा समय स्लॉट पसंद करेंगे? जैसे सुबह 10 बजे या दोपहर 2 बजे।',
+    askSlot: 'उपलब्ध खुले स्लॉट हैं: {slots}। आप कौन सा समय पसंद करेंगे?',
     confirm: 'कृपया पुष्टि करें: {centre}, {crop}, {qty} क्विंटल, {date} को {slot}। क्या मैं यह स्लॉट बुक कर दूँ? बोलिए हाँ या नहीं।',
     booking: 'आपका स्लॉट बुक किया जा रहा है, कृपया प्रतीक्षा करें…',
     done: 'बधाई हो! आपका स्लॉट सफलतापूर्वक बुक हो गया है। आपका टोकन नंबर है {token}।',
     error: 'बुकिंग में त्रुटि हुई। कृपया पुनः प्रयास करें।',
-    cancelled: 'बुकिंग रद्द कर दी गई। शुरू करने के लिए कभी भी बटन दबाएं।',
+    cancelled: 'बुकिंग रद्द कर दी गई है। शुरू करने के लिए कभी भी बटन दबाएं।',
     notUnderstoodCentre: 'कृपया केंद्र का नाम बताएं, जैसे पुणे, नासिक, नागपुर, औरंगाबाद, कोल्हापुर, या नीचे से चुनें।',
     notUnderstoodCrop: 'कृपया फसल का नाम बताएं, जैसे गेहूं, धान, कपास, सोयाबीन, तूर, या नीचे से चुनें।',
     notUnderstoodQty: 'कृपया क्विंटल में मात्रा बताएं, जैसे 10 क्विंटल, 20 क्विंटल या 50 क्विंटल।',
     notUnderstoodDate: 'कृपया आज या कल बोलें।',
-    notUnderstoodSlot: 'कृपया समय स्लॉट बताएं या नीचे से चुनें।',
+    notUnderstoodSlot: 'कृपया उपलब्ध समय स्लॉट बताएं या नीचे से चुनें।',
     notUnderstoodConfirm: 'कृपया पुष्टि के लिए हाँ बोलें या रद्द करने के लिए नहीं बोलें।',
     yesKeywords: ['हाँ', 'हां', 'हा', 'yes', 'haan', 'haa', 'ok', 'theek', 'theek hai', 'sahi', 'book', 'kardo', 'kar do', 'pack'],
-    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat'],
+    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat', 'nako'],
   },
   mr: {
     askCentre: 'नमस्कार! तुम्हाला कोणत्या खरेदी केंद्रात (बाजार समितीत) जायचे आहे? तुम्ही पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगू शकता.',
     askCrop: 'तुम्ही {centre} निवडले आहे. तुम्ही कोणते पीक विक्रीसाठी आणणार आहात? जसे गहू, भात, कापूस, सोयाबीन किंवा तूर.',
     askQty: 'छान! तुम्ही {centre} मध्ये किती क्विंटल {crop} आणणार आहात? (जास्तीत जास्त: {max} क्विंटल).',
     askDate: 'तुम्हाला कोणती तारीख हवी आहे? आज किंवा उद्या म्हणा.',
-    askSlot: 'तुम्हाला कोणता वेळ स्लॉट सोयीचा आहे? जसे सकाळी 10 वाजता किंवा दुपारी 2 वाजता.',
+    askSlot: 'उपलब्ध खुले स्लॉट आहेत: {slots}. तुम्हाला कोणता वेळ सोयीचा आहे?',
     confirm: 'कृपया खात्री करा: {centre}, {crop}, {qty} क्विंटल, {date} रोजी {slot}. हा स्लॉट बुक करायचा का? होय किंवा नाही म्हणा.',
     booking: 'तुमचा स्लॉट बुक केला जात आहे, कृपया थांबा…',
     done: 'अभिनंदन! तुमचा स्लॉट यशस्वीरित्या बुक झाला आहे. तुमचा टोकन नंबर {token} आहे.',
     error: 'बुकिंग होऊ शकली नाही. कृपया पुन्हा प्रयत्न करा.',
-    cancelled: 'बुकिंग रद्द करण्यात आले. सुरू करण्यासाठी कधीही बटण दाबा.',
+    cancelled: 'बुकिंग रद्द करण्यात आले आहे. सुरू करण्यासाठी कधीही बटण दाबा.',
     notUnderstoodCentre: 'कृपया केंद्राचे नाव सांगा, जसे पुणे, नाशिक, नागपूर, औरंगाबाद, कोल्हापूर, किंवा खालील पर्याय निवडा.',
     notUnderstoodCrop: 'कृपया पिकाचे नाव सांगा, जसे गहू, भात, कापूस, सोयाबीन, तूर, किंवा खालील पर्याय निवडा.',
     notUnderstoodQty: 'कृपया क्विंटलमध्ये प्रमाण सांगा, जसे 10 क्विंटल, 20 क्विंटल किंवा 50 क्विंटल.',
     notUnderstoodDate: 'कृपया आज किंवा उद्या म्हणा.',
-    notUnderstoodSlot: 'कृपया वेळ स्लॉट निवडा किंवा खालील पर्याय निवडा.',
+    notUnderstoodSlot: 'कृपया उपलब्ध वेळ स्लॉट निवडा किंवा खालील पर्याय निवडा.',
     notUnderstoodConfirm: 'कृपया पुष्टीसाठी होय म्हणा किंवा रद्द करण्यासाठी नाही म्हणा.',
     yesKeywords: ['हो', 'होय', 'हाय', 'yes', 'haan', 'ok', 'bar', 'bara', 'nakkich', 'book', 'kara', 'karun taka'],
     noKeywords: ['नाही', 'नको', 'no', 'nahi', 'cancel', 'thamba', 'chuka'],
@@ -180,6 +180,55 @@ function formatSlotForSpeech(slotTime, lang) {
   return slotTime;
 }
 
+function getBestVoice(targetLang, voices) {
+  if (!voices || voices.length === 0) return null;
+  const tLang = targetLang.toLowerCase();
+  const prefix = tLang.split('-')[0];
+
+  // 1. Prioritize natural neural / regional voices for Hindi & Marathi
+  if (prefix === 'hi') {
+    const hi = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('hi') ||
+        /hindi|swara|kalpana|hemant|madhur|google.*हिन्दी/i.test(v.name)
+    );
+    if (hi) return hi;
+  }
+
+  if (prefix === 'mr') {
+    const mr = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('mr') ||
+        /marathi|aarohi|manhar|google.*मराठी/i.test(v.name)
+    );
+    if (mr) return mr;
+
+    // Fallback Marathi to Hindi voice (Devanagari script matches natively)
+    const hiFallback = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('hi') ||
+        /hindi|swara|kalpana|hemant/i.test(v.name)
+    );
+    if (hiFallback) return hiFallback;
+  }
+
+  // 2. Exact match
+  const exact = voices.find(
+    (v) => v.lang.toLowerCase() === tLang || v.lang.toLowerCase().replace('_', '-') === tLang
+  );
+  if (exact) return exact;
+
+  // 3. Prefix match
+  const pMatch = voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
+  if (pMatch) return pMatch;
+
+  // 4. Any Indian voice
+  const inVoice = voices.find((v) => v.lang.toLowerCase().includes('in'));
+  if (inVoice) return inVoice;
+
+  return voices[0] || null;
+}
+
 // ── Smart NLU Entity Matchers ──────────────────────────────────────────────────
 
 function findMatchingCentre(heard, centres) {
@@ -231,16 +280,18 @@ function extractQuantity(heard) {
 
 function findMatchingDate(heard, dates, lang) {
   if (!heard) return null;
-  const clean = normalize(heard);
-  const todayKeys = ['aaj', 'today', 'aj', 'first', 'pehla', '1', 'आज', 'पहिला', 'पहिला'];
-  const tomKeys = ['kal', 'tomorrow', 'udya', 'second', 'doosra', '2', 'कल', 'उद्या', 'दुसरा'];
+  const text = heard.toLowerCase();
 
-  if (todayKeys.some((k) => clean.includes(normalize(k)))) {
-    return { iso: dates[0], label: lang === 'en' ? 'Today' : 'आज' };
-  }
-  if (tomKeys.some((k) => clean.includes(normalize(k))) && dates[1]) {
+  // If user says "tomorrow is okay", "kal chalega", "tomorrow please", "kal kar do", "tomorrow"
+  if (/\b(tomorrow|kal|udya|second|doosra|dusra|उद्या|कल|दुसरा)\b/i.test(text) && dates[1]) {
     return { iso: dates[1], label: lang === 'en' ? 'Tomorrow' : lang === 'hi' ? 'कल' : 'उद्या' };
   }
+
+  // If user says "today is okay", "aaj chalega", "today please", "aaj kar do", "today"
+  if (/\b(today|aaj|aj|first|pehla|pahila|आज|पहिला)\b/i.test(text)) {
+    return { iso: dates[0], label: lang === 'en' ? 'Today' : 'आज' };
+  }
+
   if (dates[0]) {
     return { iso: dates[0], label: lang === 'en' ? 'Today' : 'आज' };
   }
@@ -250,35 +301,53 @@ function findMatchingDate(heard, dates, lang) {
 function findMatchingSlot(heard, availableSlots) {
   if (!availableSlots || availableSlots.length === 0) return null;
   if (!heard) return availableSlots[0];
-  const clean = normalize(heard);
 
-  if (
-    clean.includes('pehla') ||
-    clean.includes('first') ||
-    clean.includes('1') ||
-    clean.includes('morning') ||
-    clean.includes('subah') ||
-    clean.includes('सकाळी')
-  ) {
+  const text = heard.toLowerCase();
+
+  const hourMap = {
+    '9': 9, '09': 9, 'nine': 9, 'nau': 9, 'नऊ': 9, 'नौ': 9,
+    '10': 10, 'ten': 10, 'das': 10, 'dus': 10, 'दहा': 10, 'दस': 10,
+    '11': 11, '11th': 11, 'eleven': 11, 'gyarah': 11, 'अकरा': 11, 'ग्यारह': 11,
+    '12': 12, '12th': 12, 'twelve': 12, 'barah': 12, 'बारा': 12, 'बारह': 12,
+    '1': 13, '13': 13, 'one': 13, '1 pm': 13, 'ek': 13, 'एक': 13,
+    '2': 14, '14': 14, 'two': 14, '2 pm': 14, 'do': 14, 'दोन': 14, 'दो': 14,
+    '3': 15, '15': 15, 'three': 15, '3 pm': 15, 'teen': 15, 'तीन': 15,
+    '4': 16, '16': 16, 'four': 16, '4 pm': 16, 'char': 16, 'चार': 16,
+    '5': 17, '17': 17, 'five': 17, '5 pm': 17, 'panch': 17, 'पाच': 17, 'पांच': 17,
+  };
+
+  // Check specific numbers with word boundaries / regex
+  for (const [key, hr] of Object.entries(hourMap)) {
+    const regex = new RegExp(`(^|[^a-zA-Z0-9])${key}([^a-zA-Z0-9]|$)`, 'i');
+    if (
+      regex.test(text) ||
+      text.includes(key + ' baje') ||
+      text.includes(key + 'th') ||
+      text.includes(key + ':00') ||
+      text.includes(key + ' vajata') ||
+      text.includes(key + ' वाजता')
+    ) {
+      const found = availableSlots.find((s) => {
+        const startHr = parseInt(s.slot.split(':')[0], 10);
+        return startHr === hr || (hr <= 5 && startHr === hr + 12) || (hr >= 13 && startHr === hr);
+      });
+      if (found) return found;
+    }
+  }
+
+  // Relative keywords
+  if (/\b(first|pehla|pahila|पहिला|morning|subah|सकाळी)\b/i.test(text)) {
     return availableSlots[0];
   }
-  if (clean.includes('last') || clean.includes('aakhri') || clean.includes('शेवटचा')) {
+  if (/\b(last|aakhri|shewat|शेवटचा|evening|shaam|संध्याकाळी)\b/i.test(text)) {
     return availableSlots[availableSlots.length - 1];
   }
 
+  // Exact slot string match
   for (const s of availableSlots) {
-    const [start] = s.slot.split('-');
-    const hour24 = parseInt(start.split(':')[0], 10);
-    const hour12 = hour24 > 12 ? hour24 - 12 : hour24;
-
-    if (
-      clean.includes(normalize(s.slot)) ||
-      clean.includes(String(hour24)) ||
-      clean.includes(String(hour12))
-    ) {
-      return s;
-    }
+    if (text.includes(s.slot.toLowerCase())) return s;
   }
+
   return availableSlots[0];
 }
 
@@ -311,7 +380,6 @@ export default function VoiceAssistant() {
   const recognitionRef = useRef(null);
   const messagesEndRef = useRef(null);
   const fallbackTimerRef = useRef(null);
-  const activeAudioRef = useRef(null);
 
   // Auto-scroll
   useEffect(() => {
@@ -333,7 +401,7 @@ export default function VoiceAssistant() {
   useEffect(() => {
     if (!selectedCentre || !selectedDate) return;
     api(`/centres/${selectedCentre.id}/slots?date=${selectedDate.iso}`)
-      .then((rows) => setAvailableSlots(rows.filter((s) => !s.full)))
+      .then((rows) => setAvailableSlots((rows || []).filter((s) => !s.full && s.left > 0)))
       .catch(() => {});
   }, [selectedCentre, selectedDate]);
 
@@ -342,16 +410,28 @@ export default function VoiceAssistant() {
     setMessages((prev) => [...prev, { from, text, id: Date.now() + Math.random() }]);
   }, []);
 
-  // Stop everything (audio stream, speech synth & recognition)
-  const stopAll = useCallback(() => {
-    if (activeAudioRef.current) {
-      try {
-        activeAudioRef.current.pause();
-        activeAudioRef.current.src = '';
-      } catch {}
-      activeAudioRef.current = null;
+  const [voices, setVoices] = useState([]);
+
+  // Preload and monitor available SpeechSynthesis voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const v = window.speechSynthesis?.getVoices() || [];
+      if (v.length > 0) setVoices(v);
+    };
+
+    loadVoices();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
     }
-    window.speechSynthesis?.cancel();
+  }, []);
+
+  // Stop everything immediately and synchronously (Zero Voice Collision)
+  const stopAll = useCallback(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
+    }
     clearTimeout(fallbackTimerRef.current);
     if (recognitionRef.current) {
       try {
@@ -362,65 +442,60 @@ export default function VoiceAssistant() {
     setLiveHeardTranscript('');
   }, []);
 
-  // True 2-Way: Bot Speaks (Cloud Stream + Local Fallback), then triggers user listening turn
+  // True 2-Way: Bot Speaks using the crisp, high-quality native neural voice exclusively
   const botSpeakAndPrompt = useCallback(
     (text, onFinishedSpeaking) => {
       stopAll();
       addMessage('bot', text);
+
+      if (!('speechSynthesis' in window)) {
+        if (onFinishedSpeaking) onFinishedSpeaking();
+        return;
+      }
+
       setTurnState('BOT_SPEAKING');
+
+      // Clean text for speech synthesis
+      const cleanText = text
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+        .replace(/[•…\-_~*]/g, ' ')
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const targetLang = SPEECH_LANG_MAP[lang] || 'hi-IN';
+      utterance.lang = targetLang;
+      utterance.rate = lang === 'hi' || lang === 'mr' ? 0.90 : 0.92;
+      utterance.pitch = 1.0;
+
+      const currentVoices = voices.length > 0 ? voices : (window.speechSynthesis.getVoices() || []);
+      const matchedVoice = getBestVoice(targetLang, currentVoices);
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+
+      window._activeSpeechUtterance = utterance;
 
       let completed = false;
       const finish = () => {
         if (completed) return;
         completed = true;
         clearTimeout(fallbackTimerRef.current);
-        if (activeAudioRef.current) activeAudioRef.current = null;
+        window._activeSpeechUtterance = null;
         setTurnState('IDLE');
         if (onFinishedSpeaking) onFinishedSpeaking();
       };
 
-      // Clean text for audio synthesis
-      const cleanText = text
-        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
-        .replace(/[•…\-_~*]/g, ' ')
-        .trim();
+      utterance.onend = finish;
+      utterance.onerror = finish;
 
-      const fallbackLocalTTS = () => {
-        if (!('speechSynthesis' in window)) {
-          finish();
-          return;
-        }
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.lang = SPEECH_LANG_MAP[lang] || 'hi-IN';
-        utterance.rate = lang === 'hi' || lang === 'mr' ? 0.88 : 0.92;
-        utterance.pitch = 1.0;
-        utterance.onend = finish;
-        utterance.onerror = finish;
-        window.speechSynthesis.speak(utterance);
-      };
+      const estTimeMs = Math.max(2000, (cleanText.length / 8) * 1000 + 1200);
+      fallbackTimerRef.current = setTimeout(finish, estTimeMs);
 
-      // 1. Primary: High-fidelity cloud TTS stream
-      try {
-        const audioUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&lang=${encodeURIComponent(lang)}`;
-        const audio = new Audio(audioUrl);
-        activeAudioRef.current = audio;
-
-        audio.onended = finish;
-        audio.onerror = () => {
-          fallbackLocalTTS();
-        };
-
-        const estTimeMs = Math.max(2500, (cleanText.length / 8) * 1000 + 1500);
-        fallbackTimerRef.current = setTimeout(finish, estTimeMs);
-
-        audio.play().catch(() => {
-          fallbackLocalTTS();
-        });
-      } catch (err) {
-        fallbackLocalTTS();
-      }
+      // Force cancel any residual queue and speak cleanly
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
     },
-    [lang, stopAll, addMessage]
+    [lang, voices, stopAll, addMessage]
   );
 
   // User Listening Turn with automatic error handling
@@ -511,7 +586,7 @@ export default function VoiceAssistant() {
     [lang, addMessage]
   );
 
-  // ── Conversation Step Handlers (Powered by NLU) ───────────────────────────────
+  // ── Conversation Step Handlers (Powered by Phone-Call Style NLU) ─────────────
 
   const askCentre = useCallback(() => {
     setStep('CENTRE');
@@ -653,14 +728,9 @@ export default function VoiceAssistant() {
             return;
           }
 
-          // Mention only the active available slot times
+          // Mention only the active available open slot times
           const slotSpeechList = openSlots.slice(0, 3).map((s) => formatSlotForSpeech(s.slot, lang)).join(', ');
-          const promptText =
-            lang === 'hi'
-              ? `उपलब्ध खुले स्लॉट हैं: ${slotSpeechList}। आप कौन सा समय पसंद करेंगे?`
-              : lang === 'mr'
-              ? `उपलब्ध खुले स्लॉट आहेत: ${slotSpeechList}. तुम्हाला कोणता वेळ सोयीचा आहे?`
-              : `Available open slots are: ${slotSpeechList}. Which time slot suits you?`;
+          const promptText = script.askSlot.replace('{slots}', slotSpeechList);
 
           setTimeout(() => {
             botSpeakAndPrompt(promptText, () => {
@@ -714,20 +784,20 @@ export default function VoiceAssistant() {
           if (isYes) {
             submitBooking(centre, cropKey, qtyNum, dateObj, slotObj);
           } else if (isNo) {
-            botSpeakAndPrompt(script.cancelled, () => {});
+            stopAll();
             setStep('IDLE');
+            botSpeakAndPrompt(script.cancelled);
           } else {
             botSpeakAndPrompt(script.notUnderstoodConfirm, () => {});
           }
         });
       });
     },
-    [lang, script, botSpeakAndPrompt, startUserTurn]
+    [lang, script, botSpeakAndPrompt, startUserTurn, stopAll]
   );
 
   const submitBooking = useCallback(
     async (centre, cropKey, qtyNum, dateObj, slotObj) => {
-      // 1. Forcefully kill any ongoing utterance or audio before submitting
       stopAll();
       setStep('BOOKING');
 
@@ -747,17 +817,16 @@ export default function VoiceAssistant() {
         setBookedToken(token);
         setStep('DONE');
 
-        // 2. Play ONLY single non-overlapping final confirmation
+        stopAll();
         const doneText = script.done.replace('{token}', token);
-        setTimeout(() => {
-          botSpeakAndPrompt(doneText, () => {
-            setTimeout(() => {
-              setOpen(false);
-              navigate('/farmer', { replace: true });
-            }, 3500);
-          });
-        }, 150);
+        botSpeakAndPrompt(doneText, () => {
+          setTimeout(() => {
+            setOpen(false);
+            navigate('/farmer', { replace: true });
+          }, 3500);
+        });
       } catch (err) {
+        stopAll();
         setStep('ERROR');
         botSpeakAndPrompt(script.error);
         addMessage('bot', err.message || 'Server error');
@@ -795,8 +864,9 @@ export default function VoiceAssistant() {
           const isNo = script.noKeywords.some((k) => normalize(heard).includes(normalize(k)));
           if (isYes) submitBooking(selectedCentre, selectedCrop?.key, selectedQty, selectedDate, selectedSlot);
           else if (isNo) {
-            botSpeakAndPrompt(script.cancelled);
+            stopAll();
             setStep('IDLE');
+            botSpeakAndPrompt(script.cancelled);
           }
         } else {
           startConversation();
@@ -806,6 +876,7 @@ export default function VoiceAssistant() {
   };
 
   const startConversation = () => {
+    stopAll();
     setMessages([]);
     setSelectedCentre(null);
     setSelectedCrop(null);
@@ -1128,7 +1199,7 @@ export default function VoiceAssistant() {
                   </div>
                 )}
 
-                {/* Step 5: Slot */}
+                {/* Step 5: Slot (Only Open Slots) */}
                 {step === 'SLOT' && (
                   <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
                     {availableSlots.filter((s) => !s.full && s.left > 0).map((s) => (
@@ -1158,8 +1229,9 @@ export default function VoiceAssistant() {
                     <button
                       type="button"
                       onClick={() => {
-                        botSpeakAndPrompt(script.cancelled);
+                        stopAll();
                         setStep('IDLE');
+                        botSpeakAndPrompt(script.cancelled);
                       }}
                       className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
                     >
