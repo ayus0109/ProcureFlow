@@ -15,6 +15,7 @@ const bookingRoutes = require('./routes/bookings');
 const queueRoutes = require('./routes/queue');
 const paymentRoutes = require('./routes/payments');
 const notificationRoutes = require('./routes/notifications');
+const ttsRoutes = require('./routes/tts');
 const { bookableDates } = require('./services/bookingService');
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/tts', ttsRoutes);
 
 const path = require('path');
 const fs = require('fs');

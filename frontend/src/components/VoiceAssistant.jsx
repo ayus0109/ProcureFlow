@@ -256,8 +256,17 @@ export default function VoiceAssistant() {
     setMessages((prev) => [...prev, { from, text, id: Date.now() + Math.random() }]);
   }, []);
 
-  // Stop everything (speech synth & recognition)
+  const activeAudioRef = useRef(null);
+
+  // Stop everything (audio playback, speech synth & recognition)
   const stopAll = useCallback(() => {
+    if (activeAudioRef.current) {
+      try {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.src = '';
+      } catch {}
+      activeAudioRef.current = null;
+    }
     window.speechSynthesis?.cancel();
     clearTimeout(fallbackTimerRef.current);
     if (recognitionRef.current) {
@@ -271,7 +280,7 @@ export default function VoiceAssistant() {
 
   const [voices, setVoices] = useState([]);
 
-  // Preload and monitor available SpeechSynthesis voices
+  // Preload and monitor available SpeechSynthesis voices for fallback
   useEffect(() => {
     const loadVoices = () => {
       const v = window.speechSynthesis?.getVoices() || [];
@@ -284,50 +293,74 @@ export default function VoiceAssistant() {
     }
   }, []);
 
-  // True 2-Way: Bot Speaks, then triggers user listening turn
+  // True 2-Way: Bot Speaks (Cloud TTS with local fallback), then triggers user listening turn
   const botSpeakAndPrompt = useCallback(
     (text, onFinishedSpeaking) => {
       stopAll();
       addMessage('bot', text);
 
-      if (!('speechSynthesis' in window)) {
-        if (onFinishedSpeaking) onFinishedSpeaking();
-        return;
-      }
-
       setTurnState('BOT_SPEAKING');
-      const utterance = new SpeechSynthesisUtterance(text);
-      const targetLang = SPEECH_LANG_MAP[lang] || 'hi-IN';
-      utterance.lang = targetLang;
-      // Slightly slower rate for rural clarity and perfect Devanagari enunciation
-      utterance.rate = lang === 'hi' || lang === 'mr' ? 0.88 : 0.92;
-      utterance.pitch = 1.0;
-
-      const currentVoices = voices.length > 0 ? voices : (window.speechSynthesis.getVoices() || []);
-      const matchedVoice = getBestVoice(targetLang, currentVoices);
-      if (matchedVoice) {
-        utterance.voice = matchedVoice;
-      }
-
-      window._activeSpeechUtterance = utterance;
 
       let completed = false;
       const finish = () => {
         if (completed) return;
         completed = true;
         clearTimeout(fallbackTimerRef.current);
-        window._activeSpeechUtterance = null;
+        if (activeAudioRef.current) {
+          activeAudioRef.current = null;
+        }
         setTurnState('IDLE');
         if (onFinishedSpeaking) onFinishedSpeaking();
       };
 
-      utterance.onend = finish;
-      utterance.onerror = finish;
+      // Clean text for audio streaming
+      const cleanText = text
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+        .replace(/[•…\-_~*]/g, ' ')
+        .trim();
 
-      const estTimeMs = Math.max(2000, (text.length / 8) * 1000 + 1000);
-      fallbackTimerRef.current = setTimeout(finish, estTimeMs);
+      // Helper for local browser SpeechSynthesis fallback
+      const fallbackLocalTTS = () => {
+        if (!('speechSynthesis' in window)) {
+          finish();
+          return;
+        }
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        const targetLang = SPEECH_LANG_MAP[lang] || 'hi-IN';
+        utterance.lang = targetLang;
+        utterance.rate = lang === 'hi' || lang === 'mr' ? 0.88 : 0.92;
+        utterance.pitch = 1.0;
 
-      window.speechSynthesis.speak(utterance);
+        const currentVoices = voices.length > 0 ? voices : (window.speechSynthesis.getVoices() || []);
+        const matchedVoice = getBestVoice(targetLang, currentVoices);
+        if (matchedVoice) utterance.voice = matchedVoice;
+
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        window.speechSynthesis.speak(utterance);
+      };
+
+      // 1. Primary: High-fidelity cloud Indian TTS stream
+      try {
+        const audioUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&lang=${encodeURIComponent(lang)}`;
+        const audio = new Audio(audioUrl);
+        activeAudioRef.current = audio;
+
+        audio.onended = finish;
+        audio.onerror = () => {
+          fallbackLocalTTS();
+        };
+
+        const estTimeMs = Math.max(2500, (cleanText.length / 8) * 1000 + 1500);
+        fallbackTimerRef.current = setTimeout(finish, estTimeMs);
+
+        audio.play().catch(() => {
+          // If browser auto-play policy blocked Audio playback, fallback to speechSynthesis
+          fallbackLocalTTS();
+        });
+      } catch (err) {
+        fallbackLocalTTS();
+      }
     },
     [lang, voices, stopAll, addMessage]
   );
