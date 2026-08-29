@@ -4,8 +4,10 @@
  * Phone-Call Style 2-Way Interactive Voice & Touch Assistant for Procurement Slot Booking.
  *
  * Key Upgrades:
- * 1. High-Definition Authentic Marathi & Indian Voices: Streams native neural audio via `/api/tts`.
- * 2. Conversational Marathi Scripts: Polite, natural farmer-oriented phrasing.
+ * 1. Comprehensive Marathi & Hindi Vocabulary & Homophone Dictionary:
+ *    - Recognizes all numbers, Devanagari numerals (०-९), and speech recognition misrecognitions (e.g. "आर्ट." => 8, "आठ" => 8, "दोन" => 2).
+ *    - Understands regional conversational dialects, crop names, center aliases, time expressions, and yes/no confirmations.
+ * 2. High-Definition Authentic Marathi & Indian Voices: Streams native neural audio via `/api/tts`.
  * 3. Strict Centre Accepted Crops Validation: Explains centre crop restrictions clearly.
  * 4. Zero Voice Overlap: Audio stops instantly upon interrupt, cancel, or completion.
  * 5. Continuous 2-Way Flow: Mic auto-activates immediately after assistant finishes speaking.
@@ -51,12 +53,12 @@ const SCRIPTS = {
     cancelled: 'Booking has been cancelled. Tap Start anytime to try again.',
     notUnderstoodCentre: "I didn't catch the centre name. Please say Pune, Nashik, Nagpur, Aurangabad, Kolhapur, or tap below.",
     notUnderstoodCrop: "Please choose a crop accepted at this centre, or tap below.",
-    notUnderstoodQty: "Please tell me the quantity in quintals, like 10, 20, or 50 quintals.",
+    notUnderstoodQty: "Please tell me the quantity in quintals, like 8, 10, 20, or 40 quintals.",
     notUnderstoodDate: "Please say Today or Tomorrow.",
     notUnderstoodSlot: "Please choose an available time slot or tap an option below.",
     notUnderstoodConfirm: "Please say YES to confirm or NO to cancel.",
     cropNotAccepted: "{centre} only accepts {accepted}. Please choose one of these crops.",
-    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi', 'kardo', 'kar do', 'ha kardo'],
+    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi', 'kardo', 'kar do', 'ha kardo', 'yes please', 'proceed'],
     noKeywords: ['no', 'nahi', 'nahin', 'cancel', 'stop', 'back', 'wrong', 'dont', "don't", 'mat karo', 'ruko', 'nako'],
   },
   hi: {
@@ -72,13 +74,13 @@ const SCRIPTS = {
     cancelled: 'बुकिंग रद्द कर दी गई है। शुरू करने के लिए कभी भी बटन दबाएं।',
     notUnderstoodCentre: 'कृपया केंद्र का नाम बताएं, जैसे पुणे, नासिक, नागपुर, औरंगाबाद, कोल्हापुर, या नीचे से चुनें।',
     notUnderstoodCrop: 'कृपया इस केंद्र पर उपलब्ध फसल का नाम बताएं, या नीचे से चुनें।',
-    notUnderstoodQty: 'कृपया क्विंटल में मात्रा बताएं, जैसे 10 क्विंटल, 20 क्विंटल या 50 क्विंटल।',
+    notUnderstoodQty: 'कृपया क्विंटल में मात्रा बताएं, जैसे 8, 10, 20 या 40 क्विंटल।',
     notUnderstoodDate: 'कृपया आज या कल बोलें।',
     notUnderstoodSlot: 'कृपया उपलब्ध समय स्लॉट बताएं या नीचे से चुनें।',
     notUnderstoodConfirm: 'कृपया पुष्टि के लिए हाँ बोलें या रद्द करने के लिए नहीं बोलें।',
     cropNotAccepted: '{centre} में केवल {accepted} स्वीकार है। कृपया इनमें से कोई फसल चुनें।',
-    yesKeywords: ['हाँ', 'हां', 'हा', 'yes', 'haan', 'haa', 'ok', 'theek', 'theek hai', 'sahi', 'book', 'kardo', 'kar do', 'pack'],
-    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat', 'nako'],
+    yesKeywords: ['हाँ', 'हां', 'हा', 'yes', 'haan', 'haa', 'ok', 'theek', 'theek hai', 'sahi', 'book', 'kardo', 'kar do', 'pack', 'kijiye', 'kar dijiye'],
+    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat', 'nako', 'roko'],
   },
   mr: {
     askCentre: 'नमस्कार! तुम्हाला कोणत्या खरेदी केंद्रात जायचे आहे? तुम्ही पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगू शकता.',
@@ -93,13 +95,13 @@ const SCRIPTS = {
     cancelled: 'बुकिंग रद्द करण्यात आले आहे. पुन्हा सुरू करण्यासाठी स्टार्ट बटण दाबा.',
     notUnderstoodCentre: 'मला केंद्राचे नाव समजले नाही. कृपया पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगा, किंवा खालील पर्याय निवडा.',
     notUnderstoodCrop: 'कृपया या केंद्रावर उपलब्ध पिकाचे नाव सांगा, किंवा खालील पर्याय निवडा.',
-    notUnderstoodQty: 'कृपया क्विंटलमध्ये प्रमाण सांगा, जसे 10, 20 किंवा 50 क्विंटल.',
+    notUnderstoodQty: 'कृपया क्विंटलमध्ये प्रमाण सांगा, जसे 8, 10, 20 किंवा 40 क्विंटल.',
     notUnderstoodDate: 'कृपया आज किंवा उद्या सांगा.',
     notUnderstoodSlot: 'कृपया उपलब्ध वेळ सांगा किंवा खालील पर्याय निवडा.',
     notUnderstoodConfirm: 'कृपया पुष्टीसाठी होय म्हणा किंवा रद्द करण्यासाठी नाही म्हणा.',
     cropNotAccepted: '{centre} मध्ये फक्त {accepted} स्वीकारले जाते. कृपया उपलब्ध पीक निवडा.',
-    yesKeywords: ['हो', 'होय', 'हाय', 'yes', 'haan', 'ha', 'haa', 'ok', 'okay', 'bar', 'bara', 'barobar', 'nakkich', 'chalel', 'kara', 'karun taka', 'book kara', 'theek', 'theek ahe', 'chaan', 'sahi'],
-    noKeywords: ['नाही', 'नको', 'no', 'nahi', 'nahin', 'cancel', 'thamba', 'chuka', 'naka', 'mat karo', 'ruko'],
+    yesKeywords: ['हो', 'होय', 'हाय', 'yes', 'haan', 'ha', 'haa', 'ok', 'okay', 'bar', 'bara', 'barobar', 'nakkich', 'chalel', 'kara', 'karun taka', 'book kara', 'theek', 'theek ahe', 'chaan', 'sahi', 'हो करा', 'होय करा', 'नक्की करा', 'कन्फर्म'],
+    noKeywords: ['नाही', 'नको', 'no', 'nahi', 'nahin', 'cancel', 'thamba', 'chuka', 'naka', 'mat karo', 'ruko', 'नको करू', 'रद्द करा', 'थांबा'],
   },
 };
 
@@ -112,11 +114,11 @@ const CROP_LABELS = {
 };
 
 const CENTRE_ALIASES = {
-  1: ['pune', 'poona', 'puna', 'पुणे', 'पुना', 'baramati', 'haveli', '1', 'one', 'pehla', 'first', 'एक', 'पहिला', 'पहिले'],
-  2: ['nashik', 'nasik', 'नासिक', 'नाशिक', 'sinnar', 'dindori', 'niphad', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा', 'दूसरे'],
-  3: ['nagpur', 'नागपुर', 'नागपूर', 'vidarbha', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा', 'तीसरे'],
-  4: ['aurangabad', 'sambhajinagar', 'sambhaji', 'औरंगाबाद', 'संभाजीनगर', 'संभाजी', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा', 'चौथे'],
-  5: ['kolhapur', 'कोल्हापुर', 'कोल्हापूर', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा', 'पाचवे'],
+  1: ['pune', 'poona', 'puna', 'पुणे', 'पुना', 'baramati', 'haveli', '1', 'one', 'pehla', 'first', 'एक', 'पहिला', 'पहिले', 'पुणे केंद्र', 'पुणे बाजार समिती', 'पुणे मंडी'],
+  2: ['nashik', 'nasik', 'नासिक', 'नाशिक', 'sinnar', 'dindori', 'niphad', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा', 'दूसरे', 'नाशिक केंद्र', 'नाशिक बाजार समिती', 'नासिक मंडी'],
+  3: ['nagpur', 'नागपुर', 'नागपूर', 'vidarbha', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा', 'तीसरे', 'नागपूर केंद्र', 'नागपूर बाजार समिती', 'नागपुर मंडी'],
+  4: ['aurangabad', 'sambhajinagar', 'sambhaji', 'औरंगाबाद', 'संभाजीनगर', 'संभाजी', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा', 'चौथे', 'छत्रपती संभाजीनगर', 'औरंगाबाद केंद्र', 'औरंगाबाद बाजार समिती'],
+  5: ['kolhapur', 'कोल्हापुर', 'कोल्हापूर', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा', 'पाचवे', 'कोल्हापूर केंद्र', 'कोल्हापूर बाजार समिती', 'कोल्हापुर मंडी'],
 };
 
 const CENTRE_LOCAL_NAMES = {
@@ -128,31 +130,60 @@ const CENTRE_LOCAL_NAMES = {
 };
 
 const CROP_MATCHERS = {
-  WHEAT: ['wheat', 'gehu', 'gehun', 'गेहूं', 'गेहूँ', 'गेहू', 'गहू', 'kanak', '1', 'one', 'pehla', 'first', 'एक', 'पहिला'],
-  PADDY: ['paddy', 'rice', 'dhan', 'chawal', 'धान', 'भात', 'चावल', 'तांदूळ', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा'],
-  COTTON: ['cotton', 'kapas', 'kapaas', 'कपास', 'कापूस', 'रुई', 'rui', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा'],
-  SOYBEAN: ['soybean', 'soya', 'soyabean', 'सोयाबीन', 'सोया', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा'],
-  TUR: ['tur', 'toor', 'arhar', 'तूर', 'अरहर', 'tuvar', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा'],
+  WHEAT: ['wheat', 'gehu', 'gehun', 'गेहूं', 'गेहूँ', 'गेहू', 'गहू', 'गव्हाचे', 'गव्हाची', 'गहू विक्री', 'kanak', '1', 'one', 'pehla', 'first', 'एक', 'पहिला'],
+  PADDY: ['paddy', 'rice', 'dhan', 'chawal', 'धान', 'भात', 'चावल', 'तांदूळ', 'भाताचे', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा'],
+  COTTON: ['cotton', 'kapas', 'kapaas', 'कपास', 'कापूस', 'रुई', 'rui', 'कापसाचे', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा'],
+  SOYBEAN: ['soybean', 'soya', 'soyabean', 'सोयाबीन', 'सोया', 'सोयाबीनचे', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा'],
+  TUR: ['tur', 'toor', 'arhar', 'तूर', 'अरहर', 'tuvar', 'तुरीचे', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा'],
 };
 
-const NUMBER_WORDS = {
-  'aadha': 0.5, 'half': 0.5, 'ek': 1, 'one': 1, 'do': 2, 'two': 2, 'teen': 3, 'three': 3,
-  'char': 4, 'chaar': 4, 'four': 4, 'panch': 5, 'paanch': 5, 'five': 5, 'chhah': 6, 'six': 6,
-  'saat': 7, 'seven': 7, 'aath': 8, 'eight': 8, 'nau': 9, 'nine': 9, 'das': 10, 'ten': 10,
-  'gyarah': 11, 'eleven': 11, 'barah': 12, 'twelve': 12, 'terah': 13, 'thirteen': 13,
-  'chaudah': 14, 'fourteen': 14, 'pandrah': 15, 'fifteen': 15, 'solah': 16, 'sixteen': 16,
-  'satrah': 17, 'seventeen': 17, 'atharah': 18, 'eighteen': 18, 'unnis': 19, 'nineteen': 19,
-  'bees': 20, 'twenty': 20, 'pachhis': 25, 'twenty five': 25, 'tees': 30, 'thirty': 30,
-  'paintis': 35, 'chaalis': 40, 'chalis': 40, 'forty': 40, 'paintalis': 45, 'pachaas': 50,
-  'pachas': 50, 'fifty': 50, 'saath': 60, 'sath': 60, 'sixty': 60, 'sattar': 70, 'seventy': 70,
-  'assi': 80, 'eighty': 80, 'nabbe': 90, 'ninety': 90, 'sau': 100, 'ek sau': 100, 'hundred': 100,
-  'dhai sau': 250, 'do sau': 200,
-  // Marathi numbers
-  'एक': 1, 'दोन': 2, 'तीन': 3, 'चार': 4, 'पाच': 5, 'सहा': 6, 'सात': 7, 'आठ': 8, 'नऊ': 9, 'दहा': 10,
-  'पंधरा': 15, 'वीस': 20, 'पंचवीस': 25, 'तीस': 30, 'चाळीस': 40, 'पन्नास': 50, 'साठ': 60, 'शंभर': 100,
-  // Hindi numbers
-  'दस': 10, 'पंद्रह': 15, 'बीस': 20, 'पच्चीस': 25, 'तीस': 30, 'चालीस': 40, 'पचास': 50, 'सौ': 100, 'दो सौ': 200,
+const DEVANAGARI_DIGITS = {
+  '०': '0', '१': '1', '२': '2', '३': '3', '४': '4',
+  '५': '5', '६': '6', '७': '7', '८': '8', '९': '9',
 };
+
+function convertDevanagariDigits(str) {
+  return (str || '').replace(/[०-९]/g, (d) => DEVANAGARI_DIGITS[d] || d);
+}
+
+// Comprehensive dictionary mapping Marathi/Hindi spoken words, homophones and speech-to-text misrecognitions to numbers
+const NUMBER_MAP = [
+  { words: ['आर्ट.', 'आर्ट', 'art', 'aart', 'आट', 'आथ', 'आठ', 'aath', 'aat', 'ath', 'eight', '८'], val: 8 },
+  { words: ['एक', 'ek', 'eka', 'one', '१'], val: 1 },
+  { words: ['दोन', 'don', 'dohn', 'dawn', 'दो', 'do', 'two', '२'], val: 2 },
+  { words: ['तीन', 'teen', 'tin', 'three', '३'], val: 3 },
+  { words: ['चार', 'char', 'chaar', 'four', '४'], val: 4 },
+  { words: ['पाच', 'paach', 'pach', 'panch', 'paanch', 'पांच', 'five', '५'], val: 5 },
+  { words: ['सहा', 'saha', 'sah', 'chhah', 'che', 'छह', 'six', '६'], val: 6 },
+  { words: ['सात', 'saat', 'sat', 'साथ', 'seven', '७'], val: 7 },
+  { words: ['नऊ', 'nau', 'nav', 'नौ', 'nine', '९'], val: 9 },
+  { words: ['दहा', 'daha', 'das', 'dus', 'दस', 'ten', '१०'], val: 10 },
+  { words: ['अकरा', 'akra', 'gyarah', 'ग्यारह', 'eleven', '११'], val: 11 },
+  { words: ['बारा', 'bara', 'barah', 'बारह', 'twelve', '१२'], val: 12 },
+  { words: ['तेरा', 'tera', 'terah', 'तेरह', 'thirteen', '१३'], val: 13 },
+  { words: ['चौदा', 'chauda', 'chaudah', 'चौदह', 'fourteen', '१४'], val: 14 },
+  { words: ['पंधरा', 'pandra', 'pandhra', 'pandrah', 'पंद्रह', 'fifteen', '१५'], val: 15 },
+  { words: ['सोळा', 'sola', 'solah', 'सोलह', 'sixteen', '१६'], val: 16 },
+  { words: ['सतरा', 'satra', 'satrah', 'सत्रह', 'seventeen', '१७'], val: 17 },
+  { words: ['अठरा', 'athra', 'atharah', 'अठारह', 'eighteen', '१८'], val: 18 },
+  { words: ['एकोणीस', 'ekonis', 'unnis', 'उन्नीस', 'nineteen', '१९'], val: 19 },
+  { words: ['वीस', 'vis', 'vees', 'bees', 'बीस', 'twenty', '२०'], val: 20 },
+  { words: ['पंचवीस', 'panchvis', 'pachhis', 'पच्चीस', 'twenty five', '२५'], val: 25 },
+  { words: ['तीस', 'tis', 'tees', 'thirty', '३०'], val: 30 },
+  { words: ['बत्तीस', 'battis', '32', '३२'], val: 32 },
+  { words: ['पस्तीस', 'pastis', 'paintis', 'पैंतीस', '35', '३५'], val: 35 },
+  { words: ['चाळीस', 'chalis', 'chaalis', 'चालीस', 'forty', '४०'], val: 40 },
+  { words: ['पंचेचाळीस', 'panchechalis', 'paintalis', 'पैंतालीस', '45', '४५'], val: 45 },
+  { words: ['पन्नास', 'pannas', 'pachaas', 'pachas', 'पचास', 'fifty', '५०'], val: 50 },
+  { words: ['साठ', 'sath', 'saath', 'sixty', '६०'], val: 60 },
+  { words: ['सत्तर', 'sattar', 'seventy', '७०'], val: 70 },
+  { words: ['पाऊणशे', 'paunshe', 'panchhattar', 'पचहत्तर', '75', '७५'], val: 75 },
+  { words: ['ऐंशी', 'aishi', 'assi', 'अस्सी', 'eighty', '८०'], val: 80 },
+  { words: ['नव्वद', 'navvad', 'nabbe', 'नब्बे', 'ninety', '९०'], val: 90 },
+  { words: ['शंभर', 'shambhar', 'sau', 'सौ', 'hundred', '१००'], val: 100 },
+  { words: ['दीडशे', 'didshe', 'dedh sau', 'डेढ़ सौ', '150', '१५०'], val: 150 },
+  { words: ['दोनशे', 'donshe', 'do sau', 'दो सौ', '200', '२००'], val: 200 },
+];
 
 function normalize(s) {
   return (s || '').toLowerCase().replace(/[\s\-_,.।!?]/g, '');
@@ -219,18 +250,34 @@ function findMatchingCrop(heard, acceptedCrops) {
 
 function extractQuantity(heard) {
   if (!heard) return null;
-  // 1. Check numbers/digits
-  const digitMatch = heard.match(/[\d.]+/);
+  const raw = heard.trim();
+  const converted = convertDevanagariDigits(raw);
+
+  // 1. Check numbers/digits in text (e.g. '8', '8 quintal', '8.5', '८ क्विंटल', '40 qtl')
+  const digitMatch = converted.match(/[\d.]+/);
   if (digitMatch) {
     const val = parseFloat(digitMatch[0]);
     if (!isNaN(val) && val > 0) return val;
   }
 
-  // 2. Check Hindi/Marathi/English word numbers
-  const lower = heard.toLowerCase().trim();
-  for (const [word, num] of Object.entries(NUMBER_WORDS)) {
-    if (lower.includes(word)) return num;
+  // 2. Check phrase matching in NUMBER_MAP
+  const lower = converted.toLowerCase();
+  const tokens = lower.split(/[\s,]+/);
+
+  for (const item of NUMBER_MAP) {
+    for (const w of item.words) {
+      const cleanW = w.toLowerCase().replace(/[\.]/g, '');
+      const cleanLower = lower.replace(/[\.]/g, '');
+      if (
+        cleanLower === cleanW ||
+        tokens.some((t) => t.replace(/[\.]/g, '') === cleanW) ||
+        cleanLower.includes(cleanW)
+      ) {
+        return item.val;
+      }
+    }
   }
+
   return null;
 }
 
@@ -238,13 +285,13 @@ function findMatchingDate(heard, dates, lang) {
   if (!heard) return null;
   const text = heard.toLowerCase();
 
-  // If user says "tomorrow is okay", "kal chalega", "tomorrow please", "kal kar do", "tomorrow", "udya"
-  if (/\b(tomorrow|kal|udya|second|doosra|dusra|उद्या|कल|दुसरा|उद्या चालेल)\b/i.test(text) && dates[1]) {
+  // If user says "tomorrow is okay", "kal chalega", "tomorrow please", "kal kar do", "tomorrow", "udya", "udya chalel", "उद्या चालेल"
+  if (/\b(tomorrow|kal|udya|second|doosra|dusra|उद्या|कल|दुसरा|उद्या चालेल|उद्या करा|उद्याचा|उद्याची)\b/i.test(text) && dates[1]) {
     return { iso: dates[1], label: lang === 'en' ? 'Tomorrow' : lang === 'hi' ? 'कल' : 'उद्या' };
   }
 
-  // If user says "today is okay", "aaj chalega", "today please", "aaj kar do", "today", "aaj"
-  if (/\b(today|aaj|aj|first|pehla|pahila|आज|पहिला|आज चालेल)\b/i.test(text)) {
+  // If user says "today is okay", "aaj chalega", "today please", "aaj kar do", "today", "aaj", "aaj chalel", "आज चालेल"
+  if (/\b(today|aaj|aj|first|pehla|pahila|आज|पहिला|आज चालेल|आज करा|आजचा|आजची)\b/i.test(text)) {
     return { iso: dates[0], label: lang === 'en' ? 'Today' : 'आज' };
   }
 
@@ -292,10 +339,10 @@ function findMatchingSlot(heard, availableSlots) {
   }
 
   // Relative keywords
-  if (/\b(first|pehla|pahila|पहिला|morning|subah|सकाळी)\b/i.test(text)) {
+  if (/\b(first|pehla|pahila|पहिला|morning|subah|सकाळी|सकाळचा)\b/i.test(text)) {
     return availableSlots[0];
   }
-  if (/\b(last|aakhri|shewat|शेवटचा|evening|shaam|संध्याकाळी)\b/i.test(text)) {
+  if (/\b(last|aakhri|shewat|शेवटचा|evening|shaam|संध्याकाळी|दुपारचा)\b/i.test(text)) {
     return availableSlots[availableSlots.length - 1];
   }
 
