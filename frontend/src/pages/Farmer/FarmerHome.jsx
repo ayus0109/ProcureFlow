@@ -23,7 +23,6 @@ import AppShell from '../../layouts/AppShell.jsx';
 import AlertsPanel from '../../components/AlertsPanel.jsx';
 import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
-import AgriServicesCard from '../../components/AgriServicesCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
 import { PrintableTokenPass } from '../../components/PrintableTokenPass.jsx';
 import { SmsDispatchModal } from '../../components/SmsDispatchModal.jsx';
@@ -343,51 +342,87 @@ export default function FarmerHome() {
 
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
-      {/* Top Quick Actions Bar: History, Bank Account, SMS Logs, e-KYC */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowHistoryModal(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
-          >
-            <History className="h-3.5 w-3.5 text-emerald-700" />
-            <span>All Bookings & History</span>
-          </button>
+      {/* Top Quick Actions Grid: All Bookings, Bank Account & DBT, SMS Log, e-KYC */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <button
+          type="button"
+          onClick={() => setShowHistoryModal(true)}
+          className="flex items-center gap-3.5 rounded-2xl border-2 border-slate-200 bg-white p-4 text-left shadow-xs transition hover:border-emerald-500 hover:shadow-md hover:bg-emerald-50/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800">
+            <History className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-sm font-bold text-slate-900">
+              All Bookings & History
+            </span>
+            <span className="block text-xs text-slate-500 font-medium truncate">
+              Past tokens & receipts
+            </span>
+          </div>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setShowBankModal(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
-          >
-            <CreditCard className="h-3.5 w-3.5 text-emerald-800" />
-            <span>🏦 Bank Account & DBT</span>
-          </button>
+        <button
+          type="button"
+          onClick={() => setShowBankModal(true)}
+          className="flex items-center gap-3.5 rounded-2xl border-2 border-emerald-300 bg-emerald-50/70 p-4 text-left shadow-xs transition hover:border-emerald-600 hover:shadow-md hover:bg-emerald-100/60 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-700 text-white">
+            <CreditCard className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-sm font-extrabold text-emerald-950">
+              Bank Account & DBT
+            </span>
+            <span className="block text-xs text-emerald-800 font-medium truncate">
+              {user.bank_account ? `🏛️ ••••${user.bank_account.slice(-4)}` : 'Link bank for payments'}
+            </span>
+          </div>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setShowSmsModal(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
-          >
-            <Smartphone className="h-3.5 w-3.5 text-blue-700" />
-            <span>SMS & WhatsApp Log</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowSmsModal(true)}
+          className="flex items-center gap-3.5 rounded-2xl border-2 border-slate-200 bg-white p-4 text-left shadow-xs transition hover:border-blue-500 hover:shadow-md hover:bg-blue-50/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-800">
+            <Smartphone className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-sm font-bold text-slate-900">
+              SMS & WhatsApp Alerts
+            </span>
+            <span className="block text-xs text-slate-500 font-medium truncate">
+              Message dispatch logs
+            </span>
+          </div>
+        </button>
 
-        <div>
-          <button
-            type="button"
-            onClick={() => setShowEkycModal(true)}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-2xs border ${
-              user?.ekyc_verified
-                ? 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100'
-                : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100 animate-pulse'
-            }`}
-          >
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-            <span>{user?.ekyc_verified ? '✅ Govt e-KYC Verified' : '⚠️ Complete Aadhaar e-KYC'}</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowEkycModal(true)}
+          className={`flex items-center gap-3.5 rounded-2xl border-2 p-4 text-left shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
+            user?.ekyc_verified
+              ? 'border-emerald-300 bg-emerald-50/60 hover:bg-emerald-100/50 hover:border-emerald-500'
+              : 'border-amber-300 bg-amber-50/70 hover:bg-amber-100/60 hover:border-amber-500 animate-pulse'
+          }`}
+        >
+          <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${
+            user?.ekyc_verified ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'
+          }`}>
+            <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className={`block text-sm font-bold ${
+              user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'
+            }`}>
+              {user?.ekyc_verified ? 'Govt e-KYC Verified' : 'Complete Aadhaar e-KYC'}
+            </span>
+            <span className="block text-xs text-slate-500 font-medium truncate">
+              {user?.ekyc_verified ? 'UIDAI & PM-Kisan Linked' : 'Click to verify Aadhaar'}
+            </span>
+          </div>
+        </button>
       </div>
 
       {loading && <p className="text-sm font-medium text-slate-500 animate-pulse">{t('common.loading')}</p>}
@@ -478,72 +513,91 @@ export default function FarmerHome() {
 
       <SeasonTracker />
 
-      <AgriServicesCard />
-
       {/* Profile summary card with e-KYC, Bank DBT, and PM-Kisan Details */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-            {t('farmer.yourDetails')}
-          </h2>
-          <div className="flex items-center gap-3">
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 className="text-base font-extrabold tracking-tight text-slate-900">
+              {t('farmer.yourDetails')}
+            </h2>
+            <p className="text-xs font-medium text-slate-500 mt-0.5">
+              Registered profile, government Aadhaar & bank records
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowBankModal(true)}
-              className="text-[11px] font-bold text-emerald-700 hover:underline"
+              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
             >
               ⚙️ Manage Bank Account
             </button>
             <button
               type="button"
               onClick={() => setShowEkycModal(true)}
-              className="text-[11px] font-bold text-emerald-700 hover:underline"
+              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
             >
               {user?.ekyc_verified ? 'View e-KYC' : 'Verify e-KYC'}
             </button>
           </div>
         </div>
-        <dl className="mt-2 divide-y divide-slate-100 text-xs">
-          <Row label={t('auth.name')} value={user.name} />
-          <Row label={t('auth.phone')} value={user.phone} />
-          {user.village && <Row label={t('auth.village')} value={user.village} />}
-          <Row
-            label="Aadhaar Number"
-            value={
-              user.aadhaar_no ? (
-                <span className="font-mono font-bold text-emerald-900">{user.aadhaar_no}</span>
+
+        <dl className="mt-4 divide-y divide-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+            <dt className="text-slate-600 font-medium">{t('auth.name')}</dt>
+            <dd className="font-bold text-slate-900">{user.name}</dd>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+            <dt className="text-slate-600 font-medium">{t('auth.phone')}</dt>
+            <dd className="font-mono font-bold text-slate-900">{user.phone}</dd>
+          </div>
+          {user.village && (
+            <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+              <dt className="text-slate-600 font-medium">{t('auth.village')}</dt>
+              <dd className="font-bold text-slate-900">{user.village}</dd>
+            </div>
+          )}
+          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+            <dt className="text-slate-600 font-medium">Aadhaar Number</dt>
+            <dd className="font-bold text-slate-900">
+              {user.aadhaar_no ? (
+                <span className="font-mono text-emerald-950 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                  {user.aadhaar_no}
+                </span>
               ) : (
                 <span className="text-amber-800 font-semibold">Not Linked</span>
-              )
-            }
-          />
-          <Row
-            label="Bank Account (DBT)"
-            value={
-              user.bank_account ? (
-                <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>🏛️ {user.bank_name || 'State Bank of India'}</span>
-                  <span className="font-mono text-emerald-900 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+              )}
+            </dd>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+            <dt className="text-slate-600 font-medium">Bank Account (DBT)</dt>
+            <dd className="font-bold text-slate-900">
+              {user.bank_account ? (
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-slate-900">🏛️ {user.bank_name || 'State Bank of India'}</span>
+                  <span className="font-mono text-emerald-950 font-extrabold bg-emerald-100/80 px-2 py-0.5 rounded-lg border border-emerald-300">
                     ••••{user.bank_account.slice(-4)}
                   </span>
-                  <span className="text-slate-500 text-[10px]">({user.ifsc_code})</span>
+                  <span className="text-slate-500 text-xs font-mono">({user.ifsc_code})</span>
                 </span>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowBankModal(true)}
-                  className="font-bold text-emerald-700 underline"
+                  className="font-bold text-emerald-800 underline hover:text-emerald-950"
                 >
                   + Add Bank Account for DBT Payouts
                 </button>
-              )
-            }
-          />
+              )}
+            </dd>
+          </div>
           {user.pmkisan_id && (
-            <Row
-              label="PM-Kisan Beneficiary ID"
-              value={<span className="font-mono font-bold text-slate-800">{user.pmkisan_id}</span>}
-            />
+            <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
+              <dt className="text-slate-600 font-medium">PM-Kisan Beneficiary ID</dt>
+              <dd className="font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
+                {user.pmkisan_id}
+              </dd>
+            </div>
           )}
         </dl>
       </section>
