@@ -113,6 +113,89 @@ function normalize(s) {
   return (s || '').toLowerCase().replace(/[\s\-_,.।!?]/g, '');
 }
 
+const CENTRE_LOCAL_NAMES = {
+  1: { en: 'Pune Procurement Center', hi: 'पुणे खरीद केंद्र (मंडी)', mr: 'पुणे खरेदी केंद्र (बाजार समिती)' },
+  2: { en: 'Nashik Procurement Center', hi: 'नासिक खरीद केंद्र (मंडी)', mr: 'नाशिक खरेदी केंद्र (बाजार समिती)' },
+  3: { en: 'Nagpur Procurement Center', hi: 'नागपुर खरीद केंद्र (मंडी)', mr: 'नागपूर खरेदी केंद्र (बाजार समिती)' },
+  4: { en: 'Aurangabad Procurement Center', hi: 'औरंगाबाद खरीद केंद्र (मंडी)', mr: 'औरंगाबाद खरेदी केंद्र (बाजार समिती)' },
+  5: { en: 'Kolhapur Procurement Center', hi: 'कोल्हापुर खरीद केंद्र (मंडी)', mr: 'कोल्हापूर खरेदी केंद्र (बाजार समिती)' },
+};
+
+function getCentreSpeechName(centre, lang) {
+  if (!centre) return '';
+  return CENTRE_LOCAL_NAMES[centre.id]?.[lang] || centre.name;
+}
+
+function formatSlotForSpeech(slotTime, lang) {
+  if (!slotTime) return '';
+  const parts = slotTime.split('-');
+  const startHour = parseInt(parts[0].split(':')[0], 10);
+  const endHour = parts[1] ? parseInt(parts[1].split(':')[0], 10) : startHour + 1;
+
+  if (lang === 'hi') {
+    const period = startHour < 12 ? 'सुबह' : 'दोपहर';
+    const s = startHour > 12 ? startHour - 12 : startHour;
+    const e = endHour > 12 ? endHour - 12 : endHour;
+    return `${period} ${s} से ${e} बजे`;
+  }
+  if (lang === 'mr') {
+    const period = startHour < 12 ? 'सकाळी' : 'दुपारी';
+    const s = startHour > 12 ? startHour - 12 : startHour;
+    const e = endHour > 12 ? endHour - 12 : endHour;
+    return `${period} ${s} ते ${e} वाजता`;
+  }
+  return slotTime;
+}
+
+function getBestVoice(targetLang, voices) {
+  if (!voices || voices.length === 0) return null;
+  const tLang = targetLang.toLowerCase();
+  const prefix = tLang.split('-')[0];
+
+  // 1. Prioritize natural neural / regional voices for Hindi & Marathi
+  if (prefix === 'hi') {
+    const hi = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('hi') ||
+        /hindi|swara|kalpana|hemant|madhur|google.*हिन्दी/i.test(v.name)
+    );
+    if (hi) return hi;
+  }
+
+  if (prefix === 'mr') {
+    const mr = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('mr') ||
+        /marathi|aarohi|manhar|google.*मराठी/i.test(v.name)
+    );
+    if (mr) return mr;
+
+    // Fallback Marathi to Hindi voice (Devanagari script matches natively)
+    const hiFallback = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith('hi') ||
+        /hindi|swara|kalpana|hemant/i.test(v.name)
+    );
+    if (hiFallback) return hiFallback;
+  }
+
+  // 2. Exact match
+  const exact = voices.find(
+    (v) => v.lang.toLowerCase() === tLang || v.lang.toLowerCase().replace('_', '-') === tLang
+  );
+  if (exact) return exact;
+
+  // 3. Prefix match
+  const pMatch = voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
+  if (pMatch) return pMatch;
+
+  // 4. Any Indian voice
+  const inVoice = voices.find((v) => v.lang.toLowerCase().includes('in'));
+  if (inVoice) return inVoice;
+
+  return voices[0] || null;
+}
+
 export default function VoiceAssistant() {
   const { lang, t } = useLanguage();
   const navigate = useNavigate();
@@ -186,6 +269,21 @@ export default function VoiceAssistant() {
     setLiveHeardTranscript('');
   }, []);
 
+  const [voices, setVoices] = useState([]);
+
+  // Preload and monitor available SpeechSynthesis voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const v = window.speechSynthesis?.getVoices() || [];
+      if (v.length > 0) setVoices(v);
+    };
+
+    loadVoices();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
   // True 2-Way: Bot Speaks, then triggers user listening turn
   const botSpeakAndPrompt = useCallback(
     (text, onFinishedSpeaking) => {
@@ -201,14 +299,15 @@ export default function VoiceAssistant() {
       const utterance = new SpeechSynthesisUtterance(text);
       const targetLang = SPEECH_LANG_MAP[lang] || 'hi-IN';
       utterance.lang = targetLang;
-      utterance.rate = 0.95;
+      // Slightly slower rate for rural clarity and perfect Devanagari enunciation
+      utterance.rate = lang === 'hi' || lang === 'mr' ? 0.88 : 0.92;
       utterance.pitch = 1.0;
 
-      const voices = window.speechSynthesis.getVoices() || [];
-      const matchVoice = voices.find(
-        (v) => v.lang === targetLang || v.lang.startsWith(targetLang.split('-')[0])
-      );
-      if (matchVoice) utterance.voice = matchVoice;
+      const currentVoices = voices.length > 0 ? voices : (window.speechSynthesis.getVoices() || []);
+      const matchedVoice = getBestVoice(targetLang, currentVoices);
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
 
       window._activeSpeechUtterance = utterance;
 
@@ -225,12 +324,12 @@ export default function VoiceAssistant() {
       utterance.onend = finish;
       utterance.onerror = finish;
 
-      const estTimeMs = Math.max(1500, (text.length / 10) * 1000 + 1000);
+      const estTimeMs = Math.max(2000, (text.length / 8) * 1000 + 1000);
       fallbackTimerRef.current = setTimeout(finish, estTimeMs);
 
       window.speechSynthesis.speak(utterance);
     },
-    [lang, stopAll, addMessage]
+    [lang, voices, stopAll, addMessage]
   );
 
   const [micError, setMicError] = useState('');
@@ -506,13 +605,15 @@ export default function VoiceAssistant() {
   const askConfirm = useCallback(
     (centre, cropKey, qtyNum, dateObj, slotObj) => {
       setStep('CONFIRM');
+      const centreSpeech = getCentreSpeechName(centre, lang);
       const cropLabel = CROP_LABELS[cropKey]?.[lang] || cropKey;
+      const slotSpeech = formatSlotForSpeech(slotObj.slot, lang);
       const confirmText = script.confirm
-        .replace('{centre}', centre.name)
+        .replace('{centre}', centreSpeech)
         .replace('{crop}', cropLabel)
         .replace('{qty}', qtyNum)
         .replace('{date}', dateObj.label)
-        .replace('{slot}', slotObj.slot);
+        .replace('{slot}', slotSpeech);
 
       botSpeakAndPrompt(confirmText, () => {
         startUserTurn((heard) => {
