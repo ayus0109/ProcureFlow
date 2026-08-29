@@ -21,6 +21,7 @@ import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
 import QRCode from '../../components/QRCode.jsx';
 import AgriServicesCard from '../../components/AgriServicesCard.jsx';
+import VoiceAssistant from '../../components/VoiceAssistant.jsx';
 import { api } from '../../services/api';
 import { money } from '../../utils/money.js';
 import { usePoll } from '../../hooks/usePoll.js';
@@ -383,6 +384,9 @@ export default function FarmerHome() {
           {user.village && <Row label={t('auth.village')} value={user.village} />}
         </dl>
       </section>
+
+      {/* AI Voice Booking Assistant — floating over page */}
+      <VoiceAssistant />
     </AppShell>
   );
 }
