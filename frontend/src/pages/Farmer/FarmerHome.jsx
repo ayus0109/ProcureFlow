@@ -12,17 +12,21 @@ import {
   Wheat,
   Scale,
   CreditCard,
-  Share2,
   History,
   Smartphone,
   ShieldCheck,
+  Building2,
+  User,
+  Phone,
   FileCheck2,
+  ChevronRight,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppShell from '../../layouts/AppShell.jsx';
 import AlertsPanel from '../../components/AlertsPanel.jsx';
 import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
+import KisanHelplineCard from '../../components/KisanHelplineCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
 import { PrintableTokenPass } from '../../components/PrintableTokenPass.jsx';
 import { SmsDispatchModal } from '../../components/SmsDispatchModal.jsx';
@@ -53,26 +57,31 @@ const PAYMENT_STYLES = {
   PAID: 'bg-emerald-100 text-emerald-900 ring-emerald-300 font-bold',
 };
 
-function Row({ label, value, highlight = false }) {
+function DetailRow({ label, value, highlight = false, icon: Icon }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 py-2 text-sm">
-      <dt className="text-slate-500 font-medium">{label}</dt>
-      <dd className={`font-semibold ${highlight ? 'text-emerald-900 font-bold' : 'text-slate-900'}`}>{value}</dd>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-1 border-b border-slate-100 last:border-0 text-sm">
+      <dt className="text-slate-500 font-semibold flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4 text-slate-400 shrink-0" />}
+        <span>{label}</span>
+      </dt>
+      <dd className={`text-base font-bold ${highlight ? 'text-emerald-900' : 'text-slate-900'}`}>
+        {value}
+      </dd>
     </div>
   );
 }
 
 function Stat({ label, value, sub, icon: Icon, color = 'emerald' }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-${color}-50 to-white p-3.5 text-center ring-1 ring-${color}-200/80 shadow-xs`}>
-      <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-        {Icon && <Icon className="h-3.5 w-3.5 text-emerald-700" />}
+    <div className="relative overflow-hidden rounded-2xl bg-slate-50 p-4 text-center border border-slate-200/80 shadow-2xs">
+      <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider">
+        {Icon && <Icon className="h-4 w-4 text-emerald-700" />}
         <span>{label}</span>
       </div>
-      <p className="mt-1 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl tabular-nums">
+      <p className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl tabular-nums">
         {value}
       </p>
-      {sub && <p className="mt-0.5 text-[10px] font-medium text-slate-500">{sub}</p>}
+      {sub && <p className="mt-1 text-xs font-medium text-slate-500">{sub}</p>}
     </div>
   );
 }
@@ -86,92 +95,115 @@ function adjustment(factor) {
 function Receipt({ p, t }) {
   if (!p.accepted) {
     return (
-      <div className="mt-4 rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-4 shadow-sm">
+      <div className="mt-4 rounded-3xl border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-5 shadow-sm">
         <div className="flex items-center gap-2 text-rose-900">
-          <AlertTriangle className="h-5 w-5 text-rose-600 shrink-0" />
-          <p className="text-sm font-bold">{t('receipt.notAcceptedTitle')}</p>
+          <AlertTriangle className="h-6 w-6 text-rose-600 shrink-0" />
+          <p className="text-base font-bold">{t('receipt.notAcceptedTitle')}</p>
         </div>
-        <p className="mt-1.5 text-xs text-rose-800 bg-white/80 p-2.5 rounded-lg border border-rose-200">
+        <p className="mt-2 text-sm text-rose-800 bg-white/80 p-3 rounded-xl border border-rose-200">
           <strong>Reason:</strong> {p.remarks}
         </p>
-        <dl className="mt-3 divide-y divide-rose-100 text-xs">
-          <Row label={t('receipt.grade')} value={p.quality_grade} />
-          <Row label={t('receipt.moisture')} value={`${p.moisture_pct}%`} />
+        <dl className="mt-4 divide-y divide-rose-100 text-sm">
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-600 font-medium">{t('receipt.grade')}</dt>
+            <dd className="font-bold text-slate-900">{p.quality_grade}</dd>
+          </div>
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-600 font-medium">{t('receipt.moisture')}</dt>
+            <dd className="font-bold text-slate-900">{p.moisture_pct}%</dd>
+          </div>
         </dl>
       </div>
     );
   }
 
   return (
-    <div className="mt-5 overflow-hidden rounded-2xl border-2 border-emerald-600/30 bg-gradient-to-b from-emerald-50/80 to-white shadow-md">
+    <div className="mt-5 overflow-hidden rounded-3xl border-2 border-emerald-600/30 bg-gradient-to-b from-emerald-50/80 to-white shadow-md">
       {/* Receipt Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 to-teal-800 px-4 py-3 text-white">
+      <div className="bg-gradient-to-r from-emerald-800 to-teal-800 px-5 py-4 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-emerald-300" />
-            <span className="text-xs font-bold uppercase tracking-wider">
+            <span className="text-sm font-bold uppercase tracking-wider">
               Official Digital Procurement Receipt
             </span>
           </div>
-          <span className="font-mono text-xs text-emerald-200 bg-emerald-950/60 px-2 py-0.5 rounded">
+          <span className="font-mono text-xs font-bold text-emerald-200 bg-emerald-950/60 px-2.5 py-1 rounded-lg">
             {p.txn_ref}
           </span>
         </div>
       </div>
 
-      <div className="p-4 sm:p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-emerald-100 pb-3">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-emerald-100 pb-4">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
               {t('receipt.amount')}
             </p>
-            <p className="text-3xl font-extrabold tracking-tight text-emerald-950">
+            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-950">
               {money(p.total_amount)}
             </p>
-            <p className="mt-0.5 text-xs font-medium text-emerald-700">{t('receipt.doneSub')}</p>
+            <p className="mt-1 text-sm font-semibold text-emerald-700">{t('receipt.doneSub')}</p>
           </div>
           <div className="text-right">
-            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ring-1 ${PAYMENT_STYLES[p.payment_status]}`}>
+            <span className={`inline-flex rounded-full px-3.5 py-1.5 text-xs font-extrabold ring-1 ${PAYMENT_STYLES[p.payment_status]}`}>
               {t(`payment.${p.payment_status}`)}
             </span>
           </div>
         </div>
 
-        <dl className="mt-3 divide-y divide-slate-100">
-          <Row label={t('receipt.grade')} value={<span className="rounded bg-emerald-100 px-2 py-0.5 font-bold text-emerald-900">{p.quality_grade}</span>} />
-          <Row label={t('receipt.moisture')} value={`${p.moisture_pct}%`} />
-          <Row label={t('receipt.weight')} value={`${p.final_weight_qtl} ${t('booking.qtl')}`} />
+        <dl className="mt-4 divide-y divide-slate-100 text-sm">
+          <div className="flex justify-between py-2.5">
+            <dt className="text-slate-600 font-medium">{t('receipt.grade')}</dt>
+            <dd className="rounded-md bg-emerald-100 px-2.5 py-0.5 font-bold text-emerald-900">{p.quality_grade}</dd>
+          </div>
+          <div className="flex justify-between py-2.5">
+            <dt className="text-slate-600 font-medium">{t('receipt.moisture')}</dt>
+            <dd className="font-bold text-slate-900">{p.moisture_pct}%</dd>
+          </div>
+          <div className="flex justify-between py-2.5">
+            <dt className="text-slate-600 font-medium">{t('receipt.weight')}</dt>
+            <dd className="font-bold text-slate-900">{p.final_weight_qtl} {t('booking.qtl')}</dd>
+          </div>
           {p.gradeFactor !== 1 && p.baseRatePerQtl && (
             <>
-              <Row label={t('receipt.baseRate')} value={`${money(p.baseRatePerQtl)} / ${t('booking.qtl')}`} />
-              <Row
-                label={t('receipt.gradeAdj')}
-                value={
-                  <span className={`font-bold ${p.gradeFactor > 1 ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    {adjustment(p.gradeFactor)} ({p.gradeFactor > 1 ? 'Quality Bonus' : 'Deduction'})
-                  </span>
-                }
-              />
+              <div className="flex justify-between py-2.5">
+                <dt className="text-slate-600 font-medium">{t('receipt.baseRate')}</dt>
+                <dd className="font-bold text-slate-900">{money(p.baseRatePerQtl)} / {t('booking.qtl')}</dd>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <dt className="text-slate-600 font-medium">{t('receipt.gradeAdj')}</dt>
+                <dd className={`font-bold ${p.gradeFactor > 1 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  {adjustment(p.gradeFactor)} ({p.gradeFactor > 1 ? 'Quality Bonus' : 'Deduction'})
+                </dd>
+              </div>
             </>
           )}
-          <Row label={t('receipt.rate')} value={`${money(p.rate_per_qtl)} / ${t('booking.qtl')}`} highlight />
+          <div className="flex justify-between py-2.5">
+            <dt className="text-slate-600 font-medium">{t('receipt.rate')}</dt>
+            <dd className="font-extrabold text-emerald-900 text-base">{money(p.rate_per_qtl)} / {t('booking.qtl')}</dd>
+          </div>
           {p.credited_bank && (
-            <Row
-              label="Govt DBT Bank"
-              value={
-                <span className="font-bold text-emerald-950 flex items-center gap-1">
-                  🏛️ {p.credited_bank} ({p.credited_account || '••••4821'})
-                </span>
-              }
-            />
+            <div className="flex justify-between py-2.5">
+              <dt className="text-slate-600 font-medium">Govt DBT Bank</dt>
+              <dd className="font-bold text-emerald-950 flex items-center gap-1.5">
+                <span>🏛️ {p.credited_bank}</span>
+                <span className="font-mono text-xs text-slate-600">({p.credited_account || '••••4821'})</span>
+              </dd>
+            </div>
           )}
           {p.pfms_utr ? (
-            <Row
-              label="PFMS Govt UTR"
-              value={<span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100/70 px-2 py-0.5 rounded">{p.pfms_utr}</span>}
-            />
+            <div className="flex justify-between py-2.5">
+              <dt className="text-slate-600 font-medium">PFMS Govt UTR</dt>
+              <dd className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                {p.pfms_utr}
+              </dd>
+            </div>
           ) : (
-            <Row label={t('receipt.txn')} value={<span className="font-mono text-xs font-bold text-slate-800">{p.txn_ref}</span>} />
+            <div className="flex justify-between py-2.5">
+              <dt className="text-slate-600 font-medium">{t('receipt.txn')}</dt>
+              <dd className="font-mono text-xs font-bold text-slate-800">{p.txn_ref}</dd>
+            </div>
           )}
         </dl>
       </div>
@@ -193,10 +225,10 @@ function BookingCard({ booking, t, onOpenPass }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+              <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
                 {t('booking.token')}
               </p>
-              <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800">
+              <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
                 Digital Gate Pass
               </span>
             </div>
@@ -213,9 +245,9 @@ function BookingCard({ booking, t, onOpenPass }) {
           <button
             type="button"
             onClick={onOpenPass}
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
           >
-            <Printer className="h-3.5 w-3.5 text-emerald-700" />
+            <Printer className="h-4 w-4 text-emerald-700" />
             <span>Print Mandi Pass (PDF)</span>
           </button>
         </div>
@@ -251,12 +283,24 @@ function BookingCard({ booking, t, onOpenPass }) {
       )}
 
       {/* Booking Particulars */}
-      <div className="mt-4 rounded-2xl bg-slate-50/70 p-4 ring-1 ring-slate-200/60">
-        <dl className="divide-y divide-slate-200/60 text-xs">
-          <Row label={t('booking.centre')} value={booking.centre_name} />
-          <Row label={t('booking.crop')} value={t(`crop.${booking.crop}`)} />
-          <Row label={t('booking.quantity')} value={`${booking.quantity_qtl} ${t('booking.qtl')}`} />
-          <Row label={t('booking.when')} value={`${booking.slot_date} · ${booking.slot_time}`} />
+      <div className="mt-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60">
+        <dl className="divide-y divide-slate-200/60 text-sm">
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-500 font-medium">{t('booking.centre')}</dt>
+            <dd className="font-bold text-slate-900">{booking.centre_name}</dd>
+          </div>
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-500 font-medium">{t('booking.crop')}</dt>
+            <dd className="font-bold text-slate-900">{t(`crop.${booking.crop}`)}</dd>
+          </div>
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-500 font-medium">{t('booking.quantity')}</dt>
+            <dd className="font-bold text-slate-900">{booking.quantity_qtl} {t('booking.qtl')}</dd>
+          </div>
+          <div className="flex justify-between py-2">
+            <dt className="text-slate-500 font-medium">{t('booking.when')}</dt>
+            <dd className="font-bold text-slate-900">{booking.slot_date} · {booking.slot_time}</dd>
+          </div>
         </dl>
       </div>
 
@@ -283,15 +327,15 @@ function EmptyState({ t }) {
       <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-700/20 ring-4 ring-emerald-100">
         <CalendarPlus className="h-8 w-8" aria-hidden="true" />
       </div>
-      <h2 className="mt-4 text-lg font-bold text-slate-900">{t('farmer.noSlotTitle')}</h2>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600 leading-relaxed">
+      <h2 className="mt-4 text-xl font-extrabold text-slate-900">{t('farmer.noSlotTitle')}</h2>
+      <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600 leading-relaxed font-medium">
         {t('farmer.noSlotSub')}
       </p>
       <Link
         to="/farmer/book"
         className="mt-6 inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-7 text-base font-bold text-white shadow-md shadow-emerald-800/20 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
       >
-        <Sparkles className="h-4 w-4" />
+        <Sparkles className="h-5 w-5" />
         {t('farmer.bookSlot')}
       </Link>
     </section>
@@ -342,86 +386,92 @@ export default function FarmerHome() {
 
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
-      {/* Top Quick Actions Grid: All Bookings, Bank Account & DBT, SMS Log, e-KYC */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* 🚀 ENLARGED Quick Actions Grid: All Bookings, Bank Account & DBT, SMS Log, e-KYC */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 1. All Bookings & History */}
         <button
           type="button"
           onClick={() => setShowHistoryModal(true)}
-          className="flex items-center gap-3.5 rounded-2xl border-2 border-slate-200 bg-white p-4 text-left shadow-xs transition hover:border-emerald-500 hover:shadow-md hover:bg-emerald-50/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+          className="flex items-center gap-3.5 rounded-3xl border-2 border-slate-200/80 bg-white p-4 text-left shadow-xs transition hover:border-emerald-500 hover:bg-emerald-50/40 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800">
-            <History className="h-6 w-6" aria-hidden="true" />
-          </span>
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 group-hover:scale-105 transition">
+            <History className="h-6 w-6" />
+          </div>
           <div className="min-w-0 flex-1">
-            <span className="block text-sm font-bold text-slate-900">
+            <span className="block text-sm font-extrabold text-slate-900 group-hover:text-emerald-950">
               All Bookings & History
             </span>
-            <span className="block text-xs text-slate-500 font-medium truncate">
-              Past tokens & receipts
+            <span className="block text-xs font-medium text-slate-500 truncate">
+              Tokens & digital receipts
             </span>
           </div>
+          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-emerald-600 transition" />
         </button>
 
+        {/* 2. Bank Account & DBT */}
         <button
           type="button"
           onClick={() => setShowBankModal(true)}
-          className="flex items-center gap-3.5 rounded-2xl border-2 border-emerald-300 bg-emerald-50/70 p-4 text-left shadow-xs transition hover:border-emerald-600 hover:shadow-md hover:bg-emerald-100/60 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+          className="flex items-center gap-3.5 rounded-3xl border-2 border-emerald-300/80 bg-emerald-50/60 p-4 text-left shadow-xs transition hover:border-emerald-600 hover:bg-emerald-100/60 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-700 text-white">
-            <CreditCard className="h-6 w-6" aria-hidden="true" />
-          </span>
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-700 text-white shadow-xs group-hover:scale-105 transition">
+            <CreditCard className="h-6 w-6" />
+          </div>
           <div className="min-w-0 flex-1">
             <span className="block text-sm font-extrabold text-emerald-950">
               Bank Account & DBT
             </span>
-            <span className="block text-xs text-emerald-800 font-medium truncate">
-              {user.bank_account ? `🏛️ ••••${user.bank_account.slice(-4)}` : 'Link bank for payments'}
+            <span className="block text-xs font-medium text-emerald-800 truncate">
+              {user?.bank_account ? `🏛️ ${user.bank_name || 'Bank linked'}` : '⚠️ Add bank details'}
             </span>
           </div>
+          <ChevronRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-0.5 transition" />
         </button>
 
+        {/* 3. SMS & WhatsApp Dispatch Log */}
         <button
           type="button"
           onClick={() => setShowSmsModal(true)}
-          className="flex items-center gap-3.5 rounded-2xl border-2 border-slate-200 bg-white p-4 text-left shadow-xs transition hover:border-blue-500 hover:shadow-md hover:bg-blue-50/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+          className="flex items-center gap-3.5 rounded-3xl border-2 border-slate-200/80 bg-white p-4 text-left shadow-xs transition hover:border-blue-500 hover:bg-blue-50/40 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 group"
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-800">
-            <Smartphone className="h-6 w-6" aria-hidden="true" />
-          </span>
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-100 text-blue-800 group-hover:scale-105 transition">
+            <Smartphone className="h-6 w-6" />
+          </div>
           <div className="min-w-0 flex-1">
-            <span className="block text-sm font-bold text-slate-900">
-              SMS & WhatsApp Alerts
+            <span className="block text-sm font-extrabold text-slate-900 group-hover:text-blue-950">
+              SMS & WhatsApp Log
             </span>
-            <span className="block text-xs text-slate-500 font-medium truncate">
-              Message dispatch logs
+            <span className="block text-xs font-medium text-slate-500 truncate">
+              Live token & alert dispatches
             </span>
           </div>
+          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-blue-600 transition" />
         </button>
 
+        {/* 4. Government e-KYC Verified */}
         <button
           type="button"
           onClick={() => setShowEkycModal(true)}
-          className={`flex items-center gap-3.5 rounded-2xl border-2 p-4 text-left shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
+          className={`flex items-center gap-3.5 rounded-3xl border-2 p-4 text-left shadow-xs transition hover:shadow-md focus:outline-none focus-visible:ring-4 group ${
             user?.ekyc_verified
-              ? 'border-emerald-300 bg-emerald-50/60 hover:bg-emerald-100/50 hover:border-emerald-500'
-              : 'border-amber-300 bg-amber-50/70 hover:bg-amber-100/60 hover:border-amber-500 animate-pulse'
+              ? 'border-emerald-300/80 bg-emerald-50/40 hover:border-emerald-500 hover:bg-emerald-100/50 focus-visible:ring-emerald-200'
+              : 'border-amber-300/80 bg-amber-50/50 hover:border-amber-500 hover:bg-amber-100/60 focus-visible:ring-amber-200 animate-pulse'
           }`}
         >
-          <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${
-            user?.ekyc_verified ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'
+          <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white shadow-xs group-hover:scale-105 transition ${
+            user?.ekyc_verified ? 'bg-emerald-600' : 'bg-amber-500'
           }`}>
-            <ShieldCheck className="h-6 w-6" aria-hidden="true" />
-          </span>
+            <ShieldCheck className="h-6 w-6" />
+          </div>
           <div className="min-w-0 flex-1">
-            <span className={`block text-sm font-bold ${
-              user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'
-            }`}>
+            <span className={`block text-sm font-extrabold ${user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'}`}>
               {user?.ekyc_verified ? 'Govt e-KYC Verified' : 'Complete Aadhaar e-KYC'}
             </span>
-            <span className="block text-xs text-slate-500 font-medium truncate">
-              {user?.ekyc_verified ? 'UIDAI & PM-Kisan Linked' : 'Click to verify Aadhaar'}
+            <span className="block text-xs font-medium text-slate-500 truncate">
+              {user?.ekyc_verified ? 'UIDAI authenticated' : 'Tap to complete verification'}
             </span>
           </div>
+          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 transition" />
         </button>
       </div>
 
@@ -435,26 +485,26 @@ export default function FarmerHome() {
 
       {/* Multi-Slot Switcher Tabs (when farmer holds multiple bookings) */}
       {allBookings.length > 1 && (
-        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-1.5">
-          <div className="flex gap-1.5 overflow-x-auto">
+        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-2">
+          <div className="flex gap-2 overflow-x-auto">
             {allBookings.map((b, idx) => (
               <button
                 key={b.id}
                 type="button"
                 onClick={() => setSelectedSlotIdx(idx)}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold transition ${
                   selectedSlotIdx === idx
                     ? 'bg-emerald-700 text-white shadow-xs'
                     : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                 }`}
               >
                 <span className="font-mono">{b.token}</span>
-                <span className="text-[10px] opacity-80">({t(`crop.${b.crop}`)})</span>
+                <span className="text-xs font-medium opacity-85">({t(`crop.${b.crop}`)})</span>
               </button>
             ))}
           </div>
 
-          <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 shrink-0">
+          <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800 shrink-0">
             {activeCount}/3 Slots
           </span>
         </div>
@@ -492,20 +542,20 @@ export default function FarmerHome() {
       {currentBooking && activeCount < 3 && (
         <Link
           to="/farmer/book"
-          className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100/70"
+          className="flex min-h-13 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-sm font-extrabold text-emerald-900 transition hover:bg-emerald-100/70"
         >
-          <CalendarPlus className="h-4 w-4 text-emerald-700" />
+          <CalendarPlus className="h-5 w-5 text-emerald-700" />
           <span>+ Book Another Slot ({activeCount}/3 slots active)</span>
         </Link>
       )}
 
       {currentBooking && !currentBooking.procurement && (
-        <div className="flex items-center justify-between px-2 text-xs font-medium text-slate-500">
+        <div className="flex items-center justify-between px-2 text-xs font-semibold text-slate-500">
           <span className="flex items-center gap-1.5">
-            <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin" aria-hidden="true" />
+            <RefreshCw className="h-4 w-4 text-emerald-600 animate-spin" aria-hidden="true" />
             <span className="text-emerald-800 font-bold">⚡ Live Instant Sync</span>
           </span>
-          <span className="text-[11px] text-slate-400">Server-Sent Events Active</span>
+          <span className="text-xs text-slate-400">Server-Sent Events Active</span>
         </div>
       )}
 
@@ -513,91 +563,102 @@ export default function FarmerHome() {
 
       <SeasonTracker />
 
-      {/* Profile summary card with e-KYC, Bank DBT, and PM-Kisan Details */}
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
-          <div>
-            <h2 className="text-base font-extrabold tracking-tight text-slate-900">
-              {t('farmer.yourDetails')}
-            </h2>
-            <p className="text-xs font-medium text-slate-500 mt-0.5">
-              Registered profile, government Aadhaar & bank records
-            </p>
+      {/* Dedicated Kisan Helpline & Support Card (No weather or mandi comparison) */}
+      <KisanHelplineCard />
+
+      {/* 👤 ENLARGED Farmer Profile Summary with Simple, Clear Typography */}
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-800">
+              <User className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+                {t('farmer.yourDetails') || 'Your Registered Farmer Profile'}
+              </h2>
+              <p className="text-xs font-medium text-slate-500">
+                Authenticated government beneficiary records
+              </p>
+            </div>
           </div>
+
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowBankModal(true)}
-              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
+              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition shadow-2xs"
             >
-              ⚙️ Manage Bank Account
+              ⚙️ Manage Bank Details
             </button>
             <button
               type="button"
               onClick={() => setShowEkycModal(true)}
-              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
+              className="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
             >
               {user?.ekyc_verified ? 'View e-KYC' : 'Verify e-KYC'}
             </button>
           </div>
         </div>
 
-        <dl className="mt-4 divide-y divide-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-            <dt className="text-slate-600 font-medium">{t('auth.name')}</dt>
-            <dd className="font-bold text-slate-900">{user.name}</dd>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-            <dt className="text-slate-600 font-medium">{t('auth.phone')}</dt>
-            <dd className="font-mono font-bold text-slate-900">{user.phone}</dd>
-          </div>
+        <dl className="mt-2 divide-y divide-slate-100">
+          <DetailRow label={t('auth.name')} value={user.name} icon={User} />
+          <DetailRow label={t('auth.phone')} value={user.phone} icon={Phone} />
           {user.village && (
-            <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-              <dt className="text-slate-600 font-medium">{t('auth.village')}</dt>
-              <dd className="font-bold text-slate-900">{user.village}</dd>
-            </div>
+            <DetailRow label={t('auth.village')} value={`${user.village} (Maharashtra)`} icon={MapPin} />
           )}
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-            <dt className="text-slate-600 font-medium">Aadhaar Number</dt>
-            <dd className="font-bold text-slate-900">
-              {user.aadhaar_no ? (
-                <span className="font-mono text-emerald-950 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                  {user.aadhaar_no}
+          <DetailRow
+            label="Aadhaar Verification"
+            icon={ShieldCheck}
+            value={
+              user.aadhaar_no ? (
+                <span className="flex items-center gap-2">
+                  <span className="font-mono text-slate-900 font-bold">{user.aadhaar_no}</span>
+                  <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-extrabold text-emerald-800 border border-emerald-200">
+                    Verified
+                  </span>
                 </span>
               ) : (
-                <span className="text-amber-800 font-semibold">Not Linked</span>
-              )}
-            </dd>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-            <dt className="text-slate-600 font-medium">Bank Account (DBT)</dt>
-            <dd className="font-bold text-slate-900">
-              {user.bank_account ? (
-                <span className="flex flex-wrap items-center gap-2">
-                  <span className="text-slate-900">🏛️ {user.bank_name || 'State Bank of India'}</span>
-                  <span className="font-mono text-emerald-950 font-extrabold bg-emerald-100/80 px-2 py-0.5 rounded-lg border border-emerald-300">
+                <span className="text-amber-800 font-bold">Not Linked</span>
+              )
+            }
+          />
+          <DetailRow
+            label="Bank Account (Govt DBT)"
+            icon={CreditCard}
+            value={
+              user.bank_account ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-slate-900">🏛️ {user.bank_name || 'State Bank of India'}</span>
+                  <span className="font-mono text-sm text-emerald-900 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                     ••••{user.bank_account.slice(-4)}
                   </span>
-                  <span className="text-slate-500 text-xs font-mono">({user.ifsc_code})</span>
-                </span>
+                  <span className="text-xs font-mono text-slate-500">IFSC: {user.ifsc_code}</span>
+                </div>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowBankModal(true)}
-                  className="font-bold text-emerald-800 underline hover:text-emerald-950"
+                  className="font-bold text-emerald-700 underline text-sm"
                 >
                   + Add Bank Account for DBT Payouts
                 </button>
-              )}
-            </dd>
-          </div>
+              )
+            }
+          />
           {user.pmkisan_id && (
-            <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm sm:text-base">
-              <dt className="text-slate-600 font-medium">PM-Kisan Beneficiary ID</dt>
-              <dd className="font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
-                {user.pmkisan_id}
-              </dd>
-            </div>
+            <DetailRow
+              label="PM-Kisan Beneficiary ID"
+              icon={FileCheck2}
+              value={<span className="font-mono font-bold text-slate-800">{user.pmkisan_id}</span>}
+            />
+          )}
+          {user.land_acres && (
+            <DetailRow
+              label="Registered Land Holding"
+              icon={Building2}
+              value={<span className="font-bold text-slate-900">{user.land_acres} Acres</span>}
+            />
           )}
         </dl>
       </section>
@@ -613,7 +674,7 @@ export default function FarmerHome() {
         />
       )}
 
-      {/* Printable Mandi Pass Modal (Item 9) */}
+      {/* Printable Mandi Pass Modal */}
       {showPassModal && selectedPassBooking && (
         <PrintableTokenPass
           booking={selectedPassBooking}
@@ -622,12 +683,12 @@ export default function FarmerHome() {
         />
       )}
 
-      {/* SMS & WhatsApp Dispatch Log Modal (Item 6) */}
+      {/* SMS & WhatsApp Dispatch Log Modal */}
       {showSmsModal && (
         <SmsDispatchModal farmerId={user.id} onClose={() => setShowSmsModal(false)} />
       )}
 
-      {/* Govt Aadhaar e-KYC Modal (Item 7) */}
+      {/* Govt Aadhaar e-KYC Modal */}
       {showEkycModal && (
         <EkycModal
           farmer={user}
@@ -638,7 +699,7 @@ export default function FarmerHome() {
         />
       )}
 
-      {/* All Bookings & History Modal (Item 13) */}
+      {/* All Bookings & History Modal */}
       {showHistoryModal && (
         <BookingHistoryModal
           onClose={() => setShowHistoryModal(false)}
@@ -655,4 +716,3 @@ export default function FarmerHome() {
     </AppShell>
   );
 }
-
