@@ -19,7 +19,6 @@ import AppShell from '../../layouts/AppShell.jsx';
 import AlertsPanel from '../../components/AlertsPanel.jsx';
 import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
-import QRCode from '../../components/QRCode.jsx';
 import AgriServicesCard from '../../components/AgriServicesCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
 import { api } from '../../services/api';
@@ -226,25 +225,14 @@ function BookingCard({ booking, t }) {
         </div>
       )}
 
-      {/* QR Code + Booking Particulars Grid */}
-      <div className="mt-4 flex flex-col gap-4 rounded-2xl bg-slate-50/70 p-4 ring-1 ring-slate-200/60 sm:flex-row sm:items-center sm:justify-between">
-        <dl className="flex-1 divide-y divide-slate-200/60 text-xs">
+      {/* Booking Particulars */}
+      <div className="mt-4 rounded-2xl bg-slate-50/70 p-4 ring-1 ring-slate-200/60">
+        <dl className="divide-y divide-slate-200/60 text-xs">
           <Row label={t('booking.centre')} value={booking.centre_name} />
           <Row label={t('booking.crop')} value={t(`crop.${booking.crop}`)} />
           <Row label={t('booking.quantity')} value={`${booking.quantity_qtl} ${t('booking.qtl')}`} />
           <Row label={t('booking.when')} value={`${booking.slot_date} · ${booking.slot_time}`} />
         </dl>
-        <button
-          type="button"
-          onClick={() => setPrintModal(true)}
-          title="Click to view full Gate Pass & QR Code"
-          className="group flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 transition hover:border-emerald-500 hover:shadow-xs border-t sm:border-t-0 sm:border-l sm:pl-4"
-        >
-          <QRCode text={booking.token} size={84} />
-          <span className="mt-1 text-[10px] font-bold text-emerald-800 group-hover:underline">
-            🔍 Scan at Gate (Click)
-          </span>
-        </button>
       </div>
 
       {/* Completed Receipt */}
@@ -270,9 +258,9 @@ function BookingCard({ booking, t }) {
               <p className="text-lg font-extrabold text-slate-900">{booking.centre_name}</p>
               <p className="text-xs text-slate-500">Ministry of Agriculture Verified Token</p>
             </div>
-            <div className="my-4 flex flex-col items-center justify-center">
-              <QRCode text={booking.token} size={110} />
-              <p className="mt-2 font-mono text-2xl font-black text-emerald-950">{booking.token}</p>
+            <div className="my-5 flex flex-col items-center justify-center rounded-2xl bg-emerald-50/80 p-4 ring-1 ring-emerald-200 text-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Official Pass Token</span>
+              <p className="mt-1 font-mono text-3xl font-black text-emerald-950">{booking.token}</p>
             </div>
             <dl className="space-y-1 text-xs border-t border-dashed border-slate-300 pt-3">
               <div className="flex justify-between"><dt className="text-slate-500">Farmer:</dt><dd className="font-bold">{booking.farmer_name || 'Ramesh Patil'}</dd></div>

@@ -15,8 +15,6 @@ import {
   Phone,
   MapPin,
   Flame,
-  QrCode,
-  Camera,
   X,
 } from 'lucide-react';
 import AppShell from '../../layouts/AppShell.jsx';
@@ -134,8 +132,6 @@ export default function AdminHome() {
   const [gradeFactors, setGradeFactors] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [scannerModal, setScannerModal] = useState(false);
-  const [scannedInput, setScannedInput] = useState('');
 
   useEffect(() => {
     api('/reference')
@@ -278,16 +274,6 @@ export default function AdminHome() {
               />
             </div>
 
-            {/* Scan QR Pass Button */}
-            <button
-              type="button"
-              onClick={() => setScannerModal(true)}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 px-3.5 text-xs font-bold text-white shadow-xs transition hover:brightness-110"
-            >
-              <QrCode className="h-4 w-4" />
-              <span>Scan QR Pass</span>
-            </button>
-
             {/* Quick Status Filter Tabs */}
             <div className="flex gap-1 overflow-x-auto text-xs">
               {['ALL', 'WAITING', 'CALLED', 'CHECKED_IN'].map((st) => (
@@ -343,129 +329,6 @@ export default function AdminHome() {
 
       {/* Payments Ledger Panel */}
       <PaymentsPanel />
-
-      {/* Mandi Gate QR Scanner Simulator Modal */}
-      {scannerModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl text-slate-900">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-100 text-emerald-800">
-                  <Camera className="h-4 w-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">Mandi Gate Optical QR Scanner</h3>
-                  <p className="text-[11px] text-slate-500">Instant APMC gate pass token verification</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setScannerModal(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Scanner Viewfinder Box */}
-            <div className="relative my-4 flex flex-col items-center justify-center rounded-2xl bg-slate-900 p-6 text-white overflow-hidden shadow-inner">
-              <div className="relative h-44 w-44 rounded-xl border-2 border-dashed border-emerald-400/80 flex items-center justify-center bg-black/40">
-                <QrCode className="h-28 w-28 text-emerald-400/70" />
-                {/* Laser scan line animation */}
-                <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_8px_#34d399] animate-pulse top-1/2" />
-              </div>
-              <p className="mt-3 text-xs font-semibold text-emerald-300">
-                Point at Farmer's e-Pass QR Code
-              </p>
-            </div>
-
-            {/* Manual Token Scan/Search Input */}
-            <div className="mb-3">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Enter or scan token (e.g. PF-1025)..."
-                  value={scannedInput}
-                  onChange={(e) => setScannedInput(e.target.value)}
-                  className="h-10 flex-1 rounded-xl border border-slate-300 px-3 text-xs font-mono font-bold uppercase outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const match = queue.find(
-                      (q) => q.token.toLowerCase() === scannedInput.trim().toLowerCase()
-                    );
-                    if (match) {
-                      if (match.status === 'WEIGHMENT') {
-                        setDialogRow(match);
-                      } else {
-                        advance(match.id);
-                      }
-                      setScannerModal(false);
-                      setScannedInput('');
-                    } else {
-                      setActionError(`Token ${scannedInput.toUpperCase()} not found in today's active queue.`);
-                      setScannerModal(false);
-                    }
-                  }}
-                  className="rounded-xl bg-emerald-700 px-4 text-xs font-bold text-white hover:bg-emerald-800"
-                >
-                  Verify
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Token Pick from Queue */}
-            <div>
-              <p className="text-xs font-bold text-slate-700 mb-2">
-                Farmers in Active APMC Queue:
-              </p>
-              {queue.length === 0 ? (
-                <p className="text-xs text-slate-500 italic">No farmers currently in queue.</p>
-              ) : (
-                <div className="max-h-40 space-y-1.5 overflow-y-auto pr-1">
-                  {queue.map((q) => (
-                    <button
-                      key={q.id}
-                      type="button"
-                      onClick={() => {
-                        if (q.status === 'WEIGHMENT') {
-                          setDialogRow(q);
-                        } else {
-                          advance(q.id);
-                        }
-                        setScannerModal(false);
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-left text-xs hover:border-emerald-500 hover:bg-emerald-50/50 transition"
-                    >
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono font-bold text-emerald-800">{q.token}</span>
-                          <span className={`rounded px-1.5 py-0.2 text-[9px] font-bold ring-1 ${STAGE_STYLES[q.status] || 'bg-slate-100'}`}>
-                            {q.status}
-                          </span>
-                        </div>
-                        <span className="font-medium text-slate-800 mt-0.5 block">{q.farmer_name}</span>
-                      </div>
-                      <span className="rounded-md bg-emerald-700 px-2.5 py-1 font-bold text-white text-[11px]">
-                        {q.status === 'WEIGHMENT' ? 'Record Sale →' : 'Scan & Advance →'}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setScannerModal(false)}
-              className="mt-4 w-full rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
-            >
-              Close Scanner
-            </button>
-          </div>
-        </div>
-      )}
     </AppShell>
   );
 }
