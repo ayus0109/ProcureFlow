@@ -46,9 +46,9 @@ export default function AgriServicesCard() {
           </span>
           <div>
             <h2 className="text-sm font-bold tracking-wider text-slate-800 uppercase">
-              Farmer Advisory & Support
+              {t('advisory.title')}
             </h2>
-            <p className="text-xs text-slate-500">Real-time weather, mandi comparisons & kisan help</p>
+            <p className="text-xs text-slate-500">{t('advisory.sub')}</p>
           </div>
         </div>
 
@@ -63,7 +63,7 @@ export default function AgriServicesCard() {
           }`}
         >
           <Volume2 className="h-3.5 w-3.5" />
-          <span>{voicePlaying ? 'Speaking...' : 'Voice Guidance'}</span>
+          <span>{voicePlaying ? t('advisory.speaking') : t('advisory.voice')}</span>
         </button>
       </div>
 
@@ -79,7 +79,7 @@ export default function AgriServicesCard() {
           }`}
         >
           <CloudSun className="h-3.5 w-3.5" />
-          <span>Weather Forecast</span>
+          <span>{t('advisory.weatherTab')}</span>
         </button>
 
         <button
@@ -92,7 +92,7 @@ export default function AgriServicesCard() {
           }`}
         >
           <TrendingUp className="h-3.5 w-3.5" />
-          <span>Mandi Rates Comparison</span>
+          <span>{t('advisory.mandiTab')}</span>
         </button>
 
         <button
@@ -105,7 +105,7 @@ export default function AgriServicesCard() {
           }`}
         >
           <HelpCircle className="h-3.5 w-3.5" />
-          <span>Helpline & FAQs</span>
+          <span>{t('advisory.faqTab')}</span>
         </button>
       </div>
 
@@ -115,10 +115,10 @@ export default function AgriServicesCard() {
           <div className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold text-sky-900 uppercase">District Weather Advisory</p>
-                <p className="text-xl font-extrabold text-slate-900 mt-0.5">Pune & Baramati: 29°C, Clear Sky</p>
+                <p className="text-xs font-bold text-sky-900 uppercase">{t('advisory.weatherTitle')}</p>
+                <p className="text-xl font-extrabold text-slate-900 mt-0.5">{t('advisory.weatherCondition')}</p>
                 <p className="text-slate-600 mt-1">
-                  Optimal dry conditions for grain assaying and weighment. Moisture levels within FAQ limits (&lt;12%).
+                  {t('advisory.weatherDesc')}
                 </p>
               </div>
               <CloudSun className="h-10 w-10 text-sky-500 shrink-0" />
@@ -129,16 +129,16 @@ export default function AgriServicesCard() {
         {activeTab === 'mandi' && (
           <div className="space-y-2">
             <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 border border-slate-200 font-medium">
-              <span>🌾 Wheat (Grade A) — Pune APMC</span>
-              <span className="font-bold font-mono text-emerald-800">₹2,546.25/qtl (Current Procurement)</span>
+              <span>{t('advisory.mandiA')}</span>
+              <span className="font-bold font-mono text-emerald-800">{t('advisory.mandiARate')}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 border border-slate-200 font-medium">
-              <span>🌾 Wheat (FAQ Standard) — Nashik APMC</span>
-              <span className="font-mono text-slate-700">₹2,425.00/qtl</span>
+              <span>{t('advisory.mandiFaq')}</span>
+              <span className="font-mono text-slate-700">{t('advisory.mandiFaqRate')}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 border border-slate-200 font-medium">
-              <span>🌾 Wheat (Local Private Traders)</span>
-              <span className="font-mono text-slate-500">₹2,280.00/qtl (Gov MSP is +₹145 higher)</span>
+              <span>{t('advisory.mandiPvt')}</span>
+              <span className="font-mono text-slate-500">{t('advisory.mandiPvtRate')}</span>
             </div>
           </div>
         )}
@@ -149,29 +149,29 @@ export default function AgriServicesCard() {
               <div>
                 <p className="font-bold flex items-center gap-1.5">
                   <PhoneCall className="h-4 w-4 text-emerald-700" />
-                  Kisan Call Centre (Toll-Free 24x7)
+                  {t('advisory.kisanTitle')}
                 </p>
-                <p className="text-[11px] text-emerald-700 mt-0.5">Dial 1800-180-1551 for agricultural procurement support</p>
+                <p className="text-[11px] text-emerald-700 mt-0.5">{t('advisory.kisanSub')}</p>
               </div>
               <a
                 href="tel:18001801551"
                 className="rounded-xl bg-emerald-700 px-3 py-1.5 font-bold text-white shadow-xs hover:bg-emerald-800"
               >
-                Call
+                {t('advisory.call')}
               </a>
             </div>
 
             <dl className="space-y-1.5 text-slate-700">
               <div className="rounded-xl border border-slate-200 p-2.5 bg-white">
-                <dt className="font-bold text-slate-900">How is my wait time calculated?</dt>
+                <dt className="font-bold text-slate-900">{t('advisory.faq1Q')}</dt>
                 <dd className="text-slate-600 mt-0.5 text-[11px]">
-                  Wait time is automatically derived from the number of farmers ahead divided by the active counters operating at your centre.
+                  {t('advisory.faq1A')}
                 </dd>
               </div>
               <div className="rounded-xl border border-slate-200 p-2.5 bg-white">
-                <dt className="font-bold text-slate-900">When will payment be credited?</dt>
+                <dt className="font-bold text-slate-900">{t('advisory.faq2Q')}</dt>
                 <dd className="text-slate-600 mt-0.5 text-[11px]">
-                  Direct Benefit Transfer (DBT) is initiated within 24 to 48 hours directly to your Aadhaar-linked bank account.
+                  {t('advisory.faq2A')}
                 </dd>
               </div>
             </dl>

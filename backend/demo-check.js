@@ -5,7 +5,7 @@
  * Run the backend first, then:  node demo-check.js
  */
 
-const BASE = 'http://localhost:4000/api';
+const BASE = 'http://127.0.0.1:4000/api';
 const { todayISO } = require('./utils/dates');
 const TODAY = todayISO();
 let pass = 0;
