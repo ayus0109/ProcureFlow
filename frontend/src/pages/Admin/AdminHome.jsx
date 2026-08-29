@@ -167,12 +167,12 @@ export default function AdminHome() {
     useCallback(
       (event) => {
         if (event.type === 'QUEUE_UPDATED' || event.type === 'PAYMENT_UPDATED') {
-          api(`/queue?date=${date}`)
+          api('/queue')
             .then((res) => setData(res))
             .catch(() => {});
         }
       },
-      [date, setData]
+      [setData]
     )
   );
 
