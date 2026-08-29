@@ -1,7 +1,7 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const { activeBooking, createBooking } = require('../services/bookingService');
-const { farmerSummary } = require('../services/trackerService');
+const { farmerSummary, allFarmerBookings } = require('../services/trackerService');
 
 const router = express.Router();
 
@@ -13,6 +13,11 @@ router.get('/mine', requireAuth('farmer'), (req, res) => {
 /** GET /api/bookings/summary — the farmer's own season record. */
 router.get('/summary', requireAuth('farmer'), (req, res) => {
   res.json(farmerSummary(req.auth.id));
+});
+
+/** GET /api/bookings/history — the farmer's complete past bookings and receipts. */
+router.get('/history', requireAuth('farmer'), (req, res) => {
+  res.json(allFarmerBookings(req.auth.id));
 });
 
 /** POST /api/bookings  { centreId, crop, quantityQtl, slotDate, slotTime } */

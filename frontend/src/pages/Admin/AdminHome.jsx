@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   CheckCircle2,
   ChevronRight,
@@ -16,13 +16,19 @@ import {
   MapPin,
   Flame,
   X,
+  BarChart3,
+  Smartphone,
+  CreditCard,
 } from 'lucide-react';
 import AppShell from '../../layouts/AppShell.jsx';
 import CongestionBadge from '../../components/CongestionBadge.jsx';
 import ProcurementDialog from '../../components/ProcurementDialog.jsx';
 import PaymentsPanel from '../../components/PaymentsPanel.jsx';
+import { AdminAnalytics } from '../../components/AdminAnalytics.jsx';
+import { SmsDispatchModal } from '../../components/SmsDispatchModal.jsx';
 import { api } from '../../services/api';
 import { usePoll } from '../../hooks/usePoll.js';
+import { useLiveEvents } from '../../hooks/useLiveEvents.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useLanguage } from '../../i18n/LanguageContext.jsx';
 import { money } from '../../utils/money.js';
@@ -130,6 +136,8 @@ export default function AdminHome() {
   const [outcome, setOutcome] = useState(null);
   const [grades, setGrades] = useState([]);
   const [gradeFactors, setGradeFactors] = useState({});
+  const [activeTab, setActiveTab] = useState('QUEUE'); // 'QUEUE' | 'ANALYTICS' | 'PAYMENTS'
+  const [showSmsModal, setShowSmsModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [quotaModal, setQuotaModal] = useState(false);
@@ -137,8 +145,11 @@ export default function AdminHome() {
     daily_target_qtl: 500,
     max_qty_per_farmer: 50,
     daily_capacity: 120,
-    slot_capacity: 15,
+    slot_capacity: 10,
     active_counters: 2,
+    accepted_crops: ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'],
+    max_moisture_pct: 12.0,
+    min_quality_grade: 'FAQ',
   });
   const [quotaSaving, setQuotaSaving] = useState(false);
 
@@ -150,6 +161,20 @@ export default function AdminHome() {
       })
       .catch(() => setGrades([]));
   }, []);
+
+  // Real-time SSE listener (Item 8)
+  useLiveEvents(
+    useCallback(
+      (event) => {
+        if (event.type === 'QUEUE_UPDATED' || event.type === 'PAYMENT_UPDATED') {
+          api(`/queue?date=${date}`)
+            .then((res) => setData(res))
+            .catch(() => {});
+        }
+      },
+      [date, setData]
+    )
+  );
 
   const centre = data ? data.centre : null;
   const queue = data ? data.queue : [];
@@ -186,6 +211,83 @@ export default function AdminHome() {
 
   return (
     <AppShell title={user.centre_name} subtitle={`Officer: ${user.name} • Code: ${user.admin_code}`}>
+      {/* Top Cockpit Tabs & Global Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+        <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('QUEUE')}
+            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              activeTab === 'QUEUE'
+                ? 'bg-white text-emerald-950 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Users className="h-3.5 w-3.5 text-emerald-700" />
+            <span>Live Queue</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('ANALYTICS')}
+            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              activeTab === 'ANALYTICS'
+                ? 'bg-white text-emerald-950 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <BarChart3 className="h-3.5 w-3.5 text-emerald-700" />
+            <span>APMC Analytics & CSV</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('PAYMENTS')}
+            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              activeTab === 'PAYMENTS'
+                ? 'bg-white text-emerald-950 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <CreditCard className="h-3.5 w-3.5 text-emerald-700" />
+            <span>DBT Payments</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowSmsModal(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
+          >
+            <Smartphone className="h-3.5 w-3.5 text-blue-700" />
+            <span>SMS & WhatsApp Log</span>
+          </button>
+
+          {centre && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuotaForm({
+                  daily_target_qtl: centre?.daily_target_qtl || 500,
+                  max_qty_per_farmer: centre?.max_qty_per_farmer || 50,
+                  daily_capacity: centre?.daily_capacity || 120,
+                  slot_capacity: centre?.slot_capacity || 10,
+                  active_counters: centre?.active_counters || 2,
+                  accepted_crops: centre?.accepted_crops_list || ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'],
+                  max_moisture_pct: centre?.max_moisture_pct || 12.0,
+                  min_quality_grade: centre?.min_quality_grade || 'FAQ',
+                });
+                setQuotaModal(true);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/80 px-3 py-1.5 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5 text-emerald-800" />
+              <span>⚙️ Centre Quotas & Crops</span>
+            </button>
+          )}
+        </div>
+      </div>
       {/* Toast Announcement for completed/rejected sale */}
       {outcome && (
         <div
@@ -219,150 +321,190 @@ export default function AdminHome() {
         </div>
       )}
 
-      {/* Centre Cockpit Overview */}
-      <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-emerald-700" />
-            <h2 className="text-sm font-bold tracking-wider text-slate-800 uppercase">
-              {t('admin.today')}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {centre && <CongestionBadge level={centre.congestion} />}
-            <button
-              type="button"
-              onClick={() => {
-                setQuotaForm({
-                  daily_target_qtl: centre?.daily_target_qtl || 500,
-                  max_qty_per_farmer: centre?.max_qty_per_farmer || 50,
-                  daily_capacity: centre?.daily_capacity || 120,
-                  slot_capacity: centre?.slot_capacity || 15,
-                  active_counters: centre?.active_counters || 2,
-                });
-                setQuotaModal(true);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/80 px-3 py-1 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>⚙️ Centre Capacity & Quotas</span>
-            </button>
-          </div>
-        </div>
+      {/* Tab Content: ANALYTICS */}
+      {activeTab === 'ANALYTICS' && (
+        <AdminAnalytics centreId={user.centre_id} />
+      )}
 
-        {message && (
-          <div role="alert" className="mt-3 rounded-xl bg-rose-50 p-3 text-xs font-semibold text-rose-900 ring-1 ring-rose-200">
-            {message}
-          </div>
-        )}
+      {/* Tab Content: PAYMENTS */}
+      {activeTab === 'PAYMENTS' && (
+        <PaymentsPanel />
+      )}
 
-        {loading && !centre && <p className="mt-3 text-xs text-slate-500 animate-pulse">{t('common.loading')}</p>}
-
-        {centre && (
-          <>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <StatCard label={t('admin.bookedToday')} value={centre.booked_today} sub="Total slots reserved" icon={Calendar} />
-              <StatCard label={t('admin.inQueue')} value={centre.in_queue} sub="Waiting for counter" icon={Users} />
-              <StatCard label={t('admin.wait')} value={centre.waitLabel} sub="Based on active counters" icon={Clock} />
-              <StatCard label={t('admin.slotsLeft')} value={centre.slotsLeft} sub={`Capacity: ${centre.daily_capacity} / day`} icon={Layers} />
-            </div>
-
-            {/* Live Configured Requirements Strip */}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-slate-50 p-3 text-xs border border-slate-200/80">
-              <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                <span>🎯 Target Requirement:</span>
-                <span className="font-mono text-emerald-800">{centre.daily_target_qtl || 500} Quintals</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                <span>⚖️ Max Quota per Farmer:</span>
-                <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-emerald-950">
-                  {centre.max_qty_per_farmer || 50} qtl
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-slate-700">
-                <span>⏰ Per-Slot Quota:</span>
-                <span className="font-mono text-slate-800">{centre.slot_capacity || 15} farmers/hour</span>
-              </div>
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Live Queue Management Table */}
-      <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm">
-        <div className="border-b border-slate-100 bg-slate-50/60 p-4 sm:p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
+      {/* Tab Content: QUEUE */}
+      {activeTab === 'QUEUE' && (
+        <>
+          {/* Centre Cockpit Overview */}
+          <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-emerald-700" />
-                <h2 className="text-base font-bold text-slate-900">
-                  {t('admin.queue')}
+                <Building2 className="h-5 w-5 text-emerald-700" />
+                <h2 className="text-sm font-bold tracking-wider text-slate-800 uppercase">
+                  {t('admin.today')}
                 </h2>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Manage farmer stages from entry to weighment and assaying
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
-              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-              <span>{t('admin.live')}</span>
-            </div>
-          </div>
-
-          {/* Search & Filter Bar */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search token, farmer name, village..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-              />
-            </div>
-
-            {/* Quick Status Filter Tabs */}
-            <div className="flex gap-1 overflow-x-auto text-xs">
-              {['ALL', 'WAITING', 'CALLED', 'CHECKED_IN'].map((st) => (
+              <div className="flex items-center gap-2">
+                {centre && <CongestionBadge level={centre.congestion} />}
                 <button
-                  key={st}
                   type="button"
-                  onClick={() => setStatusFilter(st)}
-                  className={`rounded-lg px-2.5 py-1.5 font-bold transition ${
-                    statusFilter === st
-                      ? 'bg-emerald-700 text-white shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                  }`}
+                  onClick={() => {
+                    setQuotaForm({
+                      daily_target_qtl: centre?.daily_target_qtl || 500,
+                      max_qty_per_farmer: centre?.max_qty_per_farmer || 50,
+                      daily_capacity: centre?.daily_capacity || 120,
+                      slot_capacity: centre?.slot_capacity || 10,
+                      active_counters: centre?.active_counters || 2,
+                      accepted_crops: centre?.accepted_crops_list || ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'],
+                      max_moisture_pct: centre?.max_moisture_pct || 12.0,
+                      min_quality_grade: centre?.min_quality_grade || 'FAQ',
+                    });
+                    setQuotaModal(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/80 px-3 py-1 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100"
                 >
-                  {st === 'ALL' ? 'All' : st}
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                  <span>⚙️ Configure Centre Crops & Slots</span>
                 </button>
-              ))}
+              </div>
             </div>
-          </div>
-        </div>
 
-        {!loading && filteredQueue.length === 0 && (
-          <div className="p-8 text-center text-xs font-medium text-slate-500">
-            {queue.length === 0 ? t('admin.emptyQueue') : 'No bookings matched your search query.'}
-          </div>
-        )}
+            {message && (
+              <div role="alert" className="mt-3 rounded-xl bg-rose-50 p-3 text-xs font-semibold text-rose-900 ring-1 ring-rose-200">
+                {message}
+              </div>
+            )}
 
-        {filteredQueue.length > 0 && (
-          <ul className="divide-y divide-slate-100">
-            {filteredQueue.map((row) => (
-              <QueueRow
-                key={row.id}
-                row={row}
-                t={t}
-                onAdvance={advance}
-                onRecord={setDialogRow}
-                busy={busyId === row.id}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
+            {loading && !centre && <p className="mt-3 text-xs text-slate-500 animate-pulse">{t('common.loading')}</p>}
+
+            {centre && (
+              <>
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <StatCard label={t('admin.bookedToday')} value={centre.booked_today} sub="Total slots reserved" icon={Calendar} />
+                  <StatCard label={t('admin.inQueue')} value={centre.in_queue} sub="Waiting for counter" icon={Users} />
+                  <StatCard label={t('admin.wait')} value={centre.waitLabel} sub="Based on active counters" icon={Clock} />
+                  <StatCard label={t('admin.slotsLeft')} value={centre.slotsLeft} sub={`Capacity: ${centre.daily_capacity} / day`} icon={Layers} />
+                </div>
+
+                {/* Live Configured Requirements Strip */}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3.5 text-xs border border-slate-200/80">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <span>🌾 Accepted Crops:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {(centre.accepted_crops_list || []).map((ck) => (
+                        <span key={ck} className="rounded-md bg-emerald-100 px-1.5 py-0.5 font-bold text-emerald-950">
+                          {t(`crop.${ck}`)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <span>🎯 Target:</span>
+                    <span className="font-mono text-emerald-800">{centre.daily_target_qtl || 500} qtl</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <span>⚖️ Max / Farmer:</span>
+                    <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-emerald-950">
+                      {centre.max_qty_per_farmer || 50} qtl
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <span>⏰ Slot Rate:</span>
+                    <span className="font-mono text-slate-800">{centre.slot_capacity || 10} / hr</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700">
+                    <span>🔬 Max Moisture:</span>
+                    <span className="font-mono text-amber-800">{centre.max_moisture_pct || 12.0}%</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
+
+          {/* Live Queue Management Table */}
+          <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm">
+            <div className="border-b border-slate-100 bg-slate-50/60 p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-emerald-700" />
+                    <h2 className="text-base font-bold text-slate-900">
+                      {t('admin.queue')}
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Manage farmer stages from entry to weighment and assaying
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  <span>⚡ Instant Live Sync</span>
+                </div>
+              </div>
+
+              {/* Search & Filter Bar */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <div className="relative flex-1 min-w-48">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search token, farmer name, village..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                  />
+                </div>
+
+                {/* Quick Status Filter Tabs */}
+                <div className="flex gap-1 overflow-x-auto text-xs">
+                  {['ALL', 'WAITING', 'CALLED', 'CHECKED_IN'].map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setStatusFilter(st)}
+                      className={`rounded-lg px-2.5 py-1.5 font-bold transition ${
+                        statusFilter === st
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      {st === 'ALL' ? 'All' : st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {!loading && filteredQueue.length === 0 && (
+              <div className="p-8 text-center text-xs font-medium text-slate-500">
+                {queue.length === 0 ? t('admin.emptyQueue') : 'No bookings matched your search query.'}
+              </div>
+            )}
+
+            {filteredQueue.length > 0 && (
+              <ul className="divide-y divide-slate-100">
+                {filteredQueue.map((row) => (
+                  <QueueRow
+                    key={row.id}
+                    row={row}
+                    t={t}
+                    onAdvance={advance}
+                    onRecord={setDialogRow}
+                    busy={busyId === row.id}
+                  />
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Payments Ledger Panel */}
+          <PaymentsPanel />
+        </>
+      )}
+
+      {/* SMS & WhatsApp Dispatch Log Modal (Item 6) */}
+      {showSmsModal && (
+        <SmsDispatchModal onClose={() => setShowSmsModal(false)} />
+      )}
 
       {/* Procurement Modal */}
       {dialogRow && (
@@ -374,9 +516,6 @@ export default function AdminHome() {
           onDone={finish}
         />
       )}
-
-      {/* Payments Ledger Panel */}
-      <PaymentsPanel />
 
       {/* Centre Capacity & Quota Management Modal */}
       {quotaModal && (
@@ -420,6 +559,52 @@ export default function AdminHome() {
               }}
               className="mt-4 space-y-4 text-xs"
             >
+              {/* 1. Accepted Crops Configuration */}
+              <div>
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">
+                  🌾 Accepted Procurement Crops (Mandatory for APMC)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { key: 'WHEAT', label: 'Wheat 🌾' },
+                    { key: 'PADDY', label: 'Paddy 🍚' },
+                    { key: 'COTTON', label: 'Cotton ☁️' },
+                    { key: 'SOYBEAN', label: 'Soybean 🌱' },
+                    { key: 'TUR', label: 'Tur 🌿' },
+                  ].map((c) => {
+                    const currentList = Array.isArray(quotaForm.accepted_crops)
+                      ? quotaForm.accepted_crops
+                      : (quotaForm.accepted_crops || '').split(',').map((s) => s.trim());
+                    const isChecked = currentList.includes(c.key);
+
+                    return (
+                      <button
+                        key={c.key}
+                        type="button"
+                        onClick={() => {
+                          const next = isChecked
+                            ? currentList.filter((k) => k !== c.key)
+                            : [...currentList, c.key];
+                          if (next.length === 0) return; // Must accept at least one crop
+                          setQuotaForm((f) => ({ ...f, accepted_crops: next }));
+                        }}
+                        className={`rounded-xl px-3 py-2 font-bold transition border text-xs flex items-center gap-1.5 ${
+                          isChecked
+                            ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span>{isChecked ? '✓' : '+'}</span>
+                        <span>{c.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1 text-[10px] text-slate-500">
+                  Farmers booking slots at this centre will only see and choose from these accepted crops
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                 <div>
                   <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
@@ -435,7 +620,7 @@ export default function AdminHome() {
                     className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
                     required
                   />
-                  <p className="mt-0.5 text-[10px] text-slate-500">Total grain procurement target for this APMC centre</p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">Total grain target for this APMC centre</p>
                 </div>
 
                 <div>
@@ -452,28 +637,12 @@ export default function AdminHome() {
                     className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
                     required
                   />
-                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum quintals a single farmer is allowed to bring (e.g. 10 or 50)</p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">Max quintals allowed per individual booking</p>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
-                    👥 Daily Total Capacity (Farmers)
-                  </label>
-                  <input
-                    type="number"
-                    min="10"
-                    max="500"
-                    value={quotaForm.daily_capacity}
-                    onChange={(e) => setQuotaForm((f) => ({ ...f, daily_capacity: Number(e.target.value) }))}
-                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-                    required
-                  />
-                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum booking slots allowed across the entire day</p>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
-                    ⏰ Slot Window Capacity (Farmers/Hour)
+                    ⏰ Slot Rate (Farmers / Hour)
                   </label>
                   <input
                     type="number"
@@ -484,7 +653,24 @@ export default function AdminHome() {
                     className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
                     required
                   />
-                  <p className="mt-0.5 text-[10px] text-slate-500">Maximum farmers permitted in any single 1-hour slot</p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">Hourly window capacity</p>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+                    🔬 Max Permissible Moisture (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="5"
+                    max="25"
+                    step="0.1"
+                    value={quotaForm.max_moisture_pct}
+                    onChange={(e) => setQuotaForm((f) => ({ ...f, max_moisture_pct: Number(e.target.value) }))}
+                    className="h-10 w-full rounded-xl border border-slate-300 px-3 font-mono font-bold text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                    required
+                  />
+                  <p className="mt-0.5 text-[10px] text-slate-500">Standard FAQ threshold (usually 12.0%)</p>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -516,7 +702,7 @@ export default function AdminHome() {
                   disabled={quotaSaving}
                   className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 py-3 text-xs font-bold text-white shadow-md transition hover:brightness-110 disabled:opacity-60"
                 >
-                  {quotaSaving ? 'Saving…' : 'Save Centre Quotas'}
+                  {quotaSaving ? 'Saving Configuration…' : 'Save Centre Requirements & Quotas'}
                 </button>
                 <button
                   type="button"

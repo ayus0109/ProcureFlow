@@ -96,7 +96,8 @@ const CLOSED_TODAY_SQL = `${BOOKING_SELECT}
 const RECEIPT_SQL = `
   SELECT p.quality_grade, p.moisture_pct, p.accepted, p.final_weight_qtl,
          p.rate_per_qtl, p.total_amount, p.remarks, p.confirmed_at,
-         y.status AS payment_status, y.txn_ref
+         y.status AS payment_status, y.txn_ref, y.pfms_utr, y.disbursed_at,
+         y.credited_bank, y.credited_account
     FROM procurements p
     LEFT JOIN payments y ON y.procurement_id = p.id
    WHERE p.booking_id = ?`;
@@ -216,11 +217,17 @@ function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTi
   }
 
   const centre = db
-    .prepare('SELECT id, name, daily_capacity, max_qty_per_farmer FROM centres WHERE id = ?')
+    .prepare('SELECT id, name, daily_capacity, max_qty_per_farmer, accepted_crops FROM centres WHERE id = ?')
     .get(Number(centreId));
   if (!centre) throw httpError(400, 'Please choose a procurement centre');
 
-  if (!findCrop(crop)) throw httpError(400, 'Please choose a crop');
+  const acceptedCrops = centre.accepted_crops
+    ? centre.accepted_crops.split(',').map((c) => c.trim()).filter(Boolean)
+    : ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'];
+
+  if (!findCrop(crop) || !acceptedCrops.includes(crop)) {
+    throw httpError(400, `${centre.name} does not accept ${crop}. Accepted crops: ${acceptedCrops.join(', ')}.`);
+  }
 
   const qty = Number(quantityQtl);
   if (!qty || qty <= 0) throw httpError(400, 'Please enter the quantity in quintals');
@@ -255,6 +262,17 @@ function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTi
       `Token ${booking.token}. You are number ${booking.position} in the queue.`,
     'SUCCESS'
   );
+
+  // Dispatch SMS / WhatsApp alert & Broadcast real-time queue update
+  try {
+    const farmer = db.prepare('SELECT id, name, phone FROM farmers WHERE id = ?').get(farmerId);
+    const smsService = require('./smsService');
+    const eventsService = require('./eventsService');
+    smsService.dispatchBookingSms(farmer, booking);
+    eventsService.broadcast('QUEUE_UPDATED', { centreId: centre.id, bookingId: booking.id });
+  } catch (err) {
+    console.error('[Booking Dispatch Warning]', err.message);
+  }
 
   return booking;
 }

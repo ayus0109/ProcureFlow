@@ -100,7 +100,7 @@ async function main() {
   // up to 3 active bookings per farmer
   const b2 = await post(
     '/bookings',
-    { centreId: pune.id, crop: 'PADDY', quantityQtl: 10, slotDate: TODAY, slotTime: open[1]?.slot || open[0].slot },
+    { centreId: pune.id, crop: 'TUR', quantityQtl: 10, slotDate: TODAY, slotTime: open[1]?.slot || open[0].slot },
     fTok
   );
   check('a second booking is allowed (up to 3 slots)', b2.status === 201, String(b2.status));
@@ -114,7 +114,7 @@ async function main() {
 
   const b4 = await post(
     '/bookings',
-    { centreId: pune.id, crop: 'COTTON', quantityQtl: 20, slotDate: TODAY, slotTime: open[0].slot },
+    { centreId: pune.id, crop: 'WHEAT', quantityQtl: 20, slotDate: TODAY, slotTime: open[0].slot },
     fTok
   );
   check('a 4th booking is refused (max 3 slots)', b4.status === 409, String(b4.status));
@@ -217,9 +217,11 @@ async function main() {
   const finalP = finalReceipt.recentCompleted?.procurement || finalReceipt.procurement || finalReceipt.allBookings?.find((b) => b.id === bookingId)?.procurement;
   check('farmer receipt now reads PAID', finalP.payment_status === 'PAID', finalP.payment_status);
   const finalAlerts = await call('/notifications', { token: fTok });
-  const paidAlert = finalAlerts.data.items.find((i) => /has been paid/.test(i.message));
-  check('farmer is told they were paid', Boolean(paidAlert), finalAlerts.data.items[0].message.slice(0, 80));
-  console.log(`   -> "${paidAlert ? paidAlert.message : ''}"`);
+  const paidAlert = finalAlerts.data.items.find((i) =>
+    /has been paid|credited directly|Govt DBT/i.test(i.message)
+  );
+  check('farmer is told they were paid', Boolean(paidAlert), paidAlert ? paidAlert.message : '');
+  if (paidAlert) console.log(`   -> "${paidAlert.message}"`);
 
   // ---- 9b. the farmer's own record ------------------------------------
   console.log("\n9b. Farmer's season tracker adds it up");

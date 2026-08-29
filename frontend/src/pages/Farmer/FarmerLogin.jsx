@@ -47,7 +47,7 @@ export default function FarmerLogin() {
 
   const [authMethod, setAuthMethod] = useState('password'); // 'password' | 'otp'
   const [mode, setMode] = useState('login'); // 'login' | 'register'
-  const [form, setForm] = useState({ name: '', phone: '', village: '', password: '' });
+  const [form, setForm] = useState({ name: '', phone: '', village: '', password: '', aadhaarNo: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -98,29 +98,36 @@ export default function FarmerLogin() {
   function handleSendOtp(e) {
     e.preventDefault();
     setError('');
-    if (!otpPhone || otpPhone.length < 10) {
-      setError('Please enter a valid 10-digit mobile number.');
+    const clean = otpPhone.trim();
+    if (!/^\d{10}$/.test(clean)) {
+      setError('Please enter a valid 10-digit mobile number');
       return;
     }
-    const expected = captchaNum1 + captchaNum2;
-    if (parseInt(captchaAnswer, 10) !== expected) {
-      setError(`Security Captcha incorrect. Please solve: ${captchaNum1} + ${captchaNum2}`);
+
+    if (parseInt(captchaAnswer, 10) !== captchaNum1 + captchaNum2) {
+      setError('Incorrect security captcha answer');
       refreshCaptcha();
       return;
     }
-    setOtpSent(true);
-    setOtpCode('4829'); // Simulated Instant SMS OTP for farmer demo
+
+    setBusy(true);
+    setTimeout(() => {
+      setBusy(false);
+      setOtpSent(true);
+      setError('');
+    }, 600);
   }
 
   async function handleVerifyOtp(e) {
     e.preventDefault();
-    setBusy(true);
     setError('');
+    if (otpCode.trim().length !== 6) {
+      setError('Please enter the 6-digit OTP code');
+      return;
+    }
+
+    setBusy(true);
     try {
-      if (otpCode !== '4829' && otpCode.length !== 4) {
-        throw new Error('Invalid OTP. Please enter 4-digit code (Use: 4829)');
-      }
-      // Log in farmer directly via OTP
       await loginFarmerOtp({ phone: otpPhone });
       navigate('/farmer', { replace: true });
     } catch (err) {
@@ -144,24 +151,29 @@ export default function FarmerLogin() {
 
   return (
     <CenteredLayout>
-      <Link
-        to="/role"
-        className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('role.heading')}
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to="/role"
+          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50 hover:text-emerald-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+        >
+          <ArrowLeft className="h-4.5 w-4.5" aria-hidden="true" />
+          <span>{t('role.heading')}</span>
+        </Link>
+        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900 border border-emerald-200">
+          Farmer Portal
+        </span>
+      </div>
 
-      <div className="border-b border-slate-100 pb-3">
-        <h1 className="text-xl font-extrabold text-slate-900">
-          {t(isRegister ? 'auth.registerTitle' : 'auth.farmerTitle')}
+      <div className="mt-4">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+          {isRegister ? t('auth.registerFarmer') : t('auth.farmerTitle')}
         </h1>
-        <p className="mt-0.5 text-xs text-slate-500">
-          {t(isRegister ? 'auth.registerSub' : 'auth.farmerSub')}
+        <p className="mt-1 text-xs text-slate-600">
+          {isRegister ? 'Create an account to book procurement slots' : t('auth.farmerSub')}
         </p>
       </div>
 
-      {/* Auth Method Switcher Tabs */}
+      {/* Auth Method Switcher (Only in Login Mode) */}
       {!isRegister && (
         <div className="mt-4 flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
           <button
@@ -216,6 +228,14 @@ export default function FarmerLogin() {
                 placeholder="e.g. Baramati"
                 value={form.village}
                 onChange={set('village')}
+              />
+              <FormField
+                id="aadhaarNo"
+                label="12-Digit Aadhaar (for Instant Govt e-KYC)"
+                hint={t('auth.optional')}
+                placeholder="XXXX-XXXX-XXXX"
+                value={form.aadhaarNo}
+                onChange={set('aadhaarNo')}
               />
             </>
           )}
@@ -403,9 +423,9 @@ export default function FarmerLogin() {
       <button
         type="button"
         onClick={switchMode}
-        className="mt-4 w-full text-center text-xs font-bold text-emerald-800 hover:underline"
+        className="mt-5 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-emerald-200/80 bg-emerald-50/70 py-3 px-4 text-center text-sm font-extrabold text-emerald-900 shadow-2xs transition hover:bg-emerald-100 hover:text-emerald-950 hover:shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
       >
-        {t(isRegister ? 'auth.haveAccount' : 'auth.noAccount')}
+        <span>{t(isRegister ? 'auth.haveAccount' : 'auth.noAccount')}</span>
       </button>
 
       {/* Google Account Picker Modal */}

@@ -93,4 +93,31 @@ function farmerSummary(farmerId) {
   };
 }
 
-module.exports = { farmerSummary };
+const ALL_BOOKINGS_SQL = `
+  SELECT b.id, b.token, b.crop, b.quantity_qtl, b.slot_date, b.slot_time, b.status, b.created_at,
+         c.name AS centre_name, c.district,
+         pr.quality_grade, pr.moisture_pct, pr.accepted, pr.final_weight_qtl,
+         pr.rate_per_qtl, pr.total_amount, pr.confirmed_at, pr.remarks,
+         pay.status AS payment_status, pay.txn_ref, pay.updated_at AS payment_date
+    FROM bookings b
+    JOIN centres c ON c.id = b.centre_id
+    LEFT JOIN procurements pr ON pr.booking_id = b.id
+    LEFT JOIN payments pay ON pay.procurement_id = pr.id
+   WHERE b.farmer_id = ?
+   ORDER BY b.slot_date DESC, b.id DESC`;
+
+function allFarmerBookings(farmerId) {
+  const id = Number(farmerId);
+  const rows = db.prepare(ALL_BOOKINGS_SQL).all(id);
+  return rows.map((r) => {
+    const crop = CROPS.find((c) => c.key === r.crop);
+    return {
+      ...r,
+      cropLabel: crop ? crop.label : r.crop,
+      mspRate: crop ? crop.ratePerQtl : null,
+      gradeFactor: r.quality_grade ? gradeFactor(r.quality_grade) : 1,
+    };
+  });
+}
+
+module.exports = { farmerSummary, allFarmerBookings };

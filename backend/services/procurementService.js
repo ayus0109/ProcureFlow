@@ -156,6 +156,11 @@ function completeProcurement({
     };
   });
 
+  try {
+    const eventsService = require('./eventsService');
+    eventsService.broadcast('QUEUE_UPDATED', { centreId, bookingId: booking.id, completed: true });
+  } catch {}
+
   return { ...listQueue(centreId, booking.slot_date), completed: receipt };
 }
 

@@ -29,9 +29,13 @@ export default function RoleSelect() {
 
   return (
     <CenteredLayout>
-      <div className="mb-4">
-        <h1 className="text-xl font-bold tracking-tight text-slate-900">{t('role.heading')}</h1>
-        <p className="text-xs text-slate-500 mt-0.5">{t('role.sub')}</p>
+      <div className="mb-5">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          {t('role.heading')}
+        </h1>
+        <p className="text-sm font-medium text-slate-600 mt-1">
+          {t('role.sub')}
+        </p>
       </div>
 
       <div className="space-y-3.5">
@@ -60,16 +64,18 @@ export default function RoleSelect() {
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3">
+      <div className="mt-6 flex items-center justify-between border-t border-slate-200/80 pt-4">
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="inline-flex items-center gap-1.5 rounded-lg text-xs font-semibold text-emerald-800 hover:text-emerald-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+          className="inline-flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-bold text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
         >
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-          {t('lang.change')}
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <span>{t('lang.change')}</span>
         </button>
-        <span className="text-[11px] text-slate-400">Step 2 of 2</span>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+          Step 2 of 2
+        </span>
       </div>
     </CenteredLayout>
   );

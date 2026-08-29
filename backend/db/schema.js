@@ -25,16 +25,27 @@ CREATE TABLE IF NOT EXISTS centres (
   delay_min          INTEGER NOT NULL DEFAULT 0,
   max_qty_per_farmer REAL    NOT NULL DEFAULT 50,
   daily_target_qtl   REAL    NOT NULL DEFAULT 500,
-  slot_capacity      INTEGER NOT NULL DEFAULT 6
+  slot_capacity      INTEGER NOT NULL DEFAULT 10,
+  accepted_crops     TEXT    NOT NULL DEFAULT 'WHEAT,PADDY,COTTON,SOYBEAN,TUR',
+  max_moisture_pct   REAL    NOT NULL DEFAULT 12.0,
+  min_quality_grade  TEXT    NOT NULL DEFAULT 'FAQ'
 );
 
 CREATE TABLE IF NOT EXISTS farmers (
-  id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  name       TEXT NOT NULL,
-  phone      TEXT NOT NULL UNIQUE,
-  password   TEXT NOT NULL,
-  village    TEXT,
-  created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  name           TEXT NOT NULL,
+  phone          TEXT NOT NULL UNIQUE,
+  password       TEXT NOT NULL,
+  village        TEXT,
+  aadhaar_no     TEXT,
+  ekyc_verified  INTEGER NOT NULL DEFAULT 0,
+  pmkisan_id     TEXT,
+  land_acres     REAL DEFAULT 4.5,
+  bank_account   TEXT,
+  ifsc_code      TEXT,
+  bank_name      TEXT,
+  account_holder TEXT,
+  created_at     TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
 CREATE TABLE IF NOT EXISTS admins (
@@ -72,12 +83,17 @@ CREATE TABLE IF NOT EXISTS procurements (
 );
 
 CREATE TABLE IF NOT EXISTS payments (
-  id             INTEGER PRIMARY KEY AUTOINCREMENT,
-  procurement_id INTEGER NOT NULL UNIQUE REFERENCES procurements(id),
-  amount         REAL NOT NULL,
-  status         TEXT NOT NULL DEFAULT 'PENDING',
-  updated_at     TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-  txn_ref        TEXT GENERATED ALWAYS AS ('PF-TXN-' || (1000 + id)) VIRTUAL
+  id                INTEGER PRIMARY KEY AUTOINCREMENT,
+  procurement_id    INTEGER NOT NULL UNIQUE REFERENCES procurements(id),
+  amount            REAL NOT NULL,
+  status            TEXT NOT NULL DEFAULT 'PENDING',
+  disbursed_at      TEXT,
+  disbursement_type TEXT DEFAULT 'INSTANT',
+  pfms_utr          TEXT,
+  credited_bank     TEXT,
+  credited_account  TEXT,
+  updated_at        TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+  txn_ref           TEXT GENERATED ALWAYS AS ('PF-TXN-' || (1000 + id)) VIRTUAL
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
@@ -89,12 +105,25 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
+CREATE TABLE IF NOT EXISTS sms_logs (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  farmer_id  INTEGER REFERENCES farmers(id),
+  phone      TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  channel    TEXT NOT NULL DEFAULT 'SMS',
+  type       TEXT NOT NULL,
+  status     TEXT NOT NULL DEFAULT 'DELIVERED',
+  sent_at    TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_bookings_queue
   ON bookings (centre_id, slot_date, status);
 CREATE INDEX IF NOT EXISTS idx_bookings_farmer
   ON bookings (farmer_id, slot_date);
 CREATE INDEX IF NOT EXISTS idx_notifications_farmer
   ON notifications (farmer_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_sms_logs_farmer
+  ON sms_logs (farmer_id);
 `;
 
 module.exports = { SCHEMA_SQL };

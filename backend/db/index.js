@@ -23,7 +23,23 @@ db.exec(SCHEMA_SQL);
 // Safe column migrations for existing databases
 try { db.exec('ALTER TABLE centres ADD COLUMN max_qty_per_farmer REAL DEFAULT 50'); } catch {}
 try { db.exec('ALTER TABLE centres ADD COLUMN daily_target_qtl REAL DEFAULT 500'); } catch {}
-try { db.exec('ALTER TABLE centres ADD COLUMN slot_capacity INTEGER DEFAULT 6'); } catch {}
+try { db.exec('ALTER TABLE centres ADD COLUMN slot_capacity INTEGER DEFAULT 10'); } catch {}
+try { db.exec("ALTER TABLE centres ADD COLUMN accepted_crops TEXT DEFAULT 'WHEAT,PADDY,COTTON,SOYBEAN,TUR'"); } catch {}
+try { db.exec('ALTER TABLE centres ADD COLUMN max_moisture_pct REAL DEFAULT 12.0'); } catch {}
+try { db.exec("ALTER TABLE centres ADD COLUMN min_quality_grade TEXT DEFAULT 'FAQ'"); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN aadhaar_no TEXT'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN ekyc_verified INTEGER DEFAULT 0'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN pmkisan_id TEXT'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN land_acres REAL DEFAULT 4.5'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN bank_account TEXT'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN ifsc_code TEXT'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN bank_name TEXT'); } catch {}
+try { db.exec('ALTER TABLE farmers ADD COLUMN account_holder TEXT'); } catch {}
+try { db.exec('ALTER TABLE payments ADD COLUMN disbursed_at TEXT'); } catch {}
+try { db.exec("ALTER TABLE payments ADD COLUMN disbursement_type TEXT DEFAULT 'INSTANT'"); } catch {}
+try { db.exec('ALTER TABLE payments ADD COLUMN pfms_utr TEXT'); } catch {}
+try { db.exec('ALTER TABLE payments ADD COLUMN credited_bank TEXT'); } catch {}
+try { db.exec('ALTER TABLE payments ADD COLUMN credited_account TEXT'); } catch {}
 
 module.exports = db;
 module.exports.DB_PATH = DB_PATH;

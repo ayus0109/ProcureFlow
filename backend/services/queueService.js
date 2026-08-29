@@ -131,6 +131,20 @@ function advanceBooking({ bookingId, adminId }) {
     next === STATUS.CALLED ? 'ACTION' : 'INFO'
   );
 
+  // Dispatch Urgent SMS & Broadcast real-time SSE update
+  try {
+    const eventsService = require('./eventsService');
+    eventsService.broadcast('QUEUE_UPDATED', { centreId, bookingId: booking.id, stage: next });
+
+    if (next === STATUS.CALLED) {
+      const farmer = db.prepare('SELECT id, name, phone FROM farmers WHERE id = ?').get(booking.farmer_id);
+      const smsService = require('./smsService');
+      smsService.dispatchCalledSms(farmer, booking, 1);
+    }
+  } catch (err) {
+    console.error('[Queue Event Warning]', err.message);
+  }
+
   // Hand back the whole queue so the admin screen updates at once, without
   // waiting for the next poll.
   return listQueue(centreId, booking.slot_date);

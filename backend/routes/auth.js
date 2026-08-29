@@ -5,6 +5,8 @@ const {
   loginFarmer,
   loginFarmerOtp,
   loginAdmin,
+  verifyEkyc,
+  updateBankDetails,
   farmerSession,
   adminSession,
 } = require('../services/authService');
@@ -24,6 +26,16 @@ router.post('/farmer/login', (req, res) => {
 /** POST /api/auth/farmer/otp-login  { phone } */
 router.post('/farmer/otp-login', (req, res) => {
   res.json(loginFarmerOtp(req.body || {}));
+});
+
+/** POST /api/auth/farmer/ekyc  { aadhaarNo, otp } (Requires auth) */
+router.post('/farmer/ekyc', requireAuth('farmer'), (req, res) => {
+  res.json(verifyEkyc(req.auth.id, req.body || {}));
+});
+
+/** POST /api/auth/farmer/bank-details  { aadhaarNo, bankAccount, ifscCode, bankName, accountHolder } (Requires auth) */
+router.post('/farmer/bank-details', requireAuth('farmer'), (req, res) => {
+  res.json(updateBankDetails(req.auth.id, req.body || {}));
 });
 
 /** POST /api/auth/admin/login  { adminCode, password } */

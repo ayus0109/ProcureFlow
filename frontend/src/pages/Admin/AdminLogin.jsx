@@ -66,17 +66,22 @@ export default function AdminLogin() {
 
   return (
     <CenteredLayout>
-      <Link
-        to="/role"
-        className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('role.heading')}
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link
+          to="/role"
+          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-teal-800 transition hover:bg-teal-50 hover:text-teal-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+        >
+          <ArrowLeft className="h-4.5 w-4.5" aria-hidden="true" />
+          <span>{t('role.heading')}</span>
+        </Link>
+        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-900 border border-teal-200">
+          APMC Staff Portal
+        </span>
+      </div>
 
       <div className="border-b border-slate-100 pb-3">
-        <h1 className="text-xl font-extrabold text-slate-900">{t('auth.adminTitle')}</h1>
-        <p className="mt-0.5 text-xs text-slate-500">{t('auth.adminSub')}</p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t('auth.adminTitle')}</h1>
+        <p className="mt-1 text-xs text-slate-600">{t('auth.adminSub')}</p>
       </div>
 
       <form onSubmit={submit} className="mt-4 space-y-3.5">

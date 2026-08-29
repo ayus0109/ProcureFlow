@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   BellRing,
   CalendarPlus,
@@ -13,6 +13,10 @@ import {
   Scale,
   CreditCard,
   Share2,
+  History,
+  Smartphone,
+  ShieldCheck,
+  FileCheck2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppShell from '../../layouts/AppShell.jsx';
@@ -21,9 +25,15 @@ import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
 import AgriServicesCard from '../../components/AgriServicesCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
+import { PrintableTokenPass } from '../../components/PrintableTokenPass.jsx';
+import { SmsDispatchModal } from '../../components/SmsDispatchModal.jsx';
+import { EkycModal } from '../../components/EkycModal.jsx';
+import { BankDetailsModal } from '../../components/BankDetailsModal.jsx';
+import { BookingHistoryModal } from '../../components/BookingHistoryModal.jsx';
 import { api } from '../../services/api';
 import { money } from '../../utils/money.js';
 import { usePoll } from '../../hooks/usePoll.js';
+import { useLiveEvents } from '../../hooks/useLiveEvents.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
@@ -146,7 +156,24 @@ function Receipt({ p, t }) {
             </>
           )}
           <Row label={t('receipt.rate')} value={`${money(p.rate_per_qtl)} / ${t('booking.qtl')}`} highlight />
-          <Row label={t('receipt.txn')} value={<span className="font-mono text-xs font-bold text-slate-800">{p.txn_ref}</span>} />
+          {p.credited_bank && (
+            <Row
+              label="Govt DBT Bank"
+              value={
+                <span className="font-bold text-emerald-950 flex items-center gap-1">
+                  🏛️ {p.credited_bank} ({p.credited_account || '••••4821'})
+                </span>
+              }
+            />
+          )}
+          {p.pfms_utr ? (
+            <Row
+              label="PFMS Govt UTR"
+              value={<span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100/70 px-2 py-0.5 rounded">{p.pfms_utr}</span>}
+            />
+          ) : (
+            <Row label={t('receipt.txn')} value={<span className="font-mono text-xs font-bold text-slate-800">{p.txn_ref}</span>} />
+          )}
         </dl>
       </div>
     </div>
@@ -154,9 +181,8 @@ function Receipt({ p, t }) {
 }
 
 /** Digital Gate Pass with Scannable QR & Stepper */
-function BookingCard({ booking, t }) {
+function BookingCard({ booking, t, onOpenPass }) {
   const closed = booking.status === 'CONFIRMED' || booking.status === 'REJECTED';
-  const [printModal, setPrintModal] = useState(false);
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-emerald-200/80 bg-white p-5 shadow-lg shadow-slate-200/40 sm:p-6">
@@ -187,11 +213,11 @@ function BookingCard({ booking, t }) {
           </span>
           <button
             type="button"
-            onClick={() => setPrintModal(true)}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 hover:text-emerald-950 hover:underline"
+            onClick={onOpenPass}
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
           >
-            <Printer className="h-3 w-3" />
-            <span>Print Pass Slip</span>
+            <Printer className="h-3.5 w-3.5 text-emerald-700" />
+            <span>Print Mandi Pass (PDF)</span>
           </button>
         </div>
       </div>
@@ -248,44 +274,6 @@ function BookingCard({ booking, t }) {
           {t('farmer.bookAnother')}
         </Link>
       )}
-
-      {/* Printable Slip Modal */}
-      {printModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl text-slate-900">
-            <div className="text-center border-b border-dashed border-slate-300 pb-3">
-              <p className="text-xs font-bold tracking-widest text-emerald-800 uppercase">ProcureFlow e-Pass</p>
-              <p className="text-lg font-extrabold text-slate-900">{booking.centre_name}</p>
-              <p className="text-xs text-slate-500">Ministry of Agriculture Verified Token</p>
-            </div>
-            <div className="my-5 flex flex-col items-center justify-center rounded-2xl bg-emerald-50/80 p-4 ring-1 ring-emerald-200 text-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Official Pass Token</span>
-              <p className="mt-1 font-mono text-3xl font-black text-emerald-950">{booking.token}</p>
-            </div>
-            <dl className="space-y-1 text-xs border-t border-dashed border-slate-300 pt-3">
-              <div className="flex justify-between"><dt className="text-slate-500">Farmer:</dt><dd className="font-bold">{booking.farmer_name || 'Ramesh Patil'}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Crop:</dt><dd className="font-bold">{t(`crop.${booking.crop}`)} ({booking.quantity_qtl} qtl)</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Slot:</dt><dd className="font-bold">{booking.slot_date} ({booking.slot_time})</dd></div>
-            </dl>
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="flex-1 rounded-xl bg-emerald-700 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-800"
-              >
-                Print Slip
-              </button>
-              <button
-                type="button"
-                onClick={() => setPrintModal(false)}
-                className="rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
@@ -312,18 +300,96 @@ function EmptyState({ t }) {
 }
 
 export default function FarmerHome() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { t } = useLanguage();
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
 
-  const { data: booking, error, loading } = usePoll(() => api('/bookings/mine'), 4000, []);
+  // Modals state
+  const [showPassModal, setShowPassModal] = useState(false);
+  const [showSmsModal, setShowSmsModal] = useState(false);
+  const [showEkycModal, setShowEkycModal] = useState(false);
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedPassBooking, setSelectedPassBooking] = useState(null);
+
+  const { data: booking, error, loading, setData: setBookingData } = usePoll(
+    () => api('/bookings/mine'),
+    5000,
+    []
+  );
+
+  // Real-time SSE push listener (Item 8)
+  useLiveEvents(
+    useCallback(
+      (event) => {
+        if (event.type === 'QUEUE_UPDATED' || event.type === 'PAYMENT_UPDATED') {
+          api('/bookings/mine')
+            .then((data) => setBookingData(data))
+            .catch(() => {});
+        }
+      },
+      [setBookingData]
+    )
+  );
 
   const allBookings = booking?.allBookings || (booking ? [booking] : []);
   const activeCount = booking?.activeCount || (booking && booking.status !== 'CONFIRMED' && booking.status !== 'REJECTED' ? 1 : 0);
   const currentBooking = allBookings[selectedSlotIdx] || allBookings[0] || booking;
 
+  const handleOpenActivePass = () => {
+    setSelectedPassBooking(currentBooking);
+    setShowPassModal(true);
+  };
+
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
+      {/* Top Quick Actions Bar: History, Bank Account, SMS Logs, e-KYC */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowHistoryModal(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
+          >
+            <History className="h-3.5 w-3.5 text-emerald-700" />
+            <span>All Bookings & History</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowBankModal(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs"
+          >
+            <CreditCard className="h-3.5 w-3.5 text-emerald-800" />
+            <span>🏦 Bank Account & DBT</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowSmsModal(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
+          >
+            <Smartphone className="h-3.5 w-3.5 text-blue-700" />
+            <span>SMS & WhatsApp Log</span>
+          </button>
+        </div>
+
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowEkycModal(true)}
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-2xs border ${
+              user?.ekyc_verified
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100'
+                : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100 animate-pulse'
+            }`}
+          >
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+            <span>{user?.ekyc_verified ? '✅ Govt e-KYC Verified' : '⚠️ Complete Aadhaar e-KYC'}</span>
+          </button>
+        </div>
+      </div>
+
       {loading && <p className="text-sm font-medium text-slate-500 animate-pulse">{t('common.loading')}</p>}
 
       {error && (
@@ -375,7 +441,17 @@ export default function FarmerHome() {
         </div>
       )}
 
-      {!loading && !error && (currentBooking ? <BookingCard booking={currentBooking} t={t} /> : <EmptyState t={t} />)}
+      {!loading && !error && (
+        currentBooking ? (
+          <BookingCard
+            booking={currentBooking}
+            t={t}
+            onOpenPass={handleOpenActivePass}
+          />
+        ) : (
+          <EmptyState t={t} />
+        )
+      )}
 
       {/* Multi-Slot Action: Add another slot when < 3 */}
       {currentBooking && activeCount < 3 && (
@@ -392,9 +468,9 @@ export default function FarmerHome() {
         <div className="flex items-center justify-between px-2 text-xs font-medium text-slate-500">
           <span className="flex items-center gap-1.5">
             <RefreshCw className="h-3.5 w-3.5 text-emerald-600 animate-spin" aria-hidden="true" />
-            {t('farmer.live')}
+            <span className="text-emerald-800 font-bold">⚡ Live Instant Sync</span>
           </span>
-          <span className="text-[11px] text-slate-400">Syncing queue every 4s</span>
+          <span className="text-[11px] text-slate-400">Server-Sent Events Active</span>
         </div>
       )}
 
@@ -404,20 +480,125 @@ export default function FarmerHome() {
 
       <AgriServicesCard />
 
-      {/* Profile summary card */}
+      {/* Profile summary card with e-KYC, Bank DBT, and PM-Kisan Details */}
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-        <h2 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-          {t('farmer.yourDetails')}
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+            {t('farmer.yourDetails')}
+          </h2>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowBankModal(true)}
+              className="text-[11px] font-bold text-emerald-700 hover:underline"
+            >
+              ⚙️ Manage Bank Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowEkycModal(true)}
+              className="text-[11px] font-bold text-emerald-700 hover:underline"
+            >
+              {user?.ekyc_verified ? 'View e-KYC' : 'Verify e-KYC'}
+            </button>
+          </div>
+        </div>
         <dl className="mt-2 divide-y divide-slate-100 text-xs">
           <Row label={t('auth.name')} value={user.name} />
           <Row label={t('auth.phone')} value={user.phone} />
           {user.village && <Row label={t('auth.village')} value={user.village} />}
+          <Row
+            label="Aadhaar Number"
+            value={
+              user.aadhaar_no ? (
+                <span className="font-mono font-bold text-emerald-900">{user.aadhaar_no}</span>
+              ) : (
+                <span className="text-amber-800 font-semibold">Not Linked</span>
+              )
+            }
+          />
+          <Row
+            label="Bank Account (DBT)"
+            value={
+              user.bank_account ? (
+                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span>🏛️ {user.bank_name || 'State Bank of India'}</span>
+                  <span className="font-mono text-emerald-900 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    ••••{user.bank_account.slice(-4)}
+                  </span>
+                  <span className="text-slate-500 text-[10px]">({user.ifsc_code})</span>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowBankModal(true)}
+                  className="font-bold text-emerald-700 underline"
+                >
+                  + Add Bank Account for DBT Payouts
+                </button>
+              )
+            }
+          />
+          {user.pmkisan_id && (
+            <Row
+              label="PM-Kisan Beneficiary ID"
+              value={<span className="font-mono font-bold text-slate-800">{user.pmkisan_id}</span>}
+            />
+          )}
         </dl>
       </section>
+
+      {/* Bank Details Modal */}
+      {showBankModal && (
+        <BankDetailsModal
+          farmer={user}
+          onSaved={(updatedUser) => {
+            if (setUser) setUser(updatedUser);
+          }}
+          onClose={() => setShowBankModal(false)}
+        />
+      )}
+
+      {/* Printable Mandi Pass Modal (Item 9) */}
+      {showPassModal && selectedPassBooking && (
+        <PrintableTokenPass
+          booking={selectedPassBooking}
+          farmer={user}
+          onClose={() => setShowPassModal(false)}
+        />
+      )}
+
+      {/* SMS & WhatsApp Dispatch Log Modal (Item 6) */}
+      {showSmsModal && (
+        <SmsDispatchModal farmerId={user.id} onClose={() => setShowSmsModal(false)} />
+      )}
+
+      {/* Govt Aadhaar e-KYC Modal (Item 7) */}
+      {showEkycModal && (
+        <EkycModal
+          farmer={user}
+          onVerified={(updatedUser) => {
+            if (setUser) setUser(updatedUser);
+          }}
+          onClose={() => setShowEkycModal(false)}
+        />
+      )}
+
+      {/* All Bookings & History Modal (Item 13) */}
+      {showHistoryModal && (
+        <BookingHistoryModal
+          onClose={() => setShowHistoryModal(false)}
+          onSelectPass={(b) => {
+            setSelectedPassBooking(b);
+            setShowHistoryModal(false);
+            setShowPassModal(true);
+          }}
+        />
+      )}
 
       {/* AI Voice Booking Assistant — floating over page */}
       <VoiceAssistant />
     </AppShell>
   );
 }
+

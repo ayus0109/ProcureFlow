@@ -10,9 +10,15 @@ router.get('/', requireAuth('admin'), (req, res) => {
   res.json(listPayments(adminCentreId(req.auth.id), req.query.date));
 });
 
-/** POST /api/payments/:paymentId/paid — release the money. */
+/** POST /api/payments/:paymentId/paid — release the money via Govt DBT. */
 router.post('/:paymentId/paid', requireAuth('admin'), (req, res) => {
-  res.json(markPaid({ paymentId: req.params.paymentId, adminId: req.auth.id }));
+  res.json(
+    markPaid({
+      paymentId: req.params.paymentId,
+      adminId: req.auth.id,
+      ...(req.body || {}),
+    })
+  );
 });
 
 module.exports = router;
