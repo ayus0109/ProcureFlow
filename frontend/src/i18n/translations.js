@@ -312,7 +312,7 @@ export const translations = {
     'historyModal.sub': 'Complete records of all digital tokens, appointments, and MSP receipts',
     'historyModal.empty': 'No booking records found.',
 
-    // Admin Cockpit
+    // Admin Cockpit & Analytics
     'admin.today': 'Today at your centre',
     'admin.bookedToday': 'Booked today',
     'admin.inQueue': 'In queue now',
@@ -327,6 +327,17 @@ export const translations = {
     'admin.recordProcurement': 'Record procurement',
     'admin.atCounter': 'At the counter',
     'admin.searchPlaceholder': 'Search by token, farmer name or village…',
+
+    // Advanced Analytics & Farmer Dossier
+    'analytics.cockpit': 'Executive Procurement Cockpit',
+    'analytics.farmerSearch': 'Instant Farmer Dossier & Procurement Audit',
+    'analytics.searchPlaceholder': 'Search by Farmer Name, 12-digit Aadhaar Card, Mobile, or Token #…',
+    'analytics.searchHint': 'Quick lookup suggestions:',
+    'analytics.farmerDetails': 'Farmer Particulars & Land Verification',
+    'analytics.allHistory': 'All Past Mandi Transactions & Procurement History',
+    'analytics.noFarmerFound': 'No farmer matching this search criteria found.',
+    'analytics.typeToSearch': 'Type any farmer name or Aadhaar number above to inspect full procurement history within seconds.',
+    'analytics.exportCsv': 'Export APMC Report (CSV)',
 
     // AI Voice Assistant
     'va.assistantTitle': 'AI Booking Assistant',
@@ -639,7 +650,7 @@ export const translations = {
     'historyModal.sub': 'आपके सभी डिजिटल टोकन, पास और भुगतान रसीदों का विवरण',
     'historyModal.empty': 'कोई पुराना रिकॉर्ड नहीं मिला।',
 
-    // Admin Cockpit
+    // Admin Cockpit & Analytics
     'admin.today': 'आज आपके केंद्र पर',
     'admin.bookedToday': 'आज बुक हुए',
     'admin.inQueue': 'अभी कतार में',
@@ -654,6 +665,17 @@ export const translations = {
     'admin.recordProcurement': 'खरीद दर्ज करें',
     'admin.atCounter': 'काउंटर पर',
     'admin.searchPlaceholder': 'टोकन, किसान का नाम या गांव खोजें…',
+
+    // Advanced Analytics & Farmer Dossier
+    'analytics.cockpit': 'कार्यकारी खरीद केंद्र विश्लेषण',
+    'analytics.farmerSearch': 'त्वरित किसान विवरण एवं खरीद ऑडिट',
+    'analytics.searchPlaceholder': 'किसान का नाम, 12-अंकों का आधार कार्ड, मोबाइल या टोकन नंबर दर्ज करें…',
+    'analytics.searchHint': 'त्वरित खोज सुझाव:',
+    'analytics.farmerDetails': 'किसान विवरण एवं भूमि सत्यापन',
+    'analytics.allHistory': 'सभी पूर्व मंडी लेनदेन एवं खरीद विवरण',
+    'analytics.noFarmerFound': 'इस खोज से कोई किसान नहीं मिला।',
+    'analytics.typeToSearch': 'पूरी खरीद इतिहास देखने के लिए ऊपर किसान का नाम या आधार कार्ड नंबर लिखें।',
+    'analytics.exportCsv': 'एपीएमसी रिपोर्ट डाउनलोड करें (CSV)',
 
     // AI Voice Assistant
     'va.assistantTitle': 'एआई बुकिंग सहायक',
@@ -966,7 +988,7 @@ export const translations = {
     'historyModal.sub': 'तुमच्या सर्व डिजिटल टोकन्स, पासेस आणि पावत्यांचा तपशील',
     'historyModal.empty': 'कोणताही जुना रेकॉर्ड आढळला नाही.',
 
-    // Admin Cockpit
+    // Admin Cockpit & Analytics
     'admin.today': 'आज तुमच्या केंद्रावर',
     'admin.bookedToday': 'आज बुक झाले',
     'admin.inQueue': 'सध्या रांगेत',
@@ -981,6 +1003,17 @@ export const translations = {
     'admin.recordProcurement': 'खरेदी नोंदवा',
     'admin.atCounter': 'काऊंटरवर',
     'admin.searchPlaceholder': 'टोकन, शेतकरी नाव किंवा गाव शोधा…',
+
+    // Advanced Analytics & Farmer Dossier
+    'analytics.cockpit': 'कार्यकारी शेतमाल खरेदी विश्लेषण डॅशबोर्ड',
+    'analytics.farmerSearch': 'त्वरित शेतकरी माहिती आणि खरेदी तपासणी',
+    'analytics.searchPlaceholder': 'शेतकऱ्याचे नाव, १२ अंकी आधार कार्ड, मोबाईल किंवा टोकन क्रमांक टाका…',
+    'analytics.searchHint': 'जलद शोध पर्याय:',
+    'analytics.farmerDetails': 'शेतकरी तपशील आणि जमीन पडताळणी',
+    'analytics.allHistory': 'सर्व मागील खरेदी आणि व्यवहार इतिहास',
+    'analytics.noFarmerFound': 'या शोधाशी जुळणारा कोणताही शेतकरी आढळला नाही.',
+    'analytics.typeToSearch': 'संपूर्ण खरेदी इतिहास पाहण्यासाठी वर शेतकऱ्याचे नाव किंवा आधार नंबर टाका.',
+    'analytics.exportCsv': 'एपीएमसी अहवाल डाउनलोड करा (CSV)',
 
     // AI Voice Assistant
     'va.assistantTitle': 'एआय बुकिंग सहाय्यक',

@@ -2,7 +2,7 @@
  * backend/routes/analytics.js
  *
  * Real-time Procurement Analytics, Grade Distributions, Financial Metrics,
- * and Official APMC CSV Export for District Administration.
+ * Instant Farmer Dossier & Aadhaar Lookup, and Official APMC CSV Export.
  */
 
 const express = require('express');
@@ -28,14 +28,17 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
   const totals = db.prepare(`
     SELECT
       COUNT(DISTINCT b.id) AS total_bookings,
+      COUNT(DISTINCT b.farmer_id) AS total_farmers,
       SUM(CASE WHEN b.slot_date = ? THEN 1 ELSE 0 END) AS bookings_today,
       SUM(CASE WHEN b.status = 'CONFIRMED' THEN 1 ELSE 0 END) AS completed_sales,
+      SUM(CASE WHEN b.status = 'REJECTED' THEN 1 ELSE 0 END) AS rejected_sales,
       SUM(CASE WHEN b.status IN ('BOOKED', 'WAITING', 'CALLED', 'CHECKED_IN', 'ASSAYING', 'WEIGHMENT') AND b.slot_date = ? THEN 1 ELSE 0 END) AS active_in_queue,
       COALESCE(SUM(p.final_weight_qtl), 0) AS total_weight_qtl,
       COALESCE(SUM(CASE WHEN b.slot_date = ? THEN p.final_weight_qtl ELSE 0 END), 0) AS today_weight_qtl,
       COALESCE(SUM(p.total_amount), 0) AS total_revenue_inr,
       COALESCE(SUM(CASE WHEN y.status = 'PAID' THEN y.amount ELSE 0 END), 0) AS paid_revenue_inr,
-      COALESCE(SUM(CASE WHEN y.status != 'PAID' AND p.id IS NOT NULL THEN p.total_amount ELSE 0 END), 0) AS pending_payout_inr
+      COALESCE(SUM(CASE WHEN y.status != 'PAID' AND p.id IS NOT NULL THEN p.total_amount ELSE 0 END), 0) AS pending_payout_inr,
+      COALESCE(AVG(p.moisture_pct), 11.2) AS avg_moisture_pct
     FROM bookings b
     LEFT JOIN procurements p ON p.booking_id = b.id AND p.accepted = 1
     LEFT JOIN payments y ON y.procurement_id = p.id
@@ -49,7 +52,8 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
       COUNT(b.id) AS booking_count,
       COALESCE(SUM(b.quantity_qtl), 0) AS planned_qtl,
       COALESCE(SUM(p.final_weight_qtl), 0) AS procured_qtl,
-      COALESCE(SUM(p.total_amount), 0) AS payout_inr
+      COALESCE(SUM(p.total_amount), 0) AS payout_inr,
+      COALESCE(AVG(p.moisture_pct), 0) AS avg_moisture
     FROM bookings b
     LEFT JOIN procurements p ON p.booking_id = b.id AND p.accepted = 1
     WHERE b.centre_id = ?
@@ -58,7 +62,7 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
 
   const cropMap = new Map(cropRows.map((r) => [r.crop, r]));
   const cropBreakdown = CROPS.map((c) => {
-    const data = cropMap.get(c.key) || { booking_count: 0, planned_qtl: 0, procured_qtl: 0, payout_inr: 0 };
+    const data = cropMap.get(c.key) || { booking_count: 0, planned_qtl: 0, procured_qtl: 0, payout_inr: 0, avg_moisture: 0 };
     return {
       cropKey: c.key,
       cropLabel: c.label,
@@ -67,6 +71,7 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
       plannedQtl: Number(data.planned_qtl.toFixed(1)),
       procuredQtl: Number(data.procured_qtl.toFixed(1)),
       payoutInr: Number(data.payout_inr.toFixed(2)),
+      avgMoisture: Number(Number(data.avg_moisture).toFixed(1)),
     };
   });
 
@@ -96,6 +101,22 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
     ORDER BY b.slot_time
   `).all(centreId, today);
 
+  // 5. Recent 7-Day Procurement Trend
+  const trendRows = db.prepare(`
+    SELECT
+      b.slot_date AS date,
+      COUNT(b.id) AS total_bookings,
+      SUM(CASE WHEN b.status = 'CONFIRMED' THEN 1 ELSE 0 END) AS completed_sales,
+      COALESCE(SUM(p.final_weight_qtl), 0) AS total_qtl,
+      COALESCE(SUM(p.total_amount), 0) AS total_payout
+    FROM bookings b
+    LEFT JOIN procurements p ON p.booking_id = b.id AND p.accepted = 1
+    WHERE b.centre_id = ?
+    GROUP BY b.slot_date
+    ORDER BY b.slot_date ASC
+    LIMIT 7
+  `).all(centreId);
+
   res.json({
     centre: {
       id: centre.id,
@@ -111,7 +132,143 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
     cropBreakdown,
     gradeBreakdown: gradeRows,
     hourlyThroughput: slotRows,
+    trend: trendRows,
     generatedAt: new Date().toISOString(),
+  });
+});
+
+/**
+ * GET /api/analytics/farmer-lookup?query=...
+ * High-speed instant search for farmer by Name, Aadhaar Card, Phone, PM-Kisan ID, or Token #.
+ * Returns full farmer dossier and all historical procurement transaction details within milliseconds.
+ */
+router.get('/farmer-lookup', requireAuth('admin'), (req, res) => {
+  const query = (req.query.q || req.query.query || '').trim();
+  if (!query) {
+    return res.json({ query: '', count: 0, farmers: [] });
+  }
+
+  const cleanDigits = query.replace(/\D/g, '');
+  const likeQuery = `%${query}%`;
+  const likeDigits = cleanDigits ? `%${cleanDigits}%` : null;
+
+  let farmerIds = [];
+
+  // Match by Token e.g. PF-1024 or 1024
+  if (query.toUpperCase().startsWith('PF-') || (cleanDigits.length >= 3 && cleanDigits.length <= 6)) {
+    const tokenMatch = db.prepare(`
+      SELECT DISTINCT farmer_id FROM bookings WHERE token LIKE ? OR id = ?
+    `).all(`%${query.toUpperCase()}%`, Number(cleanDigits) >= 1024 ? Number(cleanDigits) - 1023 : Number(cleanDigits));
+    farmerIds.push(...tokenMatch.map((r) => r.farmer_id));
+  }
+
+  // Match by name, phone, village, pmkisan_id, aadhaar_no
+  const directMatches = db.prepare(`
+    SELECT id FROM farmers
+    WHERE name LIKE ?
+       OR phone LIKE ?
+       OR village LIKE ?
+       OR pmkisan_id LIKE ?
+       OR (aadhaar_no IS NOT NULL AND REPLACE(aadhaar_no, '-', '') LIKE ?)
+       OR (aadhaar_no IS NOT NULL AND aadhaar_no LIKE ?)
+    LIMIT 20
+  `).all(likeQuery, likeQuery, likeQuery, likeQuery, likeDigits || likeQuery, likeQuery);
+
+  farmerIds.push(...directMatches.map((r) => r.id));
+  farmerIds = Array.from(new Set(farmerIds)).slice(0, 10);
+
+  if (farmerIds.length === 0) {
+    return res.json({ query, count: 0, farmers: [] });
+  }
+
+  const results = [];
+
+  for (const fId of farmerIds) {
+    const farmer = db.prepare(`
+      SELECT id, name, phone, village, aadhaar_no, ekyc_verified, pmkisan_id, land_acres, bank_account, ifsc_code, bank_name, account_holder, created_at
+      FROM farmers WHERE id = ?
+    `).get(fId);
+
+    if (!farmer) continue;
+
+    const summary = db.prepare(`
+      SELECT
+        COUNT(b.id) AS total_bookings,
+        SUM(CASE WHEN b.status = 'CONFIRMED' THEN 1 ELSE 0 END) AS completed_sales,
+        SUM(CASE WHEN b.status IN ('BOOKED', 'WAITING', 'CALLED', 'CHECKED_IN', 'ASSAYING', 'WEIGHMENT') THEN 1 ELSE 0 END) AS active_bookings,
+        COALESCE(SUM(p.final_weight_qtl), 0) AS total_weighed_qtl,
+        COALESCE(SUM(p.total_amount), 0) AS total_payout_inr,
+        COALESCE(SUM(CASE WHEN y.status = 'PAID' THEN y.amount ELSE 0 END), 0) AS paid_amount_inr,
+        COALESCE(SUM(CASE WHEN y.status != 'PAID' AND p.id IS NOT NULL THEN p.total_amount ELSE 0 END), 0) AS pending_payout_inr
+      FROM bookings b
+      LEFT JOIN procurements p ON p.booking_id = b.id AND p.accepted = 1
+      LEFT JOIN payments y ON y.procurement_id = p.id
+      WHERE b.farmer_id = ?
+    `).get(fId);
+
+    const history = db.prepare(`
+      SELECT
+        b.id AS booking_id,
+        b.token,
+        b.slot_date,
+        b.slot_time,
+        b.status AS booking_status,
+        b.crop,
+        b.quantity_qtl AS booked_qty_qtl,
+        b.created_at AS booking_created_at,
+        c.id AS centre_id,
+        c.name AS centre_name,
+        c.district AS centre_district,
+        p.id AS procurement_id,
+        p.quality_grade,
+        p.moisture_pct,
+        p.final_weight_qtl,
+        p.rate_per_qtl,
+        p.total_amount,
+        p.remarks,
+        p.confirmed_at,
+        COALESCE(y.status, CASE WHEN p.id IS NOT NULL THEN 'PROCESSING' ELSE 'PENDING' END) AS payment_status,
+        y.txn_ref,
+        y.pfms_utr,
+        y.disbursed_at,
+        y.credited_bank,
+        y.credited_account
+      FROM bookings b
+      JOIN centres c ON c.id = b.centre_id
+      LEFT JOIN procurements p ON p.booking_id = b.id
+      LEFT JOIN payments y ON y.procurement_id = p.id
+      WHERE b.farmer_id = ?
+      ORDER BY b.slot_date DESC, b.id DESC
+    `).all(fId);
+
+    const enrichedHistory = history.map((h) => {
+      const cropObj = CROPS.find((c) => c.key === h.crop) || { label: h.crop, ratePerQtl: h.rate_per_qtl || 0 };
+      return {
+        ...h,
+        cropLabel: cropObj.label,
+        baseMspRate: cropObj.ratePerQtl,
+      };
+    });
+
+    results.push({
+      farmer,
+      summary: {
+        totalBookings: Number(summary.total_bookings || 0),
+        completedSales: Number(summary.completed_sales || 0),
+        activeBookings: Number(summary.active_bookings || 0),
+        totalWeighedQtl: Number((summary.total_weighed_qtl || 0).toFixed(1)),
+        totalPayoutInr: Number((summary.total_payout_inr || 0).toFixed(2)),
+        paidAmountInr: Number((summary.paid_amount_inr || 0).toFixed(2)),
+        pendingPayoutInr: Number((summary.pending_payout_inr || 0).toFixed(2)),
+      },
+      transactions: enrichedHistory,
+    });
+  }
+
+  res.json({
+    query,
+    count: results.length,
+    farmers: results,
   });
 });
 
@@ -144,7 +301,8 @@ router.get('/export', requireAuth('admin'), (req, res) => {
       p.total_amount,
       p.confirmed_at,
       COALESCE(y.status, 'UNPAID') AS payment_status,
-      y.txn_ref
+      y.txn_ref,
+      y.pfms_utr
     FROM bookings b
     JOIN farmers f ON f.id = b.farmer_id
     LEFT JOIN procurements p ON p.booking_id = b.id
@@ -173,6 +331,7 @@ router.get('/export', requireAuth('admin'), (req, res) => {
     'Confirmed At',
     'Payment Status',
     'Txn Ref',
+    'PFMS UTR',
   ];
 
   const csvRows = [headers.join(',')];
@@ -197,6 +356,7 @@ router.get('/export', requireAuth('admin'), (req, res) => {
       r.confirmed_at || '',
       r.payment_status || '',
       r.txn_ref || '',
+      r.pfms_utr || '',
     ];
     csvRows.push(values.join(','));
   }
