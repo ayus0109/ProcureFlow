@@ -335,27 +335,17 @@ export default function FarmerChatbot() {
 
   return (
     <>
-      {/* 🚀 PROMINENT, LARGE FLOATING TRIGGER WIDGET (FULLY VISIBLE ON PHONE & DESKTOP) */}
+      {/* Floating Trigger Button (Compact Circular Floating Icon) */}
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 rounded-full bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 py-3.5 px-5 sm:py-4 sm:px-6 text-white shadow-2xl shadow-emerald-950/60 ring-4 ring-emerald-300/50 transition-all hover:scale-105 active:scale-95 group"
+          className="fixed bottom-6 right-5 z-50 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 shadow-2xl shadow-emerald-950/50 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95"
           aria-label="Kisan Sahayak Chatbot"
         >
-          <span className="relative flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-white/20">
-            <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-            <Bot className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
-          </span>
-          <div className="text-left">
-            <p className="text-sm sm:text-base font-black leading-tight tracking-wide">
-              {lang === 'mr' ? 'किसान सहाय्यक AI' : lang === 'hi' ? 'किसान सहायक AI' : 'Kisan Sahayak AI'}
-            </p>
-            <p className="text-xs text-emerald-200 font-bold">
-              {lang === 'mr' ? 'मदत व शंका निवारण' : lang === 'hi' ? 'मदद एवं समाधान' : 'Doubts & Help AI'}
-            </p>
-          </div>
-          <span className="rounded-full bg-amber-400 px-2.5 py-1 text-xs font-black text-slate-950 shadow-sm ml-1">
+          <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-50 animate-ping" />
+          <Bot className="relative h-7 w-7 text-white" />
+          <span className="absolute -top-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950 shadow-xs">
             AI
           </span>
         </button>
