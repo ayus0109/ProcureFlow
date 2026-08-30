@@ -570,16 +570,6 @@ export default function FarmerHome() {
         </Link>
       )}
 
-      {currentBooking && !currentBooking.procurement && (
-        <div className="flex items-center justify-between px-2 text-xs font-semibold text-slate-500">
-          <span className="flex items-center gap-1.5">
-            <RefreshCw className="h-4 w-4 text-emerald-600 animate-spin" aria-hidden="true" />
-            <span className="text-emerald-800 font-bold">⚡ {t('farmer.live')}</span>
-          </span>
-          <span className="text-xs text-slate-400">{t('farmer.sseActive')}</span>
-        </div>
-      )}
-
       <AlertsPanel />
 
       <SeasonTracker />
@@ -602,22 +592,13 @@ export default function FarmerHome() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => setHelperModalOpen(true)} className="flex items-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-900 hover:bg-blue-100 transition shadow-2xs">
-              <Users className="h-4 w-4" /> Family Helpers
-            </button>
             <button
               type="button"
-              onClick={() => setShowBankModal(true)}
-              className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition shadow-2xs"
+              onClick={() => setHelperModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-900 hover:bg-blue-100 transition shadow-2xs"
             >
-              {t('farmer.manageBank')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowEkycModal(true)}
-              className="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
-            >
-              {user?.ekyc_verified ? t('farmer.viewEkyc') : t('farmer.verifyEkyc')}
+              <Users className="h-4 w-4 text-blue-700" />
+              <span>Family Helpers</span>
             </button>
           </div>
         </div>
