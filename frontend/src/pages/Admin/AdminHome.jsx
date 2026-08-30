@@ -211,81 +211,65 @@ export default function AdminHome() {
 
   return (
     <AppShell title={user.centre_name} subtitle={`Officer: ${user.name} • Code: ${user.admin_code}`}>
-      {/* Top Cockpit Tabs & Global Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-        <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
+      {/* 🚀 ENLARGED & DEDUPLICATED EXECUTIVE NAVIGATION TABS */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-slate-100/90 p-1.5 border border-slate-200/80 shadow-2xs">
+          {/* 1. Live Queue */}
           <button
             type="button"
             onClick={() => setActiveTab('QUEUE')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'QUEUE'
-                ? 'bg-white text-emerald-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
             }`}
           >
-            <Users className="h-3.5 w-3.5 text-emerald-700" />
+            <Users className="h-4 w-4 text-emerald-700" />
             <span>Live Queue</span>
+            {queue.length > 0 && (
+              <span className="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-mono font-black text-emerald-900 border border-emerald-200">
+                {queue.length}
+              </span>
+            )}
           </button>
 
+          {/* 2. APMC Analytics & CSV */}
           <button
             type="button"
             onClick={() => setActiveTab('ANALYTICS')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'ANALYTICS'
-                ? 'bg-white text-emerald-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
             }`}
           >
-            <BarChart3 className="h-3.5 w-3.5 text-emerald-700" />
+            <BarChart3 className="h-4 w-4 text-emerald-700" />
             <span>APMC Analytics & CSV</span>
           </button>
 
+          {/* 3. DBT Payments */}
           <button
             type="button"
             onClick={() => setActiveTab('PAYMENTS')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'PAYMENTS'
-                ? 'bg-white text-emerald-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
             }`}
           >
-            <CreditCard className="h-3.5 w-3.5 text-emerald-700" />
+            <CreditCard className="h-4 w-4 text-emerald-700" />
             <span>DBT Payments</span>
           </button>
-        </div>
 
-        <div className="flex items-center gap-2">
+          {/* 4. SMS & WhatsApp Log */}
           <button
             type="button"
             onClick={() => setShowSmsModal(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-2xs"
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black text-slate-700 hover:text-blue-950 hover:bg-white/60 transition-all"
           >
-            <Smartphone className="h-3.5 w-3.5 text-blue-700" />
+            <Smartphone className="h-4 w-4 text-blue-700" />
             <span>SMS & WhatsApp Log</span>
           </button>
-
-          {centre && (
-            <button
-              type="button"
-              onClick={() => {
-                setQuotaForm({
-                  daily_target_qtl: centre?.daily_target_qtl || 500,
-                  max_qty_per_farmer: centre?.max_qty_per_farmer || 50,
-                  daily_capacity: centre?.daily_capacity || 120,
-                  slot_capacity: centre?.slot_capacity || 10,
-                  active_counters: centre?.active_counters || 2,
-                  accepted_crops: centre?.accepted_crops_list || ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'],
-                  max_moisture_pct: centre?.max_moisture_pct || 12.0,
-                  min_quality_grade: centre?.min_quality_grade || 'FAQ',
-                });
-                setQuotaModal(true);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/80 px-3 py-1.5 text-xs font-bold text-emerald-900 transition hover:bg-emerald-100"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5 text-emerald-800" />
-              <span>⚙️ Centre Quotas & Crops</span>
-            </button>
-          )}
         </div>
       </div>
       {/* Toast Announcement for completed/rejected sale */}
