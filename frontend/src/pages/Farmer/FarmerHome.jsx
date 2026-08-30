@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   Building2,
   User,
+  Users,
   Phone,
   FileCheck2,
   ChevronRight,
@@ -28,6 +29,10 @@ import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
 import KisanHelplineCard from '../../components/KisanHelplineCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
+import DisputeButton from '../../components/DisputeButton.jsx';
+import HelperAccountModal from '../../components/HelperAccountModal.jsx';
+import SpeakButton from '../../components/ui/SpeakButton.jsx';
+import OnlineStatus from '../../components/ui/OnlineStatus.jsx';
 import { PrintableTokenPass } from '../../components/PrintableTokenPass.jsx';
 import { SmsDispatchModal } from '../../components/SmsDispatchModal.jsx';
 import { EkycModal } from '../../components/EkycModal.jsx';
@@ -232,9 +237,12 @@ function BookingCard({ booking, t, onOpenPass }) {
                 Digital Gate Pass
               </span>
             </div>
-            <p className="font-mono text-2xl font-extrabold tracking-tight text-emerald-950 sm:text-3xl">
-              {booking.token}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="font-mono text-2xl font-extrabold tracking-tight text-emerald-950 sm:text-3xl">
+                {booking.token}
+              </p>
+              <SpeakButton text={`Token ${booking.token}. Position ${booking.position}. Wait time ${booking.waitLabel}.`} />
+            </div>
           </div>
         </div>
 
@@ -307,6 +315,15 @@ function BookingCard({ booking, t, onOpenPass }) {
       {/* Completed Receipt */}
       {booking.procurement && <Receipt p={booking.procurement} t={t} />}
 
+      {booking.status === 'REJECTED' && (
+        <DisputeButton 
+          bookingId={booking.id}
+          currentStatus={booking.status}
+          disputeStatus={booking.dispute_status}
+          disputeResolution={booking.dispute_resolution}
+        />
+      )}
+
       {/* Book Another Slot Button if closed */}
       {closed && (
         <Link
@@ -354,6 +371,7 @@ export default function FarmerHome() {
   const [showBankModal, setShowBankModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedPassBooking, setSelectedPassBooking] = useState(null);
+  const [helperModalOpen, setHelperModalOpen] = useState(false);
 
   const { data: booking, error, loading, setData: setBookingData } = usePoll(
     () => api('/bookings/mine'),
@@ -386,6 +404,9 @@ export default function FarmerHome() {
 
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
+      <div className="mb-4">
+        <OnlineStatus />
+      </div>
       {/* 🚀 ENLARGED Quick Actions Grid: All Bookings, Bank Account & DBT, SMS Log, e-KYC */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 1. All Bookings & History */}
@@ -581,6 +602,9 @@ export default function FarmerHome() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button onClick={() => setHelperModalOpen(true)} className="flex items-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-900 hover:bg-blue-100 transition shadow-2xs">
+              <Users className="h-4 w-4" /> Family Helpers
+            </button>
             <button
               type="button"
               onClick={() => setShowBankModal(true)}
@@ -710,6 +734,9 @@ export default function FarmerHome() {
           }}
         />
       )}
+
+      {/* Helper Account Modal */}
+      <HelperAccountModal open={helperModalOpen} onClose={() => setHelperModalOpen(false)} />
 
       {/* AI Voice Booking Assistant — floating over page */}
       <VoiceAssistant />

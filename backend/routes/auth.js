@@ -51,4 +51,51 @@ router.get('/me', requireAuth(), (req, res) => {
   res.json(session);
 });
 
+/** POST /api/auth/farmer/add-helper — link a helper to the farmer's account. */
+router.post('/farmer/add-helper', requireAuth('farmer'), (req, res) => {
+  const db = require('../db');
+  const { helperName, helperPhone, relationship } = req.body || {};
+  
+  if (!helperName || !helperPhone) {
+    throw require('../utils/http').httpError(400, 'Helper name and phone number are required');
+  }
+  
+  // Max 3 helpers per farmer
+  const count = db.prepare('SELECT COUNT(*) as cnt FROM helpers WHERE farmer_id = ?').get(req.auth.id);
+  if (count && count.cnt >= 3) {
+    throw require('../utils/http').httpError(400, 'Maximum 3 helpers allowed per account');
+  }
+  
+  try {
+    db.prepare('INSERT INTO helpers (farmer_id, helper_name, helper_phone, relationship) VALUES (?, ?, ?, ?)')
+      .run(req.auth.id, helperName, helperPhone, relationship || 'Family');
+  } catch (err) {
+    if (err.message?.includes('UNIQUE')) {
+      throw require('../utils/http').httpError(409, 'This phone number is already linked as a helper');
+    }
+    throw err;
+  }
+  
+  res.json({ ok: true, message: 'Helper added successfully' });
+});
+
+/** GET /api/auth/farmer/helpers — list linked helpers. */
+router.get('/farmer/helpers', requireAuth('farmer'), (req, res) => {
+  const db = require('../db');
+  const helpers = db.prepare('SELECT id, helper_name, helper_phone, relationship, created_at FROM helpers WHERE farmer_id = ?')
+    .all(req.auth.id);
+  res.json(helpers || []);
+});
+
+/** DELETE /api/auth/farmer/helpers/:id — remove a helper. */
+router.delete('/farmer/helpers/:id', requireAuth('farmer'), (req, res) => {
+  const db = require('../db');
+  const result = db.prepare('DELETE FROM helpers WHERE id = ? AND farmer_id = ?')
+    .run(Number(req.params.id), req.auth.id);
+  if (result.changes === 0) {
+    throw require('../utils/http').httpError(404, 'Helper not found');
+  }
+  res.json({ ok: true, message: 'Helper removed' });
+});
+
 module.exports = router;

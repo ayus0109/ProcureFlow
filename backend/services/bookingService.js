@@ -70,7 +70,7 @@ function slotAvailability(centreId, date) {
 
 const BOOKING_SELECT = `
   SELECT b.id, b.farmer_id, b.centre_id, b.crop, b.quantity_qtl,
-         b.slot_date, b.slot_time, b.status, b.token, b.created_at,
+         b.slot_date, b.slot_time, b.status, b.token, b.created_at, b.priority_score,
          c.name AS centre_name, c.district,
          c.avg_processing_min, c.active_counters, c.delay_min
     FROM bookings b
@@ -108,7 +108,7 @@ const RECEIPT_SQL = `
  */
 const POSITION_SQL = `
   WITH queue AS (
-    SELECT id, ROW_NUMBER() OVER (ORDER BY slot_time, id) AS position
+    SELECT id, ROW_NUMBER() OVER (ORDER BY priority_score DESC, slot_time, id) AS position
       FROM bookings
      WHERE centre_id = ? AND slot_date = ? AND status IN (${WAITING_PLACEHOLDERS})
   )
@@ -151,6 +151,7 @@ function decorateBooking(row) {
           ? row.slot_time.split('-')[0]
           : null
         : null,
+    priority_score: row.priority_score || 0,
     procurement: decorateReceipt(db.prepare(RECEIPT_SQL).get(row.id) || null, crop),
   };
 }
@@ -245,12 +246,34 @@ function createBooking({ farmerId, centreId, crop, quantityQtl, slotDate, slotTi
   const window = slotAvailability(centre.id, slotDate).find((s) => s.slot === slotTime);
   if (window.full) throw httpError(409, 'That time slot is full. Please pick another window.');
 
+  // Fair Queue Algorithm: calculate priority score
+  let priorityScore = 0;
+
+  // +10 if farmer has never sold at this centre this season (first-time seller)
+  const prevSales = db.prepare(
+    `SELECT COUNT(*) as cnt FROM bookings WHERE farmer_id = ? AND centre_id = ? AND status = 'CONFIRMED'`
+  ).get(farmerId, centre.id);
+  if (!prevSales || prevSales.cnt === 0) priorityScore += 10;
+
+  // +5 if small landholding (< 5 acres)
+  const farmer = db.prepare('SELECT land_acres FROM farmers WHERE id = ?').get(farmerId);
+  if (farmer && farmer.land_acres && farmer.land_acres < 5) priorityScore += 5;
+
+  // +3 if no booking in last 7 days
+  const recentBooking = db.prepare(
+    `SELECT COUNT(*) as cnt FROM bookings WHERE farmer_id = ? AND created_at > datetime('now', '-7 days')`
+  ).get(farmerId);
+  if (!recentBooking || recentBooking.cnt === 0) priorityScore += 3;
+
+  // +1 base FIFO tiebreaker (all get this)
+  priorityScore += 1;
+
   const result = db
     .prepare(
-      `INSERT INTO bookings (farmer_id, centre_id, crop, quantity_qtl, slot_date, slot_time, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO bookings (farmer_id, centre_id, crop, quantity_qtl, slot_date, slot_time, status, priority_score)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(farmerId, centre.id, crop, qty, slotDate, slotTime, STATUS.BOOKED);
+    .run(farmerId, centre.id, crop, qty, slotDate, slotTime, STATUS.BOOKED, priorityScore);
 
   const booking = decorateBooking(
     db.prepare(ONE_BOOKING_SQL).get(Number(result.lastInsertRowid))

@@ -1,5 +1,5 @@
 /**
- * ProcureFlow schema — 7 tables.
+ * ProcureFlow schema — 9 tables.
  *
  * Deliberately absent:
  *   - a `slots` table: windows are a fixed list in config/constants.js and
@@ -66,7 +66,12 @@ CREATE TABLE IF NOT EXISTS bookings (
   slot_time    TEXT    NOT NULL,
   status       TEXT    NOT NULL DEFAULT 'BOOKED',
   created_at   TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
-  token        TEXT GENERATED ALWAYS AS ('PF-' || (1023 + id)) VIRTUAL
+  token        TEXT GENERATED ALWAYS AS ('PF-' || (1023 + id)) VIRTUAL,
+  priority_score  INTEGER NOT NULL DEFAULT 0,
+  dispute_reason  TEXT,
+  dispute_status  TEXT,
+  dispute_resolution TEXT,
+  helper_id       INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS procurements (
@@ -116,6 +121,16 @@ CREATE TABLE IF NOT EXISTS sms_logs (
   sent_at    TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
+CREATE TABLE IF NOT EXISTS helpers (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  farmer_id    INTEGER NOT NULL REFERENCES farmers(id),
+  helper_name  TEXT    NOT NULL,
+  helper_phone TEXT    NOT NULL,
+  relationship TEXT    NOT NULL DEFAULT 'Family',
+  created_at   TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+  UNIQUE(farmer_id, helper_phone)
+);
+
 CREATE INDEX IF NOT EXISTS idx_bookings_queue
   ON bookings (centre_id, slot_date, status);
 CREATE INDEX IF NOT EXISTS idx_bookings_farmer
@@ -124,6 +139,8 @@ CREATE INDEX IF NOT EXISTS idx_notifications_farmer
   ON notifications (farmer_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_sms_logs_farmer
   ON sms_logs (farmer_id);
+CREATE INDEX IF NOT EXISTS idx_helpers_farmer ON helpers (farmer_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_dispute ON bookings (centre_id, dispute_status);
 `;
 
 module.exports = { SCHEMA_SQL };
