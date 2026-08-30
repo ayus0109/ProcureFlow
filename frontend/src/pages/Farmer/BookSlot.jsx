@@ -173,7 +173,7 @@ export default function BookSlot() {
   return (
     <AppShell title={t('book.title')} subtitle={t('book.sub')}>
       {/* 🧭 STEP INDICATOR PROGRESS BAR (1 -> 2 -> 3) */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+      <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-5 shadow-xs">
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {/* Step 1 Pill */}
           <button
@@ -187,16 +187,16 @@ export default function BookSlot() {
                 : 'bg-slate-50 text-slate-400'
             }`}
           >
-            <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl font-black text-xs ${
+            <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
               step === 1 ? 'bg-white text-emerald-950' : centreId ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {centreId && step !== 1 ? <Check className="h-4 w-4" /> : '1'}
             </div>
-            <div className="min-w-0 hidden xs:block sm:block">
-              <span className="block text-[10px] font-bold uppercase tracking-wider opacity-80">
+            <div className="min-w-0">
+              <span className="block text-[9px] sm:text-[10px] font-black uppercase tracking-wider opacity-80">
                 {t('common.step')} 1
               </span>
-              <span className="block text-xs font-black truncate">
+              <span className="block text-xs sm:text-sm font-black truncate">
                 {selectedCentre ? (t(`centre.${selectedCentre.id}`) || selectedCentre.name).split(' ')[0] : t('book.centre')}
               </span>
             </div>
@@ -215,17 +215,17 @@ export default function BookSlot() {
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
-            <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl font-black text-xs ${
+            <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
               step === 2 ? 'bg-white text-emerald-950' : isStep2Valid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep2Valid && step !== 2 ? <Check className="h-4 w-4" /> : '2'}
             </div>
-            <div className="min-w-0 hidden xs:block sm:block">
-              <span className="block text-[10px] font-bold uppercase tracking-wider opacity-80">
+            <div className="min-w-0">
+              <span className="block text-[9px] sm:text-[10px] font-black uppercase tracking-wider opacity-80">
                 {t('common.step')} 2
               </span>
-              <span className="block text-xs font-black truncate">
-                {crop && quantity ? `${t(`crop.${crop}`)} (${quantity}q)` : t('book.crop')}
+              <span className="block text-xs sm:text-sm font-black truncate">
+                {crop && quantity ? `${t(`crop.${crop}`)}` : t('book.crop')}
               </span>
             </div>
           </button>
@@ -243,16 +243,16 @@ export default function BookSlot() {
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
-            <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl font-black text-xs ${
+            <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
               step === 3 ? 'bg-white text-emerald-950' : isStep3Valid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep3Valid && step !== 3 ? <Check className="h-4 w-4" /> : '3'}
             </div>
-            <div className="min-w-0 hidden xs:block sm:block">
-              <span className="block text-[10px] font-bold uppercase tracking-wider opacity-80">
+            <div className="min-w-0">
+              <span className="block text-[9px] sm:text-[10px] font-black uppercase tracking-wider opacity-80">
                 {t('common.step')} 3
               </span>
-              <span className="block text-xs font-black truncate">
+              <span className="block text-xs sm:text-sm font-black truncate">
                 {slot ? `${slot}` : t('book.slot')}
               </span>
             </div>
