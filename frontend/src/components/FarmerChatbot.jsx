@@ -7,10 +7,9 @@
  *
  * Multilingual: Marathi (मराठी), Hindi (हिंदी), and English.
  * Features:
- * - Smart NLP knowledge retrieval
- * - Voice Input (Speech-to-Text)
- * - Voice Readout (High-Definition Neural Text-to-Speech)
- * - Quick suggestion prompt chips
+ * - Reactive instant language switching (synced with global header & 1-tap in-chat switcher)
+ * - Large, touch-friendly suggestion cards
+ * - Voice Input (Speech-to-Text) & Voice Readout (Text-to-Speech)
  * - Direct navigation action buttons
  */
 
@@ -29,6 +28,7 @@ import {
   Loader2,
   ChevronRight,
   HelpCircle,
+  Globe,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
@@ -68,7 +68,7 @@ const SUGGESTIONS = {
 };
 
 export default function FarmerChatbot() {
-  const { lang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -87,14 +87,14 @@ export default function FarmerChatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  // Initial Bot Welcome Greeting
-  const initChat = useCallback(() => {
+  // Initial Bot Welcome Greeting Generator
+  const getWelcomeMessage = useCallback((currentLang) => {
     let welcomeText = '';
-    if (lang === 'mr') {
+    if (currentLang === 'mr') {
       welcomeText =
         `नमस्कार! 🙏 मी **'किसान सहाय्यक' (Kisan Sahayak)** आहे — तुमचा २४/७ शासकीय APMC खरेदी मदतनीस.\n\n` +
         `तुम्हाला शासकीय हमीभाव, स्लॉट बुकिंग, DBT बँक पेमेंट, आवश्यक कागदपत्रे किंवा आर्द्रता नियमांबाबत काहीही अडचण किंवा प्रश्न असल्यास मला विचारा!`;
-    } else if (lang === 'hi') {
+    } else if (currentLang === 'hi') {
       welcomeText =
         `नमस्ते! 🙏 मैं **'किसान सहायक' (Kisan Sahayak)** हूँ — आपका २४/७ सरकारी मंडी खरीद सहायक।\n\n` +
         `आपको न्यूनतम समर्थन मूल्य (MSP), स्लॉट बुकिंग, बैंक भुगतान, आवश्यक दस्तावेज या नमी मानकों से जुड़ा कोई भी प्रश्न या समस्या हो, तो बेझिझक पूछें!`;
@@ -104,21 +104,25 @@ export default function FarmerChatbot() {
         `Ask me anything about Government MSP rates, slot booking, DBT payments, required documents, or moisture and quality guidelines!`;
     }
 
-    setMessages([
-      {
-        id: 'welcome',
-        from: 'bot',
-        text: welcomeText,
-        suggestions: SUGGESTIONS[lang] || SUGGESTIONS.en,
-      },
-    ]);
-  }, [lang]);
+    return {
+      id: `welcome-${currentLang}`,
+      from: 'bot',
+      text: welcomeText,
+      suggestions: SUGGESTIONS[currentLang] || SUGGESTIONS.en,
+    };
+  }, []);
 
+  // Initialize or update welcome greeting whenever `lang` or `open` changes
   useEffect(() => {
-    if (open && messages.length === 0) {
-      initChat();
+    if (open) {
+      setMessages((prev) => {
+        if (prev.length <= 1) {
+          return [getWelcomeMessage(lang)];
+        }
+        return prev;
+      });
     }
-  }, [open, initChat, messages.length]);
+  }, [open, lang, getWelcomeMessage]);
 
   // Stop active speech audio
   const stopAudio = useCallback(() => {
@@ -290,11 +294,11 @@ export default function FarmerChatbot() {
     }
   };
 
-  // Simple Markdown-style bold & bullet point renderer
+  // Markdown-style bold & bullet point renderer
   const renderMessageContent = (text) => {
     const lines = text.split('\n');
     return (
-      <div className="space-y-1 text-xs leading-relaxed">
+      <div className="space-y-1 text-xs sm:text-sm leading-relaxed">
         {lines.map((line, idx) => {
           if (!line.trim()) return <div key={idx} className="h-1" />;
 
@@ -303,7 +307,7 @@ export default function FarmerChatbot() {
           const formattedLine = parts.map((part, pIdx) => {
             if (part.startsWith('**') && part.endsWith('**')) {
               return (
-                <strong key={pIdx} className="font-extrabold text-slate-950">
+                <strong key={pIdx} className="font-black text-slate-950">
                   {part.slice(2, -2)}
                 </strong>
               );
@@ -335,18 +339,18 @@ export default function FarmerChatbot() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-5 z-50 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 py-3.5 px-5 text-white shadow-2xl shadow-emerald-950/40 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95 group"
+          className="fixed bottom-6 right-5 z-50 flex items-center gap-3 rounded-full bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 py-3.5 px-5 text-white shadow-2xl shadow-emerald-950/40 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95 group"
           aria-label="Kisan Sahayak Chatbot"
         >
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+          <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
             <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
             <Bot className="h-5 w-5 text-white" />
           </span>
           <div className="text-left hidden sm:block">
-            <p className="text-xs font-black leading-tight tracking-wide">
-              {lang === 'mr' ? 'किसान सहाय्यक' : lang === 'hi' ? 'किसान सहायक' : 'Kisan Sahayak'}
+            <p className="text-sm font-black leading-tight tracking-wide">
+              {lang === 'mr' ? 'किसान सहाय्यक AI' : lang === 'hi' ? 'किसान सहायक AI' : 'Kisan Sahayak AI'}
             </p>
-            <p className="text-[10px] text-emerald-200 font-semibold">
+            <p className="text-[11px] text-emerald-200 font-bold">
               {lang === 'mr' ? 'मदत व शंका निवारण' : lang === 'hi' ? 'मदद एवं समाधान' : 'Doubts & Help AI'}
             </p>
           </div>
@@ -359,7 +363,7 @@ export default function FarmerChatbot() {
       {/* Interactive Chat Window Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-xs sm:items-center sm:justify-center sm:p-4 animate-fadeIn">
-          <div className="flex h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[660px] sm:max-w-md sm:rounded-3xl overflow-hidden border border-slate-200">
+          <div className="flex h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[680px] sm:max-w-lg sm:rounded-3xl overflow-hidden border border-slate-200">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-emerald-900/20 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 px-4 py-3.5 text-white">
               <div className="flex items-center gap-3">
@@ -368,7 +372,7 @@ export default function FarmerChatbot() {
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-emerald-900" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black tracking-wide flex items-center gap-1.5">
+                  <h3 className="text-sm sm:text-base font-black tracking-wide flex items-center gap-1.5">
                     <span>{lang === 'mr' ? 'किसान सहाय्यक AI' : lang === 'hi' ? 'किसान सहायक AI' : 'Kisan Sahayak AI'}</span>
                     <span className="rounded-full bg-emerald-500/40 px-1.5 py-0.2 text-[9px] font-extrabold uppercase text-emerald-100">
                       Online
@@ -385,7 +389,7 @@ export default function FarmerChatbot() {
                   type="button"
                   onClick={() => {
                     stopAudio();
-                    initChat();
+                    setMessages([getWelcomeMessage(lang)]);
                   }}
                   title="Reset Chat"
                   className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-emerald-100 hover:bg-white/20 transition"
@@ -405,15 +409,60 @@ export default function FarmerChatbot() {
               </div>
             </div>
 
-            {/* Quick Context Banner */}
-            <div className="flex items-center justify-between px-4 py-2 text-[11px] font-semibold border-b border-slate-100 bg-emerald-50/70 text-emerald-900">
-              <div className="flex items-center gap-1.5">
+            {/* In-Chat Quick Language Switcher Strip */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 bg-emerald-50/90 text-xs font-bold text-emerald-950">
+              <div className="flex items-center gap-1.5 text-[11px] text-emerald-900">
                 <Sparkles className="h-3.5 w-3.5 text-emerald-700" />
-                <span>{lang === 'mr' ? 'कोणतीही शंका विचारा (गहू, हमीभाव, DBT)' : lang === 'hi' ? 'कोई भी प्रश्न पूछें (गेहूं, MSP, DBT)' : 'Ask any doubt (MSP, Slots, DBT, Docs)'}</span>
+                <span>{lang === 'mr' ? 'भाषा निवडा:' : lang === 'hi' ? 'भाषा चुनें:' : 'Language:'}</span>
               </div>
-              <span className="font-mono text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded-md border border-emerald-200">
-                GovTech AI
-              </span>
+
+              {/* 1-Tap Language Switcher Pills */}
+              <div className="flex items-center gap-1 bg-white/90 p-1 rounded-xl border border-emerald-200 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLang('mr');
+                    setMessages([getWelcomeMessage('mr')]);
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-black transition-all ${
+                    lang === 'mr'
+                      ? 'bg-emerald-800 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
+                  }`}
+                >
+                  मराठी
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLang('hi');
+                    setMessages([getWelcomeMessage('hi')]);
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-black transition-all ${
+                    lang === 'hi'
+                      ? 'bg-emerald-800 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
+                  }`}
+                >
+                  हिंदी
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLang('en');
+                    setMessages([getWelcomeMessage('en')]);
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-black transition-all ${
+                    lang === 'en'
+                      ? 'bg-emerald-800 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
+                  }`}
+                >
+                  English
+                </button>
+              </div>
             </div>
 
             {/* Chat Messages Log */}
@@ -424,16 +473,16 @@ export default function FarmerChatbot() {
                   className={`flex gap-2.5 ${m.from === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   {m.from === 'bot' && (
-                    <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                       <Bot className="h-4 w-4" />
                     </div>
                   )}
 
-                  <div className={`max-w-[85%] space-y-2`}>
+                  <div className={`max-w-[88%] space-y-2.5`}>
                     <div
-                      className={`rounded-2xl px-4 py-3 shadow-2xs ${
+                      className={`rounded-2xl p-4 shadow-2xs ${
                         m.from === 'user'
-                          ? 'bg-gradient-to-r from-emerald-700 to-teal-700 text-white rounded-tr-xs text-xs font-semibold'
+                          ? 'bg-gradient-to-r from-emerald-700 to-teal-700 text-white rounded-tr-xs text-xs sm:text-sm font-semibold'
                           : 'bg-white text-slate-900 border border-slate-200/90 rounded-tl-xs'
                       }`}
                     >
@@ -446,17 +495,17 @@ export default function FarmerChatbot() {
                         <button
                           type="button"
                           onClick={() => playSpeech(m.id, m.text)}
-                          className="inline-flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-[11px] font-bold text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800 transition shadow-2xs"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-900 transition shadow-2xs"
                         >
                           {playingAudioId === m.id ? (
                             <>
-                              <VolumeX className="h-3 w-3 text-rose-600" />
+                              <VolumeX className="h-3.5 w-3.5 text-rose-600 animate-pulse" />
                               <span className="text-rose-700">थांबवा (Stop Audio)</span>
                             </>
                           ) : (
                             <>
-                              <Volume2 className="h-3 w-3 text-emerald-700" />
-                              <span>ऐका (Listen)</span>
+                              <Volume2 className="h-3.5 w-3.5 text-emerald-700" />
+                              <span>{lang === 'mr' ? '🔊 आवाजात ऐका' : lang === 'hi' ? '🔊 आवाज में सुनें' : '🔊 Listen Aloud'}</span>
                             </>
                           )}
                         </button>
@@ -471,24 +520,28 @@ export default function FarmerChatbot() {
                           setOpen(false);
                           navigate(m.action.link);
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-800 px-3.5 py-2 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-900 transition"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-md hover:brightness-110 transition"
                       >
                         <span>{m.action.label}</span>
-                        <ChevronRight className="h-3.5 w-3.5" />
+                        <ChevronRight className="h-4 w-4" />
                       </button>
                     )}
 
-                    {/* Suggested Follow-up Questions Chips */}
+                    {/* 🚀 ENLARGED & TOUCH-FRIENDLY SUGGESTION CARDS */}
                     {m.suggestions && m.suggestions.length > 0 && (
-                      <div className="pt-1 flex flex-wrap gap-1.5">
+                      <div className="pt-2 flex flex-col gap-2 w-full">
+                        <p className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-1">
+                          {lang === 'mr' ? '👇 महत्त्वाचे प्रश्न (टॅप करा):' : lang === 'hi' ? '👇 मुख्य प्रश्न (टैप करें):' : '👇 Common Questions (Tap to ask):'}
+                        </p>
                         {m.suggestions.map((s, sIdx) => (
                           <button
                             key={sIdx}
                             type="button"
                             onClick={() => handleSend(s)}
-                            className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-2.5 py-1 text-[11px] font-bold text-emerald-950 hover:bg-emerald-100 transition shadow-2xs text-left"
+                            className="w-full rounded-2xl border-2 border-emerald-200/90 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-white p-3 sm:p-3.5 text-xs sm:text-sm font-extrabold text-emerald-950 hover:border-emerald-500 hover:bg-emerald-100/90 shadow-2xs hover:shadow-xs transition-all active:scale-98 flex items-center justify-between text-left group"
                           >
-                            {s}
+                            <span className="leading-snug pr-2">{s}</span>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-emerald-700 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         ))}
                       </div>
@@ -500,12 +553,14 @@ export default function FarmerChatbot() {
               {/* Bot typing loading state */}
               {loading && (
                 <div className="flex items-center gap-2.5 text-xs text-slate-500">
-                  <div className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-emerald-800">
+                  <div className="grid h-8 w-8 place-items-center rounded-full bg-emerald-100 text-emerald-800">
                     <Bot className="h-4 w-4" />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-2xl bg-white p-3 border border-slate-200 shadow-2xs">
+                  <div className="flex items-center gap-2 rounded-2xl bg-white p-3.5 border border-slate-200 shadow-2xs">
                     <Loader2 className="h-4 w-4 animate-spin text-emerald-700" />
-                    <span className="font-semibold">{lang === 'mr' ? 'माहिती शोधत आहे…' : lang === 'hi' ? 'उत्तर तैयार कर रहा है…' : 'Finding answer…'}</span>
+                    <span className="font-bold text-slate-700">
+                      {lang === 'mr' ? 'माहिती शोधत आहे…' : lang === 'hi' ? 'उत्तर तैयार कर रहा है…' : 'Finding answer…'}
+                    </span>
                   </div>
                 </div>
               )}
@@ -514,7 +569,7 @@ export default function FarmerChatbot() {
             </div>
 
             {/* Input Bar with Textbox + Mic + Send */}
-            <div className="border-t border-slate-200 bg-white p-3">
+            <div className="border-t border-slate-200 bg-white p-3 sm:p-3.5">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -526,7 +581,7 @@ export default function FarmerChatbot() {
                 <button
                   type="button"
                   onClick={toggleSpeechRecognition}
-                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl border transition ${
+                  className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-2 transition ${
                     isListening
                       ? 'border-rose-500 bg-rose-50 text-rose-600 animate-pulse ring-4 ring-rose-200'
                       : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
@@ -544,19 +599,19 @@ export default function FarmerChatbot() {
                   placeholder={
                     isListening
                       ? (lang === 'mr' ? 'ऐकत आहे... बोला...' : lang === 'hi' ? 'सुन रहा हूँ... बोलिए...' : 'Listening... Speak now...')
-                      : (lang === 'mr' ? 'तुमचा प्रश्न इथे विचारा...' : lang === 'hi' ? 'अपना प्रश्न यहाँ लिखें...' : 'Ask your doubt here...')
+                      : (lang === 'mr' ? 'तुमचा प्रश्न इथे विचारा (गहू, हमीभाव, DBT)...' : lang === 'hi' ? 'अपना प्रश्न यहाँ लिखें (गेहूं, MSP, DBT)...' : 'Ask your doubt here (MSP, Slots, DBT)...')
                   }
-                  className="h-11 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xs font-semibold text-slate-900 outline-none focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                  className="h-12 flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 text-xs sm:text-sm font-bold text-slate-900 outline-none focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 placeholder:font-medium placeholder:text-slate-400"
                 />
 
                 {/* Send Button */}
                 <button
                   type="submit"
                   disabled={!input.trim() || loading}
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 text-white shadow-md hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 text-white shadow-md hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition"
                   title="Send"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-5 w-5" />
                 </button>
               </form>
             </div>
