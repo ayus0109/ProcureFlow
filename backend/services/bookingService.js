@@ -108,7 +108,7 @@ const RECEIPT_SQL = `
  */
 const POSITION_SQL = `
   WITH queue AS (
-    SELECT id, ROW_NUMBER() OVER (ORDER BY priority_score DESC, slot_time, id) AS position
+    SELECT id, ROW_NUMBER() OVER (ORDER BY slot_time, id) AS position
       FROM bookings
      WHERE centre_id = ? AND slot_date = ? AND status IN (${WAITING_PLACEHOLDERS})
   )
