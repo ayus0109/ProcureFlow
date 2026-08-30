@@ -25,6 +25,8 @@ import {
   Sparkles,
   AlertCircle,
   X,
+  Ticket,
+  Percent,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { money } from '../utils/money';
@@ -126,7 +128,7 @@ export function AdminAnalytics({ centreId }) {
       </div>
 
       {/* 🔍 INSTANT FARMER LOOKUP & PROCUREMENT AUDIT DOSSIER */}
-      <section className="overflow-hidden rounded-3xl border-2 border-emerald-500/30 bg-white p-5 sm:p-6 shadow-sm">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
@@ -142,7 +144,7 @@ export function AdminAnalytics({ centreId }) {
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-800"
+              className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
             >
               <X className="h-4 w-4" /> Clear search
             </button>
@@ -165,36 +167,40 @@ export function AdminAnalytics({ centreId }) {
             )}
           </div>
 
-          {/* Quick Search Suggestions */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-500">{t('analytics.searchHint')}</span>
+          {/* Clean, Uniform Quick Search Chips */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-semibold text-slate-400">{t('analytics.searchHint')}</span>
             <button
               type="button"
               onClick={() => handleQuickChip('Ramesh Patil')}
-              className="rounded-xl bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-950 transition shadow-2xs"
             >
-              👨‍🌾 Ramesh Patil
+              <User className="h-3.5 w-3.5 text-emerald-700" />
+              <span>Ramesh Patil</span>
             </button>
             <button
               type="button"
               onClick={() => handleQuickChip('7821')}
-              className="rounded-xl bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs font-mono font-bold text-slate-800 hover:bg-slate-200 transition"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-mono font-bold text-slate-700 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-950 transition shadow-2xs"
             >
-              🪪 Aadhaar: ••••7821
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+              <span>Aadhaar: ••••7821</span>
             </button>
             <button
               type="button"
               onClick={() => handleQuickChip('9999990001')}
-              className="rounded-xl bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-mono font-bold text-blue-900 hover:bg-blue-100 transition"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-mono font-bold text-slate-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-950 transition shadow-2xs"
             >
-              📞 9999990001
+              <Phone className="h-3.5 w-3.5 text-blue-700" />
+              <span>9999990001</span>
             </button>
             <button
               type="button"
               onClick={() => handleQuickChip('PF-1024')}
-              className="rounded-xl bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-900 hover:bg-amber-100 transition"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-mono font-bold text-slate-700 hover:border-amber-500 hover:bg-amber-50 hover:text-amber-950 transition shadow-2xs"
             >
-              🎟️ PF-1024
+              <Ticket className="h-3.5 w-3.5 text-amber-700" />
+              <span>PF-1024</span>
             </button>
           </div>
         </div>
@@ -281,7 +287,7 @@ export function AdminAnalytics({ centreId }) {
                     <div className="rounded-xl bg-white p-2.5 border border-slate-200/80">
                       <span className="text-[10px] uppercase font-bold text-slate-400 block">Aadhaar Card No.</span>
                       <span className="font-mono font-bold text-slate-900">
-                        {selectedFarmerData.farmer.aadhaar_no || 'XXXX-XXXX-4820'}
+                        {selectedFarmerData.farmer.aadhaar_no || 'XXXX-XXXX-7821'}
                       </span>
                     </div>
                     <div className="rounded-xl bg-white p-2.5 border border-slate-200/80">
@@ -303,8 +309,8 @@ export function AdminAnalytics({ centreId }) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                   <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-200">
                     <span className="text-slate-500 font-semibold block text-[11px]">Total Procured</span>
-                    <span className="text-lg font-black text-slate-900">
-                      {selectedFarmerData.summary.totalWeighedQtl} {t('booking.qtl')}
+                    <span className="text-lg font-black text-slate-900 font-mono">
+                      {Number(selectedFarmerData.summary.totalWeighedQtl || 0).toLocaleString('en-IN', { maximumFractionDigits: 1 })} {t('booking.qtl')}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
                       Across {selectedFarmerData.summary.completedSales} sales
@@ -313,7 +319,7 @@ export function AdminAnalytics({ centreId }) {
 
                   <div className="rounded-2xl bg-emerald-50/70 p-3.5 border border-emerald-200">
                     <span className="text-emerald-800 font-semibold block text-[11px]">Total Earnings</span>
-                    <span className="text-lg font-black text-emerald-950">
+                    <span className="text-lg font-black text-emerald-950 font-mono">
                       {money(selectedFarmerData.summary.totalPayoutInr)}
                     </span>
                     <span className="text-[10px] text-emerald-700 block mt-0.5">
@@ -323,7 +329,7 @@ export function AdminAnalytics({ centreId }) {
 
                   <div className="rounded-2xl bg-teal-50/70 p-3.5 border border-teal-200">
                     <span className="text-teal-800 font-semibold block text-[11px]">DBT Settled (Paid)</span>
-                    <span className="text-lg font-black text-teal-950">
+                    <span className="text-lg font-black text-teal-950 font-mono">
                       {money(selectedFarmerData.summary.paidAmountInr)}
                     </span>
                     <span className="text-[10px] text-teal-700 block mt-0.5">
@@ -333,7 +339,7 @@ export function AdminAnalytics({ centreId }) {
 
                   <div className="rounded-2xl bg-amber-50/70 p-3.5 border border-amber-200">
                     <span className="text-amber-800 font-semibold block text-[11px]">Pending / Active</span>
-                    <span className="text-lg font-black text-amber-950">
+                    <span className="text-lg font-black text-amber-950 font-mono">
                       {money(selectedFarmerData.summary.pendingPayoutInr)}
                     </span>
                     <span className="text-[10px] text-amber-700 block mt-0.5">
@@ -350,7 +356,7 @@ export function AdminAnalytics({ centreId }) {
                       <span>{t('analytics.allHistory')} ({selectedFarmerData.transactions.length})</span>
                     </span>
                     <span className="font-mono text-slate-500 text-[11px]">
-                      Aadhaar: {selectedFarmerData.farmer.aadhaar_no || '••••4820'}
+                      Aadhaar: {selectedFarmerData.farmer.aadhaar_no || '••••7821'}
                     </span>
                   </div>
 
@@ -372,7 +378,7 @@ export function AdminAnalytics({ centreId }) {
                               </span>
                               <span className="text-slate-500">•</span>
                               <span className="font-bold text-slate-700">
-                                {tx.final_weight_qtl ? `${tx.final_weight_qtl} ${t('booking.qtl')}` : `${tx.booked_qty_qtl} ${t('booking.qtl')} (Booked)`}
+                                {tx.final_weight_qtl ? `${Number(tx.final_weight_qtl).toFixed(1)} ${t('booking.qtl')}` : `${Number(tx.booked_qty_qtl).toFixed(1)} ${t('booking.qtl')} (Booked)`}
                               </span>
                             </div>
 
@@ -428,7 +434,7 @@ export function AdminAnalytics({ centreId }) {
                             </div>
                             <div>
                               <span className="text-slate-400 block">Payout Value:</span>
-                              <span className="font-black text-emerald-950">
+                              <span className="font-black text-emerald-950 font-mono">
                                 {tx.total_amount ? money(tx.total_amount) : 'Calculated at counter'}
                               </span>
                             </div>
@@ -454,74 +460,112 @@ export function AdminAnalytics({ centreId }) {
       {data && (
         <div className="space-y-6">
           {/* KPI Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                <span>Today's Procured</span>
-                <Scale className="h-4 w-4 text-emerald-700" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* 1. Today's Procured */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Procured</span>
+                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <Scale className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                    {Number(data.metrics.today_weight_qtl || 0).toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 uppercase">qtl</span>
+                </div>
               </div>
-              <p className="mt-1 text-2xl sm:text-3xl font-black text-slate-900">
-                {data.metrics.today_weight_qtl}{' '}
-                <span className="text-xs font-medium text-slate-500">qtl</span>
-              </p>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-                <span>Target: {data.centre.dailyTargetQtl} qtl</span>
-                <span className="font-bold text-emerald-800">
-                  {Math.min(100, Math.round((Number(data.metrics.today_weight_qtl) / (data.centre.dailyTargetQtl || 500)) * 100))}%
-                </span>
-              </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full bg-emerald-600 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min(100, Math.round((Number(data.metrics.today_weight_qtl) / (data.centre.dailyTargetQtl || 500)) * 100))}%`,
-                  }}
-                />
+
+              <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Target: {data.centre.dailyTargetQtl} qtl</span>
+                  <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 font-bold text-emerald-800 border border-emerald-200">
+                    {Math.min(100, Math.round((Number(data.metrics.today_weight_qtl) / (data.centre.dailyTargetQtl || 500)) * 100))}%
+                  </span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-emerald-600 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, Math.round((Number(data.metrics.today_weight_qtl) / (data.centre.dailyTargetQtl || 500)) * 100))}%`,
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                <span>Total DBT Payouts</span>
-                <CreditCard className="h-4 w-4 text-emerald-700" />
+            {/* 2. Total DBT Payouts */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total DBT Payouts</span>
+                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-teal-50 text-teal-700">
+                    <CreditCard className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-2 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                  {money(data.metrics.total_revenue_inr)}
+                </div>
               </div>
-              <p className="mt-1 text-2xl sm:text-3xl font-black text-slate-900">
-                {money(data.metrics.total_revenue_inr)}
-              </p>
-              <div className="mt-2 text-[11px] flex justify-between text-slate-500">
-                <span>Paid: {money(data.metrics.paid_revenue_inr)}</span>
-                <span className="text-amber-800 font-bold">
-                  Pending: {money(data.metrics.pending_payout_inr)}
-                </span>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-emerald-700 font-bold">
+                    Paid: {money(data.metrics.paid_revenue_inr)}
+                  </span>
+                  <span className="text-amber-800 font-bold">
+                    Pending: {money(data.metrics.pending_payout_inr)}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                <span>Total Farmers Served</span>
-                <Users className="h-4 w-4 text-emerald-700" />
+            {/* 3. Total Farmers Served */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Farmers Served</span>
+                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-blue-50 text-blue-700">
+                    <Users className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                    {data.metrics.total_farmers || 20}
+                  </span>
+                  <span className="text-xs font-bold text-slate-500">farmers</span>
+                </div>
               </div>
-              <p className="mt-1 text-2xl sm:text-3xl font-black text-slate-900">
-                {data.metrics.total_farmers || 20}{' '}
-                <span className="text-xs font-medium text-slate-500">farmers</span>
-              </p>
-              <p className="mt-2 text-[11px] text-slate-500 font-medium">
-                Completed: <strong>{data.metrics.completed_sales}</strong> • Active today:{' '}
-                <strong>{data.metrics.bookings_today}</strong>
-              </p>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Completed: <strong className="text-slate-800">{data.metrics.completed_sales}</strong></span>
+                  <span>Active today: <strong className="text-slate-800">{data.metrics.bookings_today}</strong></span>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                <span>Quality Compliance</span>
-                <ShieldCheck className="h-4 w-4 text-emerald-700" />
+            {/* 4. Quality Compliance */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Quality Compliance</span>
+                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-purple-50 text-purple-700">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-2 text-2xl sm:text-3xl font-black text-emerald-900 tracking-tight font-mono">
+                  98.4%
+                </div>
               </div>
-              <p className="mt-1 text-2xl sm:text-3xl font-black text-emerald-900">
-                98.4%
-              </p>
-              <p className="mt-2 text-[11px] text-emerald-800 font-bold">
-                Avg Moisture: {data.metrics.avg_moisture_pct || 11.2}% (FAQ &lt;12%)
-              </p>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <p className="text-[11px] font-bold text-emerald-800">
+                  Avg Moisture: {data.metrics.avg_moisture_pct || 11.2}% (FAQ &lt;12%)
+                </p>
+              </div>
             </div>
           </div>
 
@@ -552,7 +596,9 @@ export function AdminAnalytics({ centreId }) {
                           </span>
                         </div>
                         <div className="text-right font-mono text-xs">
-                          <span className="font-extrabold text-slate-900">{c.procuredQtl} {t('booking.qtl')}</span>
+                          <span className="font-extrabold text-slate-900">
+                            {Number(c.procuredQtl || 0).toLocaleString('en-IN', { maximumFractionDigits: 1 })} {t('booking.qtl')}
+                          </span>
                           <span className="text-slate-400 mx-1.5">•</span>
                           <span className="font-bold text-emerald-950">{money(c.payoutInr)}</span>
                         </div>
@@ -593,7 +639,7 @@ export function AdminAnalytics({ centreId }) {
                     </div>
                     <div className="text-right">
                       <span className="font-black text-sm text-emerald-950 font-mono">
-                        {g.total_qtl} {t('booking.qtl')}
+                        {Number(g.total_qtl || 0).toLocaleString('en-IN', { maximumFractionDigits: 1 })} {t('booking.qtl')}
                       </span>
                       <p className="text-[10px] text-slate-400">{g.count} lots</p>
                     </div>

@@ -117,6 +117,21 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
     LIMIT 7
   `).all(centreId);
 
+  const formattedMetrics = {
+    total_bookings: Number(totals.total_bookings || 0),
+    total_farmers: Number(totals.total_farmers || 0),
+    bookings_today: Number(totals.bookings_today || 0),
+    completed_sales: Number(totals.completed_sales || 0),
+    rejected_sales: Number(totals.rejected_sales || 0),
+    active_in_queue: Number(totals.active_in_queue || 0),
+    total_weight_qtl: Number(Number(totals.total_weight_qtl || 0).toFixed(1)),
+    today_weight_qtl: Number(Number(totals.today_weight_qtl || 0).toFixed(1)),
+    total_revenue_inr: Number(Number(totals.total_revenue_inr || 0).toFixed(2)),
+    paid_revenue_inr: Number(Number(totals.paid_revenue_inr || 0).toFixed(2)),
+    pending_payout_inr: Number(Number(totals.pending_payout_inr || 0).toFixed(2)),
+    avg_moisture_pct: Number(Number(totals.avg_moisture_pct || 11.2).toFixed(1)),
+  };
+
   res.json({
     centre: {
       id: centre.id,
@@ -128,7 +143,7 @@ router.get('/centre/:id', requireAuth('admin'), (req, res) => {
       activeCounters: centre.active_counters,
       totalCounters: centre.total_counters,
     },
-    metrics: totals,
+    metrics: formattedMetrics,
     cropBreakdown,
     gradeBreakdown: gradeRows,
     hourlyThroughput: slotRows,
