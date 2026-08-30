@@ -14,13 +14,11 @@ const CROPS = [
   { key: 'TUR', label: 'Tur (Arhar)', ratePerQtl: 7550 },
 ];
 
-/** Fixed one-hour windows. Zero-padded so plain string sorting is chronological. */
+/** Fixed one-hour operational windows (excluding morning gate opening and 13:00-14:00 lunch break). */
 const SLOT_WINDOWS = [
-  '09:00-10:00',
   '10:00-11:00',
   '11:00-12:00',
   '12:00-13:00',
-  '13:00-14:00',
   '14:00-15:00',
   '15:00-16:00',
   '16:00-17:00',

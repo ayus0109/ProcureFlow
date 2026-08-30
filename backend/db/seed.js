@@ -108,8 +108,8 @@ function seed() {
     VALUES (?, ?, ?, ?, ?, ?, ?)`);
   const cropKeyFor = (n) => CROPS[n % CROPS.length].key;
 
-  // --- Pune: 17 waiting today, spread across the windows before 14:00 ---
-  const perWindow = [4, 4, 3, 3, 3]; // SLOT_WINDOWS[0..4] => 17 farmers
+  // --- Pune: 17 waiting today, spread across the morning windows before 14:00 ---
+  const perWindow = [6, 6, 5]; // SLOT_WINDOWS[0..2] (10:00, 11:00, 12:00) => 17 farmers
   let farmerId = 2; // farmer 1 stays clean for the live demo
   perWindow.forEach((count, w) => {
     for (let k = 0; k < count; k += 1) {
