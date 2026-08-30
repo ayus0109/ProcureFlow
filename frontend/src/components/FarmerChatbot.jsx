@@ -7,10 +7,9 @@
  *
  * Multilingual: Marathi (मराठी), Hindi (हिंदी), and English.
  * Features:
- * - Highly visible, enlarged mobile floating trigger and modal window
- * - Instant reactive language switching (synced with global header & 1-tap in-chat switcher)
- * - Large, touch-friendly suggestion cards with high contrast for rural phone screens
- * - Voice Input (Speech-to-Text) & Voice Readout (Text-to-Speech)
+ * - Clean text-based chat interface with instant send
+ * - Large touch-friendly suggestion cards with high contrast for mobile screens
+ * - 1-tap reactive language switching (Marathi / Hindi / English)
  * - Direct navigation action buttons
  */
 
@@ -19,9 +18,6 @@ import {
   MessageSquare,
   X,
   Send,
-  Mic,
-  Volume2,
-  VolumeX,
   Bot,
   RotateCcw,
   Sparkles,
@@ -34,12 +30,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
-
-const SPEECH_LANG_MAP = {
-  en: 'en-IN',
-  hi: 'hi-IN',
-  mr: 'mr-IN',
-};
 
 const SUGGESTIONS = {
   mr: [
@@ -76,12 +66,8 @@ export default function FarmerChatbot() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [playingAudioId, setPlayingAudioId] = useState(null);
 
   const messagesEndRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const activeAudioRef = useRef(null);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -125,131 +111,11 @@ export default function FarmerChatbot() {
     }
   }, [open, lang, getWelcomeMessage]);
 
-  // Stop active speech audio
-  const stopAudio = useCallback(() => {
-    if (activeAudioRef.current) {
-      try {
-        activeAudioRef.current.pause();
-        activeAudioRef.current.currentTime = 0;
-      } catch {}
-      activeAudioRef.current = null;
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch {}
-    }
-    setPlayingAudioId(null);
-  }, []);
-
-  // Play HD Text-to-Speech audio for message
-  const playSpeech = (msgId, text) => {
-    if (playingAudioId === msgId) {
-      stopAudio();
-      return;
-    }
-
-    stopAudio();
-    setPlayingAudioId(msgId);
-
-    const cleanText = text
-      .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
-      .replace(/[•…\-_~*]/g, ' ')
-      .trim();
-
-    const ttsUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&lang=${lang}`;
-    const audio = new Audio(ttsUrl);
-    activeAudioRef.current = audio;
-
-    audio.onended = () => {
-      setPlayingAudioId(null);
-      activeAudioRef.current = null;
-    };
-
-    audio.onerror = () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        try {
-          const utterance = new SpeechSynthesisUtterance(cleanText);
-          utterance.lang = SPEECH_LANG_MAP[lang] || 'mr-IN';
-          utterance.rate = 0.95;
-          utterance.onend = () => setPlayingAudioId(null);
-          utterance.onerror = () => setPlayingAudioId(null);
-          window.speechSynthesis.speak(utterance);
-          return;
-        } catch {}
-      }
-      setPlayingAudioId(null);
-    };
-
-    audio.play().catch(() => setPlayingAudioId(null));
-  };
-
-  // Voice Input (Speech-to-Text)
-  const toggleSpeechRecognition = () => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
-      return;
-    }
-
-    if (isListening) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch {}
-      }
-      setIsListening(false);
-      return;
-    }
-
-    stopAudio();
-    const recognition = new SR();
-    recognition.lang = SPEECH_LANG_MAP[lang] || 'mr-IN';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognitionRef.current = recognition;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      let final = '';
-      let interim = '';
-      for (let i = 0; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          final += event.results[i][0].transcript;
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-      const heard = final || interim;
-      if (heard) {
-        setInput(heard);
-      }
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    try {
-      recognition.start();
-    } catch {
-      setIsListening(false);
-    }
-  };
-
   // Send query to AI backend
   const handleSend = async (queryText) => {
     const q = (queryText || input).trim();
     if (!q || loading) return;
 
-    stopAudio();
     setInput('');
     const userMsgId = Date.now();
 
@@ -335,12 +201,12 @@ export default function FarmerChatbot() {
 
   return (
     <>
-      {/* Floating Trigger Button (Compact Circular Floating Icon) */}
+      {/* Floating Trigger Button (Compact Floating Circle) */}
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-5 z-50 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 shadow-2xl shadow-emerald-950/50 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95"
+          className="fixed bottom-6 right-5 z-50 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 shadow-2xl shadow-emerald-950/50 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95 group"
           aria-label="Kisan Sahayak Chatbot"
         >
           <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-50 animate-ping" />
@@ -351,7 +217,7 @@ export default function FarmerChatbot() {
         </button>
       )}
 
-      {/* 🚀 HIGH-VISIBILITY INTERACTIVE CHAT WINDOW MODAL */}
+      {/* Interactive Chat Window Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs sm:items-center sm:justify-center sm:p-4 animate-fadeIn">
           <div className="flex h-[95dvh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[700px] sm:max-w-xl sm:rounded-3xl overflow-hidden border border-slate-200">
@@ -378,10 +244,7 @@ export default function FarmerChatbot() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    stopAudio();
-                    setMessages([getWelcomeMessage(lang)]);
-                  }}
+                  onClick={() => setMessages([getWelcomeMessage(lang)])}
                   title="Reset Chat"
                   className="grid h-10 w-10 place-items-center rounded-2xl bg-white/15 text-emerald-100 hover:bg-white/25 transition shadow-2xs"
                 >
@@ -389,10 +252,7 @@ export default function FarmerChatbot() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    stopAudio();
-                    setOpen(false);
-                  }}
+                  onClick={() => setOpen(false)}
                   className="grid h-10 w-10 place-items-center rounded-2xl bg-white/15 text-emerald-100 hover:bg-white/25 transition shadow-2xs"
                 >
                   <X className="h-5 w-5" />
@@ -480,29 +340,6 @@ export default function FarmerChatbot() {
                       {m.from === 'bot' ? renderMessageContent(m.text) : m.text}
                     </div>
 
-                    {/* Audio Speaker Readout Button on Bot Replies */}
-                    {m.from === 'bot' && (
-                      <div className="flex items-center gap-2 pl-1">
-                        <button
-                          type="button"
-                          onClick={() => playSpeech(m.id, m.text)}
-                          className="inline-flex items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-xs sm:text-sm font-black text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-900 transition shadow-2xs"
-                        >
-                          {playingAudioId === m.id ? (
-                            <>
-                              <VolumeX className="h-4 w-4 text-rose-600 animate-pulse" />
-                              <span className="text-rose-700">थांबवा (Stop Audio)</span>
-                            </>
-                          ) : (
-                            <>
-                              <Volume2 className="h-4 w-4 text-emerald-700" />
-                              <span>{lang === 'mr' ? '🔊 आवाजात ऐका' : lang === 'hi' ? '🔊 आवाज में सुनें' : '🔊 Listen Aloud'}</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    )}
-
                     {/* Direct Action Link in reply */}
                     {m.action && (
                       <button
@@ -518,7 +355,7 @@ export default function FarmerChatbot() {
                       </button>
                     )}
 
-                    {/* 🚀 ENLARGED, TOUCH-FRIENDLY SUGGESTION CARDS */}
+                    {/* Touch-Friendly Suggestion Cards */}
                     {m.suggestions && m.suggestions.length > 0 && (
                       <div className="pt-2 flex flex-col gap-2.5 w-full">
                         <p className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
@@ -559,7 +396,7 @@ export default function FarmerChatbot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Bar with Textbox + Mic + Send */}
+            {/* Input Bar with Clean Textbox + Send Button */}
             <div className="border-t border-slate-200 bg-white p-3 sm:p-4">
               <form
                 onSubmit={(e) => {
@@ -568,29 +405,17 @@ export default function FarmerChatbot() {
                 }}
                 className="flex items-center gap-2.5"
               >
-                {/* Voice Input Mic Button */}
-                <button
-                  type="button"
-                  onClick={toggleSpeechRecognition}
-                  className={`grid h-13 w-13 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border-2 transition ${
-                    isListening
-                      ? 'border-rose-500 bg-rose-50 text-rose-600 animate-pulse ring-4 ring-rose-200'
-                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
-                  }`}
-                  title={isListening ? 'Stop Listening' : 'Speak your question'}
-                >
-                  <Mic className={`h-6 w-6 ${isListening ? 'animate-bounce' : ''}`} />
-                </button>
-
                 {/* Text Input */}
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={
-                    isListening
-                      ? (lang === 'mr' ? 'ऐकत आहे... बोला...' : lang === 'hi' ? 'सुन रहा हूँ... बोलिए...' : 'Listening... Speak now...')
-                      : (lang === 'mr' ? 'तुमचा प्रश्न इथे विचारा (गहू, हमीभाव, DBT)...' : lang === 'hi' ? 'अपना प्रश्न यहाँ लिखें (गेहूं, MSP, DBT)...' : 'Ask your doubt here (MSP, Slots, DBT)...')
+                    lang === 'mr'
+                      ? 'तुमचा प्रश्न इथे विचारा (गहू, हमीभाव, DBT)...'
+                      : lang === 'hi'
+                      ? 'अपना प्रश्न यहाँ लिखें (गेहूं, MSP, DBT)...'
+                      : 'Ask your doubt here (MSP, Slots, DBT)...'
                   }
                   className="h-13 sm:h-14 flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 text-sm sm:text-base font-bold text-slate-900 outline-none focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 placeholder:font-medium placeholder:text-slate-400"
                 />
