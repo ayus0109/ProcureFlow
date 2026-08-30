@@ -41,7 +41,7 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
 
   const handleWhatsAppShare = () => {
     const text =
-      `🌾 *ProcureFlow Official Mandi Pass*\n` +
+      `🌾 *KisanSathi Official Mandi Pass*\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `🎟️ *Token Number:* ${booking.token}\n` +
       `👨‍🌾 *Farmer:* ${farmer?.name || 'Farmer'}\n` +
@@ -51,7 +51,7 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
       `🌾 *Crop:* ${t(`crop.${booking.crop}`) || booking.crop} (${booking.quantity_qtl} Quintals)\n` +
       `📍 *Arrive By:* ${booking.arriveBy || booking.slot_time.split('-')[0]}\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Please carry your Aadhaar card and bank passbook. Track live status at https://procureflow.gov.in`;
+      `Please carry your Aadhaar card and bank passbook. Track live status at https://kisansathi.gov.in`;
 
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');

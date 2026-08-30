@@ -15,12 +15,12 @@ export const LANGUAGES = [
 export const translations = {
   en: {
     // App & Navigation
-    'app.name': 'ProcureFlow',
-    'app.tagline': 'Digital agricultural procurement',
+    'app.name': 'KisanSathi',
+    'app.tagline': 'Smart Agricultural Procurement & Transparent Queue Management',
     'app.govMandi': 'Gov e-Mandi',
     'app.demoNotice': 'Prototype — demo data only',
     'app.realtimeSync': 'Real-time APMC Sync',
-    'app.footer': '© 2026 ProcureFlow • Smart Agricultural Procurement Infrastructure',
+    'app.footer': '© 2026 KisanSathi • Smart Agricultural Procurement Infrastructure',
 
     // Language Selector
     'lang.heading': 'Select your language',
@@ -370,12 +370,12 @@ export const translations = {
 
   hi: {
     // App & Navigation
-    'app.name': 'ProcureFlow',
+    'app.name': 'KisanSathi',
     'app.tagline': 'डिजिटल कृषि खरीद प्रणाली',
     'app.govMandi': 'सरकारी ई-मंडी',
     'app.demoNotice': 'प्रोटोटाइप — केवल नमूना डेटा',
     'app.realtimeSync': 'रीयल-टाइम मंडी सिंक',
-    'app.footer': '© 2026 ProcureFlow • स्मार्ट कृषि खरीद डिजिटल इन्फ्रास्ट्रक्चर',
+    'app.footer': '© 2026 KisanSathi • स्मार्ट कृषि खरीद डिजिटल इन्फ्रास्ट्रक्चर',
 
     // Language Selector
     'lang.heading': 'अपनी भाषा चुनें',
@@ -725,12 +725,12 @@ export const translations = {
 
   mr: {
     // App & Navigation
-    'app.name': 'ProcureFlow',
+    'app.name': 'KisanSathi',
     'app.tagline': 'डिजिटल कृषी खरेदी प्रणाली',
     'app.govMandi': 'सरकारी ई-मंडी',
     'app.demoNotice': 'प्रोटोटाइप — केवळ नमुना डेटा',
     'app.realtimeSync': 'रीयल-टाइम बाजार समिती सिंक',
-    'app.footer': '© 2026 ProcureFlow • स्मार्ट कृषी खरेदी डिजिटल पायाभूत सुविधा',
+    'app.footer': '© 2026 KisanSathi • स्मार्ट कृषी खरेदी डिजिटल पायाभूत सुविधा',
 
     // Language Selector
     'lang.heading': 'तुमची भाषा निवडा',

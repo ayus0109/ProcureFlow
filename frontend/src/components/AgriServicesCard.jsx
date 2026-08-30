@@ -22,10 +22,10 @@ export default function AgriServicesCard() {
     if ('speechSynthesis' in window) {
       const msgText =
         lang === 'mr'
-          ? 'प्रोक्योरफ्लो मध्ये आपले स्वागत आहे. आपले टोकन आणि रांगेतील स्थान तपासा.'
+          ? 'किसानसाथी मध्ये आपले स्वागत आहे. आपले टोकन आणि रांगेतील स्थान तपासा.'
           : lang === 'hi'
-          ? 'प्रोक्योरफ्लो में आपका स्वागत है। अपना टोकन और कतार की स्थिति देखें।'
-          : 'Welcome to ProcureFlow. Check your token pass, advised arrival time, and live queue status.';
+          ? 'किसानसाथी में आपका स्वागत है। अपना टोकन और कतार की स्थिति देखें।'
+          : 'Welcome to KisanSathi. Check your token pass, advised arrival time, and live queue status.';
       const utterance = new SpeechSynthesisUtterance(msgText);
       utterance.lang = lang === 'mr' ? 'mr-IN' : lang === 'hi' ? 'hi-IN' : 'en-IN';
       utterance.onend = () => setVoicePlaying(false);

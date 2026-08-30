@@ -42,7 +42,7 @@ async function call(path, { method = 'GET', body, token } = {}) {
 const post = (path, body, token) => call(path, { method: 'POST', body, token });
 
 async function main() {
-  console.log(`\nProcureFlow demo rehearsal — ${TODAY}\n${'='.repeat(46)}`);
+  console.log(`\nKisanSathi demo rehearsal — ${TODAY}\n${'='.repeat(46)}`);
 
   // ---- 1. the farmer signs in -------------------------------------------
   console.log('\n1. Farmer signs in');

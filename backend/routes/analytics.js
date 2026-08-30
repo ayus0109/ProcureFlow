@@ -377,7 +377,7 @@ router.get('/export', requireAuth('admin'), (req, res) => {
   }
 
   const csvData = csvRows.join('\n');
-  const filename = `ProcureFlow_${centre.name.replace(/\s+/g, '_')}_Report_${todayISO()}.csv`;
+  const filename = `KisanSathi_${centre.name.replace(/\s+/g, '_')}_Report_${todayISO()}.csv`;
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

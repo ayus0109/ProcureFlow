@@ -26,7 +26,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'ProcureFlow API', time: new Date().toISOString() });
+  res.json({ ok: true, service: 'KisanSathi API', time: new Date().toISOString() });
 });
 
 /** Reference lists the frontend needs for its dropdowns. */
@@ -71,7 +71,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
   /** Friendly API index if frontend is not built yet */
   app.get('/', (req, res) => {
     res.json({
-      service: 'ProcureFlow API',
+      service: 'KisanSathi API',
       status: 'Active',
       endpoints: [
         '/api/health',
@@ -92,7 +92,7 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
-  console.error(`[ProcureFlow Error] ${req.method} ${req.originalUrl} (${status}):`, err.message);
+  console.error(`[KisanSathi Error] ${req.method} ${req.originalUrl} (${status}):`, err.message);
   if (status >= 500 && err.stack) console.error(err.stack);
   res.status(status).json({
     error: err.message || 'An unexpected error occurred. Please try again.',
@@ -101,5 +101,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`ProcureFlow server listening on port ${PORT}`);
+  console.log(`KisanSathi server listening on port ${PORT}`);
 });

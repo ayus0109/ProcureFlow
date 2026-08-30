@@ -237,7 +237,7 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `१. 🪪 **आधार कार्ड** (मूळ प्रत किंवा झेरॉक्स)\n` +
           `२. 📜 **७/१२ (सातबारा) व ८-अ उतारा** (चालू हंगामाची पीक नोंद असलेला)\n` +
           `३. 🏦 **बँक पासबुक झेरॉक्स** (किंवा कॅन्सल्ड चेक DBT साठी)\n` +
-          `४. 🎫 **ProcureFlow डिजिटल गेट पास / टोकन नंबर** (मोबाईलमध्ये दाखवला तरी चालतो)\n\n` +
+          `४. 🎫 **KisanSathi डिजिटल गेट पास / टोकन नंबर** (मोबाईलमध्ये दाखवला तरी चालतो)\n\n` +
           `💡 *टीप: ई-केवायसी (e-KYC) पूर्ण असल्यास पडताळणी केवळ २ मिनिटांत पूर्ण होते!*`,
         suggestions: [
           'आर्द्रता व गुणवत्ता निकष काय आहेत?',
@@ -251,7 +251,7 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `१. 🪪 **आधार कार्ड** (मूल प्रति या फोटोकॉपी)\n` +
           `२. 📜 **७/१२ खतौनी / भूलेख रिकॉर्ड** (फसल प्रविष्टि सहित)\n` +
           `३. 🏦 **बैंक पासबुक फोटोकॉपी** (DBT भुगतान हेतु)\n` +
-          `४. 🎫 **ProcureFlow डिजिटल गेट पास / टोकन नंबर** (मोबाइल स्क्रीन मान्य है)\n\n` +
+          `४. 🎫 **KisanSathi डिजिटल गेट पास / टोकन नंबर** (मोबाइल स्क्रीन मान्य है)\n\n` +
           `💡 *सुझाव: e-KYC सत्यापित होने पर गेट वेरिफिकेशन मात्र २ मिनट में हो जाता है!*`,
         suggestions: [
           'नमी की अधिकतम सीमा क्या है?',
@@ -265,7 +265,7 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `1. 🪪 **Aadhaar Card** (Original or copy)\n` +
           `2. 📜 **7/12 Land Record (Satbara Extract)** with current crop sowing record\n` +
           `3. 🏦 **Bank Passbook Copy / Cancelled Cheque** for DBT credit\n` +
-          `4. 🎫 **ProcureFlow Digital Gate Pass / Token Number** (on mobile screen)\n\n` +
+          `4. 🎫 **KisanSathi Digital Gate Pass / Token Number** (on mobile screen)\n\n` +
           `💡 *Tip: e-KYC verified farmers pass gate verification in under 2 minutes!*`,
         suggestions: [
           'What is the moisture limit?',

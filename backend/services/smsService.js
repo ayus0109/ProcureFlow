@@ -47,11 +47,11 @@ function dispatchBookingSms(farmer, booking) {
   if (!farmer || !booking) return;
 
   const msg =
-    `[ProcureFlow APMC] Dear ${farmer.name}, your procurement slot is BOOKED at ${booking.centre_name || 'APMC'}.\n` +
+    `[KisanSathi APMC] Dear ${farmer.name}, your procurement slot is BOOKED at ${booking.centre_name || 'APMC'}.\n` +
     `Token: ${booking.token}\n` +
     `Date: ${booking.slot_date} (${booking.slot_time})\n` +
     `Crop: ${booking.cropLabel || booking.crop} (${booking.quantity_qtl} qtl)\n` +
-    `Please arrive by ${booking.arriveBy || booking.slot_time.split('-')[0]}. Track live: https://procureflow.gov.in`;
+    `Please arrive by ${booking.arriveBy || booking.slot_time.split('-')[0]}. Track live: https://kisansathi.gov.in`;
 
   sendSms({
     farmerId: farmer.id,
@@ -65,7 +65,7 @@ function dispatchBookingSms(farmer, booking) {
   sendSms({
     farmerId: farmer.id,
     phone: farmer.phone,
-    message: `🌾 *ProcureFlow Mandi Pass*\n` +
+    message: `🌾 *KisanSathi Mandi Pass*\n` +
       `नमस्ते ${farmer.name} जी, आपका टोकन *${booking.token}* बुक हो चुका है।\n` +
       `📅 दिनांक: ${booking.slot_date} [${booking.slot_time}]\n` +
       `🏛️ केंद्र: ${booking.centre_name}\n` +
@@ -82,7 +82,7 @@ function dispatchCalledSms(farmer, booking, counterNum = 1) {
   if (!farmer || !booking) return;
 
   const msg =
-    `[ProcureFlow URGENT] Token ${booking.token} is now CALLED at Counter #${counterNum} at ${booking.centre_name || 'APMC'}. ` +
+    `[KisanSathi URGENT] Token ${booking.token} is now CALLED at Counter #${counterNum} at ${booking.centre_name || 'APMC'}. ` +
     `Please proceed immediately with your lot for quality assaying.`;
 
   sendSms({
@@ -102,7 +102,7 @@ function dispatchPaymentSms(farmer, token, amount, txnRef) {
 
   const formattedAmt = Number(amount).toLocaleString('en-IN', { maximumFractionDigits: 2 });
   const msg =
-    `[ProcureFlow DBT] Payment of Rs. ${formattedAmt} for Token ${token} has been credited to your Aadhaar-linked bank account. Ref: ${txnRef}.`;
+    `[KisanSathi DBT] Payment of Rs. ${formattedAmt} for Token ${token} has been credited to your Aadhaar-linked bank account. Ref: ${txnRef}.`;
 
   sendSms({
     farmerId: farmer.id,

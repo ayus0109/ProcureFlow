@@ -1,4 +1,4 @@
-# 🌾 ProcureFlow — Smart Digital Agricultural Procurement & Dynamic Queue Management System
+# 🌾 KisanSathi — Smart Digital Agricultural Procurement & Dynamic Queue Management System
 
 [![Node.js](https://img.shields.io/badge/Node.js-v24.0.0-339933?logo=node.js)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-v19.0.0-61DAFB?logo=react)](https://react.dev/)
@@ -240,7 +240,7 @@ Visit **[http://localhost:5173](http://localhost:5173)** in your browser.
 ## 📁 Repository Structure
 
 ```
-ProcureFlow/
+KisanSathi/
 ├── backend/
 │   ├── config/constants.js        # Crops, MSP rates, grade factors, 6 slot windows, statuses
 │   ├── data/procureflow.db        # SQLite database file

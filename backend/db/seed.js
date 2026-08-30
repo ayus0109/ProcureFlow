@@ -227,7 +227,7 @@ function seed() {
 
   db.prepare(
     'INSERT INTO notifications (farmer_id, message, type) VALUES (?, ?, ?)'
-  ).run(1, 'Welcome to ProcureFlow. Book a procurement slot to receive your token.', 'INFO');
+  ).run(1, 'Welcome to KisanSathi. Book a procurement slot to receive your token.', 'INFO');
 }
 
 function report() {
@@ -240,7 +240,7 @@ function report() {
     .get(TODAY, STATUS.WAITING);
   const firstToken = db.prepare('SELECT token FROM bookings ORDER BY id LIMIT 1').get();
 
-  console.log('\nProcureFlow demo data seeded (prototype data, not live records)');
+  console.log('\nKisanSathi demo data seeded (prototype data, not live records)');
   console.log(`  date            ${TODAY}`);
   console.log(`  centres         ${count('centres')}`);
   console.log(`  farmers         ${count('farmers')}`);

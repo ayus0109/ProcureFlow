@@ -175,7 +175,7 @@ function registerFarmer({ name, phone, password, village, aadhaarNo }) {
   const id = Number(result.lastInsertRowid);
   db.prepare('INSERT INTO notifications (farmer_id, message, type) VALUES (?, ?, ?)').run(
     id,
-    'Welcome to ProcureFlow. Book a procurement slot to receive your token.',
+    'Welcome to KisanSathi. Book a procurement slot to receive your token.',
     'INFO'
   );
 
@@ -209,7 +209,7 @@ function loginFarmerOtp({ phone }) {
     const newId = Number(result.lastInsertRowid);
     db.prepare('INSERT INTO notifications (farmer_id, message, type) VALUES (?, ?, ?)').run(
       newId,
-      'Welcome to ProcureFlow. Book a procurement slot to receive your token.',
+      'Welcome to KisanSathi. Book a procurement slot to receive your token.',
       'INFO'
     );
     farmer = { id: newId };
