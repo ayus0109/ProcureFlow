@@ -211,14 +211,14 @@ export default function AdminHome() {
 
   return (
     <AppShell title={user.centre_name} subtitle={`Officer: ${user.name} • Code: ${user.admin_code}`}>
-      {/* 🚀 ENLARGED & DEDUPLICATED EXECUTIVE NAVIGATION TABS */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-slate-100/90 p-1.5 border border-slate-200/80 shadow-2xs">
+      {/* 🚀 ENLARGED & DEDUPLICATED EXECUTIVE NAVIGATION TABS (Mobile Swipeable) */}
+      <div className="border-b border-slate-200/80 pb-3 sm:pb-4 overflow-hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none rounded-2xl bg-slate-100/90 p-1.5 border border-slate-200/80 shadow-2xs w-full">
           {/* 1. Live Queue */}
           <button
             type="button"
             onClick={() => setActiveTab('QUEUE')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
+            className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'QUEUE'
                 ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
                 : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
@@ -237,7 +237,7 @@ export default function AdminHome() {
           <button
             type="button"
             onClick={() => setActiveTab('ANALYTICS')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
+            className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'ANALYTICS'
                 ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
                 : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
@@ -251,7 +251,7 @@ export default function AdminHome() {
           <button
             type="button"
             onClick={() => setActiveTab('PAYMENTS')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
+            className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'PAYMENTS'
                 ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
                 : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
@@ -265,7 +265,7 @@ export default function AdminHome() {
           <button
             type="button"
             onClick={() => setShowSmsModal(true)}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black text-slate-700 hover:text-blue-950 hover:bg-white/60 transition-all"
+            className="flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black text-slate-700 hover:text-blue-950 hover:bg-white/60 transition-all"
           >
             <Smartphone className="h-4 w-4 text-blue-700" />
             <span>SMS & WhatsApp Log</span>

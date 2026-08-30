@@ -404,146 +404,59 @@ export default function FarmerHome() {
 
   return (
     <AppShell title={`${t('farmer.hello')}, ${user.name}`} subtitle={user.village ? `Village: ${user.village}` : undefined}>
-      <div className="mb-4">
+      <div className="mb-2">
         <OnlineStatus />
       </div>
-      {/* 🚀 ENLARGED Quick Actions Grid: All Bookings, Bank Account & DBT, SMS Log, e-KYC */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {/* 1. All Bookings & History */}
-        <button
-          type="button"
-          onClick={() => setShowHistoryModal(true)}
-          className="flex items-center gap-3.5 rounded-3xl border-2 border-slate-200/80 bg-white p-4 text-left shadow-xs transition hover:border-emerald-500 hover:bg-emerald-50/40 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
+
+      {/* High-priority announcement when called */}
+      {currentBooking?.status === 'CALLED' && (
+        <div
+          role="status"
+          className="flex items-start gap-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white shadow-lg ring-4 ring-amber-300/50 animate-bounce"
         >
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 group-hover:scale-105 transition">
-            <History className="h-6 w-6" />
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/20 backdrop-blur-md">
+            <BellRing className="h-6 w-6 text-white" aria-hidden="true" />
           </div>
-          <div className="min-w-0 flex-1">
-            <span className="block text-sm font-extrabold text-slate-900 group-hover:text-emerald-950">
-              {t('action.allBookings')}
-            </span>
-            <span className="block text-xs font-medium text-slate-500 truncate">
-              {t('action.allBookingsSub')}
-            </span>
+          <div>
+            <p className="text-base font-black">{t('farmer.calledTitle')}</p>
+            <p className="mt-0.5 text-xs font-medium text-amber-50 leading-snug">{t('farmer.calledSub')}</p>
           </div>
-          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-emerald-600 transition" />
-        </button>
-
-        {/* 2. Bank Account & DBT */}
-        <button
-          type="button"
-          onClick={() => setShowBankModal(true)}
-          className="flex items-center gap-3.5 rounded-3xl border-2 border-emerald-300/80 bg-emerald-50/60 p-4 text-left shadow-xs transition hover:border-emerald-600 hover:bg-emerald-100/60 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
-        >
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-700 text-white shadow-xs group-hover:scale-105 transition">
-            <CreditCard className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="block text-sm font-extrabold text-emerald-950">
-              {t('action.bankDbt')}
-            </span>
-            <span className="block text-xs font-medium text-emerald-800 truncate">
-              {user?.bank_account ? `🏛️ ${user.bank_name || t('action.bankDbtLinked')}` : `⚠️ ${t('action.bankDbtMissing')}`}
-            </span>
-          </div>
-          <ChevronRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-0.5 transition" />
-        </button>
-
-        {/* 3. SMS & WhatsApp Dispatch Log */}
-        <button
-          type="button"
-          onClick={() => setShowSmsModal(true)}
-          className="flex items-center gap-3.5 rounded-3xl border-2 border-slate-200/80 bg-white p-4 text-left shadow-xs transition hover:border-blue-500 hover:bg-blue-50/40 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 group"
-        >
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-100 text-blue-800 group-hover:scale-105 transition">
-            <Smartphone className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="block text-sm font-extrabold text-slate-900 group-hover:text-blue-950">
-              {t('action.smsLog')}
-            </span>
-            <span className="block text-xs font-medium text-slate-500 truncate">
-              {t('action.smsLogSub')}
-            </span>
-          </div>
-          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-blue-600 transition" />
-        </button>
-
-        {/* 4. Government e-KYC Verified */}
-        <button
-          type="button"
-          onClick={() => setShowEkycModal(true)}
-          className={`flex items-center gap-3.5 rounded-3xl border-2 p-4 text-left shadow-xs transition hover:shadow-md focus:outline-none focus-visible:ring-4 group ${
-            user?.ekyc_verified
-              ? 'border-emerald-300/80 bg-emerald-50/40 hover:border-emerald-500 hover:bg-emerald-100/50 focus-visible:ring-emerald-200'
-              : 'border-amber-300/80 bg-amber-50/50 hover:border-amber-500 hover:bg-amber-100/60 focus-visible:ring-amber-200 animate-pulse'
-          }`}
-        >
-          <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white shadow-xs group-hover:scale-105 transition ${
-            user?.ekyc_verified ? 'bg-emerald-600' : 'bg-amber-500'
-          }`}>
-            <ShieldCheck className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className={`block text-sm font-extrabold ${user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'}`}>
-              {user?.ekyc_verified ? t('action.ekycVerified') : t('action.ekycPending')}
-            </span>
-            <span className="block text-xs font-medium text-slate-500 truncate">
-              {user?.ekyc_verified ? t('action.ekycSubVerified') : t('action.ekycSubPending')}
-            </span>
-          </div>
-          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 transition" />
-        </button>
-      </div>
-
-      {loading && <p className="text-sm font-medium text-slate-500 animate-pulse">{t('common.loading')}</p>}
-
-      {error && (
-        <div role="alert" className="rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-900 ring-1 ring-rose-200">
-          {error}
         </div>
       )}
 
       {/* Multi-Slot Switcher Tabs (when farmer holds multiple bookings) */}
       {allBookings.length > 1 && (
-        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-2">
-          <div className="flex gap-2 overflow-x-auto">
+        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-1.5 scrollbar-none">
+          <div className="flex gap-1.5 overflow-x-auto">
             {allBookings.map((b, idx) => (
               <button
                 key={b.id}
                 type="button"
                 onClick={() => setSelectedSlotIdx(idx)}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold transition ${
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black transition ${
                   selectedSlotIdx === idx
                     ? 'bg-emerald-700 text-white shadow-xs'
                     : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                 }`}
               >
                 <span className="font-mono">{b.token}</span>
-                <span className="text-xs font-medium opacity-85">({t(`crop.${b.crop}`)})</span>
+                <span className="text-[11px] font-medium opacity-85">({t(`crop.${b.crop}`)})</span>
               </button>
             ))}
           </div>
 
-          <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800 shrink-0">
+          <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-[11px] font-extrabold text-emerald-800 shrink-0">
             {activeCount}/3 {t('farmer.slotsActive')}
           </span>
         </div>
       )}
 
-      {/* High-priority announcement when called */}
-      {currentBooking?.status === 'CALLED' && (
-        <div
-          role="status"
-          className="flex items-start gap-4 rounded-3xl bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white shadow-lg ring-4 ring-amber-300/50 animate-bounce"
-        >
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/20 backdrop-blur-md">
-            <BellRing className="h-7 w-7 text-white" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-lg font-black">{t('farmer.calledTitle')}</p>
-            <p className="mt-0.5 text-sm font-medium text-amber-50 leading-snug">{t('farmer.calledSub')}</p>
-          </div>
+      {/* 🌟 PRIMARY HERO SECTION: Active Gate Pass or Book Slot Button */}
+      {loading && <p className="text-sm font-medium text-slate-500 animate-pulse">{t('common.loading')}</p>}
+
+      {error && (
+        <div role="alert" className="rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-900 ring-1 ring-rose-200">
+          {error}
         </div>
       )}
 
@@ -563,12 +476,97 @@ export default function FarmerHome() {
       {currentBooking && activeCount < 3 && (
         <Link
           to="/farmer/book"
-          className="flex min-h-13 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-sm font-extrabold text-emerald-900 transition hover:bg-emerald-100/70"
+          className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-xs sm:text-sm font-extrabold text-emerald-900 transition hover:bg-emerald-100/70"
         >
-          <CalendarPlus className="h-5 w-5 text-emerald-700" />
+          <CalendarPlus className="h-4 w-4 text-emerald-700" />
           <span>+ {t('farmer.bookAnother')} ({activeCount}/3 {t('farmer.slotsActive')})</span>
         </Link>
       )}
+
+      {/* 📱 COMPACT 2x2 QUICK ACTION GRID (Mobile-Optimized) */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
+        {/* 1. All Bookings & History */}
+        <button
+          type="button"
+          onClick={() => setShowHistoryModal(true)}
+          className="flex items-center gap-2.5 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 text-left shadow-2xs transition hover:border-emerald-500 hover:bg-emerald-50/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
+        >
+          <div className="grid h-9 w-9 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800 group-hover:scale-105 transition">
+            <History className="h-4 w-4 sm:h-5 sm:w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="block text-xs sm:text-sm font-extrabold text-slate-900 truncate group-hover:text-emerald-950">
+              {t('action.allBookings')}
+            </span>
+            <span className="block text-[10px] sm:text-xs font-medium text-slate-500 truncate">
+              {t('action.allBookingsSub')}
+            </span>
+          </div>
+        </button>
+
+        {/* 2. Bank Account & DBT */}
+        <button
+          type="button"
+          onClick={() => setShowBankModal(true)}
+          className="flex items-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 sm:p-4 text-left shadow-2xs transition hover:border-emerald-500 hover:bg-emerald-100/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 group"
+        >
+          <div className="grid h-9 w-9 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-xl bg-emerald-700 text-white shadow-2xs group-hover:scale-105 transition">
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="block text-xs sm:text-sm font-extrabold text-emerald-950 truncate">
+              {t('action.bankDbt')}
+            </span>
+            <span className="block text-[10px] sm:text-xs font-medium text-emerald-800 truncate">
+              {user?.bank_account ? (user.bank_name?.split(' ')[0] || 'Linked') : 'Add Bank'}
+            </span>
+          </div>
+        </button>
+
+        {/* 3. SMS & WhatsApp Dispatch Log */}
+        <button
+          type="button"
+          onClick={() => setShowSmsModal(true)}
+          className="flex items-center gap-2.5 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 text-left shadow-2xs transition hover:border-blue-500 hover:bg-blue-50/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 group"
+        >
+          <div className="grid h-9 w-9 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-800 group-hover:scale-105 transition">
+            <Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="block text-xs sm:text-sm font-extrabold text-slate-900 truncate group-hover:text-blue-950">
+              {t('action.smsLog')}
+            </span>
+            <span className="block text-[10px] sm:text-xs font-medium text-slate-500 truncate">
+              {t('action.smsLogSub')}
+            </span>
+          </div>
+        </button>
+
+        {/* 4. Government e-KYC Verified */}
+        <button
+          type="button"
+          onClick={() => setShowEkycModal(true)}
+          className={`flex items-center gap-2.5 rounded-2xl border p-3 sm:p-4 text-left shadow-2xs transition focus:outline-none focus-visible:ring-4 group ${
+            user?.ekyc_verified
+              ? 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-500 focus-visible:ring-emerald-200'
+              : 'border-amber-200 bg-amber-50/50 hover:border-amber-500 focus-visible:ring-amber-200'
+          }`}
+        >
+          <div className={`grid h-9 w-9 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-xl text-white shadow-2xs group-hover:scale-105 transition ${
+            user?.ekyc_verified ? 'bg-emerald-600' : 'bg-amber-500'
+          }`}>
+            <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className={`block text-xs sm:text-sm font-extrabold truncate ${user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'}`}>
+              {user?.ekyc_verified ? t('action.ekycVerified') : t('action.ekycPending')}
+            </span>
+            <span className="block text-[10px] sm:text-xs font-medium text-slate-500 truncate">
+              {user?.ekyc_verified ? 'Aadhaar Verified' : 'Tap to Verify'}
+            </span>
+          </div>
+        </button>
+      </div>
 
       <AlertsPanel />
 
