@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **Smart India Hackathon (SIH) Solution**  
-> An end-to-end, resilient GovTech platform designed to eliminate multi-hour farmer queues, ensure transparent Minimum Support Price (MSP) quality bonuses, and automate Direct Benefit Transfer (DBT) payouts across Agricultural Produce Market Committees (APMCs).
+> An end-to-end, resilient GovTech platform designed to eliminate multi-hour farmer queues, ensure transparent Minimum Support Price (MSP) quality bonuses, provide 24/7 AI guidance, and automate Direct Benefit Transfer (DBT) payouts across Agricultural Produce Market Committees (APMCs).
 
 ---
 
@@ -30,9 +30,10 @@
 Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8–14 hour physical queues, extreme traffic congestion, price exploitation by middlemen, lack of moisture testing transparency, and delayed payment confirmations.
 
 ### Expected Solution Fulfillments:
-- ✅ **Multilingual AI Voice Assistant**: 2-way conversational voice booking in **Marathi (मराठी)**, **Hindi (हिंदी)**, and **English** for hands-free, zero-friction access.
+- ✅ **Kisan Sahayak (किसान सहायक) 24/7 Multilingual AI Chatbot**: Interactive doubt-clearing assistant in **Marathi (मराठी)**, **Hindi (हिंदी)**, and **English** for instant resolution of MSP rates, DBT timelines, moisture guidelines, and mandatory documents with optional voice input and HD voice readout.
+- ✅ **Zero-Scroll 3-Step Booking Wizard**: Fast, frictionless slot booking (1-tap centre selection $\rightarrow$ crop & weight with live gross MSP calculator $\rightarrow$ 6 operating slot windows) issuing an instant scannable Digital Gate Pass.
 - ✅ **Dynamic Queue Management**: Transparent 7-stage FIFO state machine with explainable wait-time calculations and Server-Sent Events (SSE) live push sync.
-- ✅ **Instant Farmer Dossier & Aadhaar Lookup**: Sub-50ms search by Farmer Name, 12-digit Aadhaar Number, Phone, PM-Kisan ID, or Token number.
+- ✅ **Instant Farmer Dossier & Aadhaar Lookup**: Sub-50ms search by Farmer Name, 12-digit Aadhaar Number (`XXXX-XXXX-XXXX`), Phone, PM-Kisan ID, or Token number.
 - ✅ **Executive APMC Centre Analytics**: Real-time capacity utilization tracking, quality grade distributions, and 1-click APMC CSV export.
 - ✅ **Anti-Corruption Graded MSP & DBT**: Server-computed quality bonuses (+5% for Grade A) and direct PFMS bank account disbursement.
 
@@ -40,11 +41,23 @@ Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8
 
 ## 🌟 Key Features & Innovations
 
-### 1. 🎙️ 2-Way Multilingual AI Voice Assistant
-- Hands-free slot booking supporting spoken dialects in **Marathi**, **Hindi**, and **English**.
-- Real-time Speech-to-Text (`webkitSpeechRecognition`), NLU entity parser (extracts crop, quantity in quintals, date, and slot window), and native Text-to-Speech (`speechSynthesis`) confirmation.
+### 1. 🤖 Kisan Sahayak (किसान सहायक / शेतकरी सहाय्यक) 24/7 AI Help Chatbot
+- **Comprehensive GovTech Domain Knowledge**: Answers farmer queries in natural language regarding:
+  - **Government MSP Rates (2026)**: Wheat (₹2,425/qtl), Soybean (₹4,892/qtl), Cotton (₹7,521/qtl), Paddy (₹2,300/qtl), Tur (₹7,550/qtl).
+  - **Direct Benefit Transfer (DBT)**: PFMS direct-to-bank credit timeline (24-48 hours), zero agent deductions, and UTR tracking.
+  - **Quality & Moisture Norms**: Max 12.0% moisture threshold, Fair Average Quality (FAQ) vs Grade A +5% bonus criteria.
+  - **Gate Documents Checklist**: Aadhaar Card, Satbara 7/12 Land Record, Bank Passbook, and Digital Gate Pass token.
+- **Multilingual & Reactive**: Live instant switching across Marathi, Hindi, and English (synced with top bar and 1-tap in-chat pills).
+- **Accessibility**: Voice-to-Text mic input and Neural Text-to-Speech (`/api/tts`) readout.
+- **Touch-Friendly Suggestion Cards**: Large interactive cards with direct navigation links (e.g. `[📅 Book Slot Now]`).
 
-### 2. 🔍 Executive Analytics & Instant Farmer Dossier Lookup
+### 2. 📅 Zero-Scroll 3-Step Farmer Booking Wizard
+- **Step 1 — Centre**: 1-tap selection of nearest APMC centre (Pune, Nashik, Nagpur, Aurangabad, Kolhapur) with live congestion badges.
+- **Step 2 — Crop & Weight**: Select harvest crop with live gross MSP amount estimator and quick-add quintal chips (`+5`, `+10`, `+20`, `+50`).
+- **Step 3 — Date & Time Slot**: Pick Today or Tomorrow across 6 one-hour operating windows (`10:00-11:00`, `11:00-12:00`, `12:00-13:00`, `14:00-15:00`, `15:00-16:00`, `16:00-17:00`).
+- **Instant Token Generation**: Allocates an ACID-compliant Digital Gate Pass token (e.g. `PF-1476`) with exact arrival time.
+
+### 3. 🔍 Executive Analytics & Instant Farmer Dossier Lookup
 - High-speed indexed search for APMC centre administrators.
 - Type any **Farmer Name**, **Aadhaar Number** (`XXXX-XXXX-XXXX` or last 4 digits), **Mobile**, **PM-Kisan ID**, or **Token #** to pull:
   - UIDAI Verified Aadhaar status & Satbara 7/12 Land Holdings.
@@ -52,19 +65,19 @@ Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8
   - Lifetime Procurement Summary (Total Qtl sold, Gross MSP earnings, Paid vs Pending DBT).
   - Complete historical transaction ledger with **Print / View Pass & Receipt** triggers.
 
-### 3. 🎫 Digital APMC Gate Pass with Scannable QR Matrix
+### 4. 🎫 Digital APMC Gate Pass with Scannable QR Matrix
 - Generates procedural SVG QR Code tokens (`PF-1024+`) for optical scanning at APMC entry gates.
 - Printable gate pass slip with farmer details, crop type, quantity, slot timing, and mandi directions.
 
-### 4. ⏱️ 7-Stage Visual Progression Pipeline
+### 5. ⏱️ 7-Stage Visual Progression Pipeline
 - Real-time stepper tracking:  
   $$\text{Booked} \longrightarrow \text{Waiting in Queue} \longrightarrow \text{Called to Counter} \longrightarrow \text{Checked In} \longrightarrow \text{Quality Assay} \longrightarrow \text{Weighment} \longrightarrow \text{Confirmed / Paid}$$
 
-### 5. 🧮 Deterministic & Explainable Wait-Time Formula
+### 6. 🧮 Deterministic & Explainable Wait-Time Formula
 - Real-time queue math engine calculated dynamically:
   $$\text{Estimated Wait (min)} = \left(\frac{\text{Farmers Ahead} \times \text{Avg Processing Time}}{\text{Active Counters}}\right) + \text{Delay}$$
 
-### 6. 🔬 Anti-Corruption Graded MSP Pricing Engine
+### 7. 🔬 Anti-Corruption Graded MSP Pricing Engine
 - Server-side atomic pricing calculator factoring in quality benchmarks:
   - **Grade A**: $+5\%$ Quality Bonus above MSP
   - **FAQ Standard**: $100\%$ Base MSP
@@ -76,22 +89,22 @@ Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8
 
 ## 🔄 Technical Workings & Flowcharts
 
-### 1. Multilingual AI Voice Assistant Flowchart
+### 1. Kisan Sahayak Multilingual AI Chatbot Flowchart
 
 ```mermaid
 flowchart LR
-    subgraph Step1 ["Step 1: Voice Capture & ASR"]
-        A["🎙️ Spoken Farmer Input<br/>(Marathi / Hindi / English)"] --> B["Speech-to-Text Engine<br/>(webkitSpeechRecognition)"]
+    subgraph Step1 ["Step 1: Multilingual Query Input"]
+        A["💬 Farmer Query Input<br/>(Text / Voice / Suggestion Card)<br/>Marathi · Hindi · English"] --> B["NLU & Intent Normalizer<br/>(Dialect & Romanized Keyword Parser)"]
     end
 
-    subgraph Step2 ["Step 2: NLU Parsing & Slot Booking"]
-        B --> C["Entity & Dialect Parser<br/>(Crop, Qtl, Date, Time Slot)"]
-        C --> D["POST /api/bookings<br/>(ACID Token Allocation)"]
+    subgraph Step2 ["Step 2: GovTech Knowledge Engine"]
+        B --> C["Knowledge Base Resolution<br/>(MSP Rates · DBT · Docs · Moisture · Centres)"]
+        C --> D["POST /api/chatbot/ask<br/>(Contextual Structured JSON Response)"]
     end
 
-    subgraph Step3 ["Step 3: Native Voice Output"]
-        D --> E["Token Pass Generated<br/>(PF-XXXX + Queue Rank)"]
-        E --> F["🔊 TTS Voice Readout<br/>(Native Audio Confirmation)"]
+    subgraph Step3 ["Step 3: Interactive UI & Audio Output"]
+        D --> E["Rich Formatted Markdown Reply<br/>(Bullet Points + Action Links)"]
+        E --> F["🔊 Neural TTS Voice Readout<br/>(/api/tts Audio Stream)"]
     end
 
     style Step1 fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
@@ -99,12 +112,12 @@ flowchart LR
     style Step3 fill:#faf5ff,stroke:#9333ea,stroke-width:2px
 ```
 
-### 2. Real-Time Dynamic Queue Management Flowchart
+### 2. Real-Time Dynamic Queue Management & 3-Step Wizard Flowchart
 
 ```mermaid
 flowchart LR
-    subgraph Step1 ["Step 1: Quota-Regulated Booking"]
-        A["Farmer Books Window<br/>(Crop, Qtl, APMC Centre)"] --> B["Capacity & Quota Engine<br/>(Counter Load & Target Limit)"]
+    subgraph Step1 ["Step 1: 3-Step Wizard Booking"]
+        A["Zero-Scroll 3-Step Wizard<br/>(1-Tap Centre ➔ Crop & Qty ➔ Slot)"] --> B["Capacity & Quota Engine<br/>(Max 50 Qtl · 6 Slot Windows)"]
     end
 
     subgraph Step2 ["Step 2: 7-Stage Dynamic Queue"]
@@ -113,7 +126,7 @@ flowchart LR
     end
 
     subgraph Step3 ["Step 3: Real-Time Broadcast"]
-        D --> E["⚡ Server-Sent Events (SSE)<br/>(Live UI Stepper Update)"]
+        D --> E["⚡ Server-Sent Events (SSE)<br/>(Live UI Stepper Sync)"]
         D --> F["📱 SMS / WhatsApp Alert<br/>(Gate Call Notification)"]
     end
 
@@ -152,7 +165,7 @@ flowchart LR
 ```mermaid
 graph TD
     subgraph L1["1. Presentation Tier (React 19 + Tailwind CSS v4)"]
-        A["Mobile-First UI • 3 Languages (EN/HI/MR) • SVG QR Pass • AI Voice Assistant • Stepper"]
+        A["Mobile-First UI • 3 Languages (EN/HI/MR) • SVG QR Pass • Kisan Sahayak AI • 3-Step Wizard"]
     end
     
     subgraph L2["2. API & Security Tier (Express 5 REST API + SSE)"]
@@ -160,7 +173,7 @@ graph TD
     end
     
     subgraph L3["3. Business Logic Engine (Node.js 24)"]
-        C["Dynamic ETA Calculator • Queue State Machine • Graded MSP Pricing • Analytics Search"]
+        C["Dynamic ETA Calculator • Queue State Machine • Graded MSP Pricing • AI Chatbot NLU"]
     end
     
     subgraph L4["4. Data Tier (Native node:sqlite Database)"]
@@ -176,7 +189,7 @@ graph TD
 
 | Role | Access URL | Credentials | Context / Test Scope |
 |---|---|---|---|
-| **Farmer (Demo)** | [http://localhost:5173/farmer/login](http://localhost:5173/farmer/login) | **Phone:** `9999990001`<br>**Password:** `farmer123`<br>*(Or OTP `4829`)* | *Ramesh Patil* (Starts clean to test slot booking, voice assistant, and pass printing) |
+| **Farmer (Demo)** | [http://localhost:5173/farmer/login](http://localhost:5173/farmer/login) | **Phone:** `9999990001`<br>**Password:** `farmer123`<br>*(Or OTP `4829`)* | *Ramesh Patil* (Starts clean to test 3-step slot booking, Kisan Sahayak AI, and pass printing) |
 | **Centre Officer (Pune)** | [http://localhost:5173/admin/login](http://localhost:5173/admin/login) | **Code:** `ADMIN001`<br>**Password:** `admin123` | *Suresh Kale* (Controls Pune APMC queue, assaying, farmer dossier search, and DBT payouts) |
 | **Centre Officer (Nashik)** | [http://localhost:5173/admin/login](http://localhost:5173/admin/login) | **Code:** `ADMIN002`<br>**Password:** `admin123` | *Vaishali Deshmukh* (Demonstrates multi-centre security isolation) |
 
@@ -229,7 +242,7 @@ Visit **[http://localhost:5173](http://localhost:5173)** in your browser.
 ```
 ProcureFlow/
 ├── backend/
-│   ├── config/constants.js        # Crops, MSP rates, grade factors, slot windows, statuses
+│   ├── config/constants.js        # Crops, MSP rates, grade factors, 6 slot windows, statuses
 │   ├── data/procureflow.db        # SQLite database file
 │   ├── db/
 │   │   ├── index.js               # Database connection using native node:sqlite
@@ -241,9 +254,11 @@ ProcureFlow/
 │   │   ├── auth.js                # Farmer & Admin authentication + OTP
 │   │   ├── bookings.js            # Slot reservation, multi-slot support, and receipts
 │   │   ├── centres.js             # APMC centre capacities and slots
+│   │   ├── chatbot.js             # Kisan Sahayak AI knowledge & NLU engine
 │   │   ├── notifications.js       # Live notifications and SSE event stream
 │   │   ├── payments.js            # DBT disbursement and PFMS UTR generation
-│   │   └── queue.js               # 7-stage queue state machine and caller
+│   │   ├── queue.js               # 7-stage queue state machine and caller
+│   │   └── tts.js                 # Neural Text-to-Speech audio proxy
 │   ├── services/                  # Business logic (booking, ETA, queue, procurement, payments)
 │   ├── demo-check.js              # 44-step automated rehearsal test suite
 │   └── server.js                  # Main Express entrypoint (Port 4000)
@@ -251,11 +266,11 @@ ProcureFlow/
 ├── frontend/
 │   ├── src/
 │   │   ├── auth/AuthContext.jsx   # Authentication context, OTP & Google login
-│   │   ├── components/            # UI components (AdminAnalytics, VoiceAssistant, Stepper, Pass)
+│   │   ├── components/            # UI components (FarmerChatbot, AdminAnalytics, Stepper, Pass)
 │   │   ├── hooks/                 # React hooks (usePoll, useLiveEvents)
 │   │   ├── i18n/                  # 3-language dictionaries (EN, HI, MR) & LanguageContext
 │   │   ├── layouts/               # Shell and responsive navigation layouts
-│   │   ├── pages/                 # Landing, Farmer Dashboard, Admin Cockpit, Slot Booking
+│   │   ├── pages/                 # Landing, Farmer Dashboard, Admin Cockpit, 3-Step BookSlot
 │   │   ├── services/api.js        # Central fetch client with Vite proxy integration
 │   │   ├── App.jsx                # Application routes
 │   │   └── main.jsx               # React entry point
