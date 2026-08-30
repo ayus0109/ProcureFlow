@@ -28,7 +28,7 @@ import AlertsPanel from '../../components/AlertsPanel.jsx';
 import SeasonTracker from '../../components/SeasonTracker.jsx';
 import StageStepper from '../../components/StageStepper.jsx';
 import KisanHelplineCard from '../../components/KisanHelplineCard.jsx';
-import VoiceAssistant from '../../components/VoiceAssistant.jsx';
+import FarmerChatbot from '../../components/FarmerChatbot.jsx';
 import DisputeButton from '../../components/DisputeButton.jsx';
 import SpeakButton from '../../components/ui/SpeakButton.jsx';
 import OnlineStatus from '../../components/ui/OnlineStatus.jsx';
@@ -701,8 +701,8 @@ export default function FarmerHome() {
         />
       )}
 
-      {/* AI Voice Booking Assistant — floating over page */}
-      <VoiceAssistant />
+      {/* Kisan Sahayak AI Help & Support Chatbot — floating over page */}
+      <FarmerChatbot />
     </AppShell>
   );
 }

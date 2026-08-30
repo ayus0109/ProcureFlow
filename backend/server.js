@@ -18,6 +18,7 @@ const notificationRoutes = require('./routes/notifications');
 const ttsRoutes = require('./routes/tts');
 const eventsRoutes = require('./routes/events');
 const analyticsRoutes = require('./routes/analytics');
+const chatbotRoutes = require('./routes/chatbot');
 const { bookableDates } = require('./services/bookingService');
 
 const app = express();
@@ -50,6 +51,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/tts', ttsRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 const path = require('path');
 const fs = require('fs');
