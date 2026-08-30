@@ -191,8 +191,8 @@ export default function BookSlot() {
       </Link>
 
       <form onSubmit={submit} className="space-y-5">
-        {/* 1. Date Selection (First so farmers pick date and see realistic slot availability across centres) */}
-        <Section label={t('book.date')} icon={Calendar} badge="Step 1">
+        {/* 1. Date Selection */}
+        <Section label={t('book.date')} icon={Calendar} badge={`${t('common.step')} 1`}>
           <div className="grid grid-cols-3 gap-2.5">
             {(reference?.dates || []).map((d, i) => {
               const isSelected = date === d;
@@ -209,7 +209,7 @@ export default function BookSlot() {
                   }`}
                 >
                   <span className="text-xs font-bold text-slate-500 uppercase">
-                    {i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : 'Day 3'}
+                    {i === 0 ? t('book.today') : i === 1 ? t('book.tomorrow') : (lang === 'mr' ? '३ रा दिवस' : lang === 'hi' ? 'तीसरा दिन' : 'Day 3')}
                   </span>
                   <span className="mt-0.5 text-sm font-extrabold text-slate-900">
                     {dateLabel(d, i)}
@@ -222,10 +222,11 @@ export default function BookSlot() {
         </Section>
 
         {/* 2. Centre Selection */}
-        <Section label={t('book.centre')} icon={Building2} badge="Step 2">
+        <Section label={t('book.centre')} icon={Building2} badge={`${t('common.step')} 2`}>
           <div className="grid gap-3 sm:grid-cols-2">
             {centres.map((c) => {
               const isSelected = String(c.id) === centreId;
+              const centreName = t(`centre.${c.id}`) || c.name;
               return (
                 <button
                   key={c.id}
@@ -240,7 +241,7 @@ export default function BookSlot() {
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2">
-                      <span className="font-bold text-slate-900 text-sm">{c.name}</span>
+                      <span className="font-bold text-slate-900 text-sm">{centreName}</span>
                       <CongestionBadge level={c.congestion} />
                     </div>
                     <p className="mt-1 text-xs text-slate-500 font-medium">
@@ -264,16 +265,16 @@ export default function BookSlot() {
                   {/* Capacity Bar & Quota Details */}
                   <div className="mt-3 border-t border-slate-100 pt-2 text-xs space-y-1">
                     <div className="flex justify-between font-semibold text-slate-700">
-                      <span>Wait: ~{c.waitLabel}</span>
+                      <span>{t('book.wait')}: ~{c.waitLabel}</span>
                       <span className="text-emerald-800 font-bold">
-                        {c.slotsLeft} {c.slotsLeft === 1 ? 'slot' : 'slots'} left ({dateLabel(date, (reference?.dates || []).indexOf(date))})
+                        {c.slotsLeft} {t('book.slotsAvailable')}
                       </span>
                     </div>
 
                     <div className="flex justify-between text-[11px] text-slate-500 font-medium">
-                      <span>🎯 Target: {c.daily_target_qtl || 500} qtl</span>
+                      <span>🎯 Target: {c.daily_target_qtl || 500} {t('booking.qtl')}</span>
                       <span className="font-semibold text-emerald-900 bg-emerald-100/70 px-1.5 py-0.2 rounded">
-                        Max {c.max_qty_per_farmer || 50} qtl/farmer
+                        Max {c.max_qty_per_farmer || 50} {t('booking.qtl')}/farmer
                       </span>
                     </div>
 
@@ -293,14 +294,14 @@ export default function BookSlot() {
         </Section>
 
         {/* 3. Crop & Quantity Selection (Dynamically Filtered by Selected Centre) */}
-        <Section label={t('book.crop')} icon={Wheat} badge="Step 3">
+        <Section label={t('book.crop')} icon={Wheat} badge={`${t('common.step')} 3`}>
           {selectedCentre && (
             <div className="mb-3 flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs border border-emerald-200">
               <span className="font-bold text-emerald-950">
-                📍 {selectedCentre.name} Requirements:
+                📍 {t(`centre.${selectedCentre.id}`) || selectedCentre.name}
               </span>
               <span className="font-medium text-emerald-800">
-                Showing {availableCrops.length} accepted crops only
+                {availableCrops.length} {t('book.crop')}
               </span>
             </div>
           )}
@@ -323,7 +324,7 @@ export default function BookSlot() {
                   <span className="text-2xl">{CROP_ICONS[c.key] || '🌾'}</span>
                   <span className="mt-1 text-sm font-bold">{t(`crop.${c.key}`)}</span>
                   <span className="mt-0.5 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                    ₹{c.ratePerQtl}/qtl
+                    ₹{c.ratePerQtl}/{t('booking.qtl')}
                   </span>
                 </button>
               );
@@ -340,7 +341,7 @@ export default function BookSlot() {
                 min="0.5"
                 max={maxAllowedQty}
                 step="0.5"
-                placeholder={`Max ${maxAllowedQty} quintals`}
+                placeholder={`Max ${maxAllowedQty} ${t('booking.qtl')}`}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 required
@@ -348,8 +349,8 @@ export default function BookSlot() {
               {selectedCentre && (
                 <p className={`mt-1 text-[11px] font-semibold ${isOverLimit ? 'text-rose-700 font-bold' : 'text-slate-500'}`}>
                   {isOverLimit
-                    ? `⚠️ Exceeds ${selectedCentre.name} limit of ${maxAllowedQty} quintals!`
-                    : `ℹ️ ${selectedCentre.name} quota limit: ${maxAllowedQty} quintals per booking.`}
+                    ? `⚠️ Exceeds ${t(`centre.${selectedCentre.id}`) || selectedCentre.name} limit of ${maxAllowedQty} ${t('booking.qtl')}!`
+                    : `ℹ️ ${t(`centre.${selectedCentre.id}`) || selectedCentre.name} limit: ${maxAllowedQty} ${t('booking.qtl')}`}
                 </p>
               )}
             </div>
@@ -357,13 +358,13 @@ export default function BookSlot() {
             {estimatedGross && (
               <div className="flex-1 min-w-44 rounded-xl bg-emerald-100/60 border border-emerald-300/60 p-3 text-xs">
                 <span className="font-semibold text-emerald-800 uppercase tracking-wider text-[10px]">
-                  Estimated MSP Value (FAQ Benchmark)
+                  {t('book.estAmount')}
                 </span>
                 <p className="text-lg font-black text-emerald-950">
                   {money(estimatedGross)}
                 </p>
                 <span className="text-[11px] text-emerald-700">
-                  {quantity} qtl × ₹{selectedCropObj.ratePerQtl}
+                  {quantity} {t('booking.qtl')} × ₹{selectedCropObj.ratePerQtl}
                 </span>
               </div>
             )}
@@ -371,7 +372,7 @@ export default function BookSlot() {
         </Section>
 
         {/* 4. Time Window Selection */}
-        <Section label={t('book.slot')} icon={Clock} badge="Step 4">
+        <Section label={t('book.slot')} icon={Clock} badge={`${t('common.step')} 4`}>
           {!centreId ? (
             <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-xs font-medium text-slate-500">
               {t('book.pickCentreFirst')}
@@ -380,10 +381,10 @@ export default function BookSlot() {
             <div>
               <div className="mb-3 flex items-center justify-between text-xs text-slate-600">
                 <span>
-                  Showing slots for <strong>{selectedCentre?.name}</strong> on <strong>{date}</strong>
+                  {t('book.showingSlots')} <strong>{t(`centre.${selectedCentre?.id}`) || selectedCentre?.name}</strong> (<strong>{date}</strong>)
                 </span>
                 <span className="font-bold text-emerald-800">
-                  Total {slots.reduce((sum, s) => sum + s.left, 0)} slots available
+                  {t('book.totalSlots').replace('{n}', slots.reduce((sum, s) => sum + s.left, 0))}
                 </span>
               </div>
 

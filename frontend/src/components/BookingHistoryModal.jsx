@@ -1,14 +1,3 @@
-/**
- * BookingHistoryModal.jsx
- *
- * Full Past Bookings & Digital Procurement Receipts History.
- *
- * Features:
- * - Search and filter by Crop, Status (Confirmed, Active, Rejected), Date
- * - Expandable procurement receipts with quality grade, moisture %, and DBT payment info
- * - Print/Download individual transaction passes
- */
-
 import { useState, useEffect } from 'react';
 import {
   History,
@@ -29,8 +18,10 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { money } from '../utils/money';
+import { useLanguage } from '../i18n/LanguageContext.jsx';
 
 export function BookingHistoryModal({ onClose, onSelectPass }) {
+  const { t } = useLanguage();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCrop, setSelectedCrop] = useState('ALL');
@@ -65,8 +56,8 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
               <History className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold">All Bookings & Transactions</h3>
-              <p className="text-[11px] text-emerald-200 font-medium">Complete procurement history & receipts</p>
+              <h3 className="text-sm font-extrabold">{t('historyModal.title')}</h3>
+              <p className="text-[11px] text-emerald-200 font-medium">{t('historyModal.sub')}</p>
             </div>
           </div>
 
@@ -90,10 +81,10 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
               onChange={(e) => setSelectedCrop(e.target.value)}
               className="rounded-xl border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 outline-none"
             >
-              <option value="ALL">All Crops</option>
+              <option value="ALL">{t('historyModal.allCrops')}</option>
               {crops.map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {t(`crop.${c}`) || c}
                 </option>
               ))}
             </select>
@@ -103,10 +94,10 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="rounded-xl border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 outline-none"
             >
-              <option value="ALL">All Statuses</option>
-              <option value="ACTIVE">Active in Queue</option>
-              <option value="CONFIRMED">Completed Sales</option>
-              <option value="REJECTED">Rejected Lots</option>
+              <option value="ALL">{t('historyModal.allStatuses')}</option>
+              <option value="ACTIVE">{t('status.ACTIVE') || 'Active'}</option>
+              <option value="CONFIRMED">{t('status.CONFIRMED') || 'Completed'}</option>
+              <option value="REJECTED">{t('status.REJECTED') || 'Rejected'}</option>
             </select>
           </div>
 
@@ -119,14 +110,14 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
         <div className="flex-1 overflow-y-auto p-6 space-y-3.5 bg-slate-50/50">
           {loading && (
             <div className="py-12 text-center text-slate-400 font-medium text-xs">
-              Loading past bookings…
+              {t('common.loading')}
             </div>
           )}
 
           {!loading && filtered.length === 0 && (
             <div className="py-12 text-center text-slate-400">
               <History className="mx-auto h-10 w-10 text-slate-300 mb-2" />
-              <p className="font-bold text-slate-700 text-sm">No bookings found</p>
+              <p className="font-bold text-slate-700 text-sm">{t('historyModal.empty')}</p>
               <p className="text-xs text-slate-400 mt-0.5">Try adjusting your filters above.</p>
             </div>
           )}
@@ -162,14 +153,14 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-extrabold text-slate-900 text-sm">
-                          {b.cropLabel || b.crop}
+                          {t(`crop.${b.crop}`) || b.cropLabel || b.crop}
                         </h4>
                         <span className="font-bold text-slate-700 text-xs">
-                          • {b.final_weight_qtl ? `${b.final_weight_qtl} qtl` : `${b.quantity_qtl} qtl`}
+                          • {b.final_weight_qtl ? `${b.final_weight_qtl} ${t('booking.qtl')}` : `${b.quantity_qtl} ${t('booking.qtl')}`}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                        <span>🏛️ {b.centre_name}</span>
+                        <span>🏛️ {t(`centre.${b.centre_id}`) || b.centre_name}</span>
                         <span>•</span>
                         <span>📅 {b.slot_date}</span>
                       </p>
@@ -192,7 +183,7 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                             : 'bg-blue-100 text-blue-900'
                         }`}
                       >
-                        {b.status}
+                        {t(`status.${b.status}`) || b.status}
                       </span>
                     </div>
 
@@ -210,7 +201,7 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <div className="rounded-xl bg-white p-2.5 border border-slate-200">
                         <span className="text-[10px] font-semibold text-slate-400 uppercase block">
-                          Token
+                          {t('booking.token')}
                         </span>
                         <span className="font-mono font-bold text-slate-900 text-sm">
                           {b.token}
@@ -218,13 +209,13 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                       </div>
                       <div className="rounded-xl bg-white p-2.5 border border-slate-200">
                         <span className="text-[10px] font-semibold text-slate-400 uppercase block">
-                          Slot Time
+                          {t('booking.when')}
                         </span>
                         <span className="font-bold text-slate-900">{b.slot_time}</span>
                       </div>
                       <div className="rounded-xl bg-white p-2.5 border border-slate-200">
                         <span className="text-[10px] font-semibold text-slate-400 uppercase block">
-                          Quality Grade
+                          Grade
                         </span>
                         <span className="font-bold text-slate-900">
                           {b.quality_grade || 'Pending'}
@@ -232,14 +223,14 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                       </div>
                       <div className="rounded-xl bg-white p-2.5 border border-slate-200">
                         <span className="text-[10px] font-semibold text-slate-400 uppercase block">
-                          Payment DBT
+                          {t('farmer.bankDbt')}
                         </span>
                         <span
                           className={`font-bold ${
                             b.payment_status === 'PAID' ? 'text-emerald-800' : 'text-amber-800'
                           }`}
                         >
-                          {b.payment_status || 'Pending'}
+                          {t(`payment.${b.payment_status}`) || b.payment_status || 'Pending'}
                         </span>
                       </div>
                     </div>
@@ -248,23 +239,23 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                     {isConfirmed && (
                       <div className="rounded-2xl bg-white p-3.5 border border-emerald-200 shadow-2xs space-y-1.5">
                         <div className="flex justify-between text-slate-600">
-                          <span>Weighed Final Quantity:</span>
-                          <span className="font-bold text-slate-900">{b.final_weight_qtl} Quintals</span>
+                          <span>{t('receipt.weight')}:</span>
+                          <span className="font-bold text-slate-900">{b.final_weight_qtl} {t('booking.qtl')}</span>
                         </div>
                         <div className="flex justify-between text-slate-600">
-                          <span>Rate Applied:</span>
-                          <span className="font-bold text-slate-900">{money(b.rate_per_qtl)}/qtl</span>
+                          <span>{t('receipt.rate')}:</span>
+                          <span className="font-bold text-slate-900">{money(b.rate_per_qtl)}/{t('booking.qtl')}</span>
                         </div>
                         <div className="flex justify-between text-slate-600">
-                          <span>Moisture Reading:</span>
+                          <span>{t('receipt.moisture')}:</span>
                           <span className="font-bold text-slate-900">{b.moisture_pct}%</span>
                         </div>
                         <div className="flex justify-between text-slate-600">
-                          <span>Payment Txn Ref:</span>
+                          <span>{t('receipt.utr')}:</span>
                           <span className="font-mono font-bold text-slate-900">{b.txn_ref || 'PF-TXN-1002'}</span>
                         </div>
                         <div className="pt-2 border-t border-slate-100 flex justify-between font-extrabold text-sm text-emerald-950">
-                          <span>Total Payout:</span>
+                          <span>{t('receipt.totalAmount')}:</span>
                           <span>{money(b.total_amount)}</span>
                         </div>
                       </div>
@@ -281,7 +272,7 @@ export function BookingHistoryModal({ onClose, onSelectPass }) {
                         className="flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 font-bold text-white shadow-xs hover:bg-emerald-800 transition"
                       >
                         <Printer className="h-3.5 w-3.5" />
-                        <span>Print Pass / PDF</span>
+                        <span>{t('common.print')}</span>
                       </button>
                     )}
                   </div>

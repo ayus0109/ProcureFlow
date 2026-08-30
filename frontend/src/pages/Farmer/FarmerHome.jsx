@@ -130,7 +130,7 @@ function Receipt({ p, t }) {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-emerald-300" />
             <span className="text-sm font-bold uppercase tracking-wider">
-              Official Digital Procurement Receipt
+              {t('receipt.title')}
             </span>
           </div>
           <span className="font-mono text-xs font-bold text-emerald-200 bg-emerald-950/60 px-2.5 py-1 rounded-lg">
@@ -190,7 +190,7 @@ function Receipt({ p, t }) {
           </div>
           {p.credited_bank && (
             <div className="flex justify-between py-2.5">
-              <dt className="text-slate-600 font-medium">Govt DBT Bank</dt>
+              <dt className="text-slate-600 font-medium">{t('receipt.dbtBank')}</dt>
               <dd className="font-bold text-emerald-950 flex items-center gap-1.5">
                 <span>🏛️ {p.credited_bank}</span>
                 <span className="font-mono text-xs text-slate-600">({p.credited_account || '••••4821'})</span>
@@ -199,7 +199,7 @@ function Receipt({ p, t }) {
           )}
           {p.pfms_utr ? (
             <div className="flex justify-between py-2.5">
-              <dt className="text-slate-600 font-medium">PFMS Govt UTR</dt>
+              <dt className="text-slate-600 font-medium">{t('receipt.pfmsUtr')}</dt>
               <dd className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-lg border border-emerald-200">
                 {p.pfms_utr}
               </dd>
@@ -234,7 +234,7 @@ function BookingCard({ booking, t, onOpenPass }) {
                 {t('booking.token')}
               </p>
               <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
-                Digital Gate Pass
+                {t('booking.passBadge')}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ function BookingCard({ booking, t, onOpenPass }) {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
           >
             <Printer className="h-4 w-4 text-emerald-700" />
-            <span>Print Mandi Pass (PDF)</span>
+            <span>{t('booking.printPass')}</span>
           </button>
         </div>
       </div>
@@ -272,19 +272,19 @@ function BookingCard({ booking, t, onOpenPass }) {
           <Stat
             label={t('booking.position')}
             value={booking.position ?? '—'}
-            sub={`${booking.farmersAhead || 0} ahead of you`}
+            sub={`${booking.farmersAhead || 0} ${t('booking.ahead')}`}
             icon={Clock}
           />
           <Stat
             label={t('booking.wait')}
             value={booking.waitLabel}
-            sub="Live estimated wait"
+            sub={t('booking.waitSub')}
             icon={Clock}
           />
           <Stat
             label={t('booking.arriveBy')}
             value={booking.arriveBy || '—'}
-            sub="Advised at gate"
+            sub={t('booking.arriveBySub')}
             icon={Clock}
           />
         </div>
@@ -295,7 +295,7 @@ function BookingCard({ booking, t, onOpenPass }) {
         <dl className="divide-y divide-slate-200/60 text-sm">
           <div className="flex justify-between py-2">
             <dt className="text-slate-500 font-medium">{t('booking.centre')}</dt>
-            <dd className="font-bold text-slate-900">{booking.centre_name}</dd>
+            <dd className="font-bold text-slate-900">{t(`centre.${booking.centre_id}`) || booking.centre_name}</dd>
           </div>
           <div className="flex justify-between py-2">
             <dt className="text-slate-500 font-medium">{t('booking.crop')}</dt>
@@ -420,10 +420,10 @@ export default function FarmerHome() {
           </div>
           <div className="min-w-0 flex-1">
             <span className="block text-sm font-extrabold text-slate-900 group-hover:text-emerald-950">
-              All Bookings & History
+              {t('action.allBookings')}
             </span>
             <span className="block text-xs font-medium text-slate-500 truncate">
-              Tokens & digital receipts
+              {t('action.allBookingsSub')}
             </span>
           </div>
           <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-emerald-600 transition" />
@@ -440,10 +440,10 @@ export default function FarmerHome() {
           </div>
           <div className="min-w-0 flex-1">
             <span className="block text-sm font-extrabold text-emerald-950">
-              Bank Account & DBT
+              {t('action.bankDbt')}
             </span>
             <span className="block text-xs font-medium text-emerald-800 truncate">
-              {user?.bank_account ? `🏛️ ${user.bank_name || 'Bank linked'}` : '⚠️ Add bank details'}
+              {user?.bank_account ? `🏛️ ${user.bank_name || t('action.bankDbtLinked')}` : `⚠️ ${t('action.bankDbtMissing')}`}
             </span>
           </div>
           <ChevronRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-0.5 transition" />
@@ -460,10 +460,10 @@ export default function FarmerHome() {
           </div>
           <div className="min-w-0 flex-1">
             <span className="block text-sm font-extrabold text-slate-900 group-hover:text-blue-950">
-              SMS & WhatsApp Log
+              {t('action.smsLog')}
             </span>
             <span className="block text-xs font-medium text-slate-500 truncate">
-              Live token & alert dispatches
+              {t('action.smsLogSub')}
             </span>
           </div>
           <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-blue-600 transition" />
@@ -486,10 +486,10 @@ export default function FarmerHome() {
           </div>
           <div className="min-w-0 flex-1">
             <span className={`block text-sm font-extrabold ${user?.ekyc_verified ? 'text-emerald-950' : 'text-amber-950'}`}>
-              {user?.ekyc_verified ? 'Govt e-KYC Verified' : 'Complete Aadhaar e-KYC'}
+              {user?.ekyc_verified ? t('action.ekycVerified') : t('action.ekycPending')}
             </span>
             <span className="block text-xs font-medium text-slate-500 truncate">
-              {user?.ekyc_verified ? 'UIDAI authenticated' : 'Tap to complete verification'}
+              {user?.ekyc_verified ? t('action.ekycSubVerified') : t('action.ekycSubPending')}
             </span>
           </div>
           <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-0.5 transition" />
@@ -526,7 +526,7 @@ export default function FarmerHome() {
           </div>
 
           <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800 shrink-0">
-            {activeCount}/3 Slots
+            {activeCount}/3 {t('farmer.slotsActive')}
           </span>
         </div>
       )}
@@ -566,7 +566,7 @@ export default function FarmerHome() {
           className="flex min-h-13 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/60 px-4 text-sm font-extrabold text-emerald-900 transition hover:bg-emerald-100/70"
         >
           <CalendarPlus className="h-5 w-5 text-emerald-700" />
-          <span>+ Book Another Slot ({activeCount}/3 slots active)</span>
+          <span>+ {t('farmer.bookAnother')} ({activeCount}/3 {t('farmer.slotsActive')})</span>
         </Link>
       )}
 
@@ -574,9 +574,9 @@ export default function FarmerHome() {
         <div className="flex items-center justify-between px-2 text-xs font-semibold text-slate-500">
           <span className="flex items-center gap-1.5">
             <RefreshCw className="h-4 w-4 text-emerald-600 animate-spin" aria-hidden="true" />
-            <span className="text-emerald-800 font-bold">⚡ Live Instant Sync</span>
+            <span className="text-emerald-800 font-bold">⚡ {t('farmer.live')}</span>
           </span>
-          <span className="text-xs text-slate-400">Server-Sent Events Active</span>
+          <span className="text-xs text-slate-400">{t('farmer.sseActive')}</span>
         </div>
       )}
 
@@ -593,10 +593,10 @@ export default function FarmerHome() {
             </span>
             <div>
               <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                {t('farmer.yourDetails') || 'Your Registered Farmer Profile'}
+                {t('farmer.yourDetails')}
               </h2>
               <p className="text-xs font-medium text-slate-500">
-                Authenticated government beneficiary records
+                {t('farmer.profileSub')}
               </p>
             </div>
           </div>
@@ -610,14 +610,14 @@ export default function FarmerHome() {
               onClick={() => setShowBankModal(true)}
               className="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition shadow-2xs"
             >
-              ⚙️ Manage Bank Details
+              {t('farmer.manageBank')}
             </button>
             <button
               type="button"
               onClick={() => setShowEkycModal(true)}
               className="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
             >
-              {user?.ekyc_verified ? 'View e-KYC' : 'Verify e-KYC'}
+              {user?.ekyc_verified ? t('farmer.viewEkyc') : t('farmer.verifyEkyc')}
             </button>
           </div>
         </div>
@@ -629,23 +629,23 @@ export default function FarmerHome() {
             <DetailRow label={t('auth.village')} value={`${user.village} (Maharashtra)`} icon={MapPin} />
           )}
           <DetailRow
-            label="Aadhaar Verification"
+            label={t('farmer.aadhaar')}
             icon={ShieldCheck}
             value={
               user.aadhaar_no ? (
                 <span className="flex items-center gap-2">
                   <span className="font-mono text-slate-900 font-bold">{user.aadhaar_no}</span>
                   <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-extrabold text-emerald-800 border border-emerald-200">
-                    Verified
+                    {t('common.verified')}
                   </span>
                 </span>
               ) : (
-                <span className="text-amber-800 font-bold">Not Linked</span>
+                <span className="text-amber-800 font-bold">{t('common.notLinked')}</span>
               )
             }
           />
           <DetailRow
-            label="Bank Account (Govt DBT)"
+            label={t('farmer.bankDbt')}
             icon={CreditCard}
             value={
               user.bank_account ? (
@@ -662,23 +662,23 @@ export default function FarmerHome() {
                   onClick={() => setShowBankModal(true)}
                   className="font-bold text-emerald-700 underline text-sm"
                 >
-                  + Add Bank Account for DBT Payouts
+                  {t('farmer.addBankPrompt')}
                 </button>
               )
             }
           />
           {user.pmkisan_id && (
             <DetailRow
-              label="PM-Kisan Beneficiary ID"
+              label={t('farmer.pmkisan')}
               icon={FileCheck2}
               value={<span className="font-mono font-bold text-slate-800">{user.pmkisan_id}</span>}
             />
           )}
           {user.land_acres && (
             <DetailRow
-              label="Registered Land Holding"
+              label={t('farmer.landHolding')}
               icon={Building2}
-              value={<span className="font-bold text-slate-900">{user.land_acres} Acres</span>}
+              value={<span className="font-bold text-slate-900">{user.land_acres} {t('farmer.acres')}</span>}
             />
           )}
         </dl>

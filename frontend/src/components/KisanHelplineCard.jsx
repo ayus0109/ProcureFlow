@@ -1,4 +1,4 @@
-import { PhoneCall, HelpCircle, Headphones, ShieldCheck, ExternalLink } from 'lucide-react';
+import { PhoneCall, HelpCircle, Headphones, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
 
 export default function KisanHelplineCard() {
@@ -14,10 +14,10 @@ export default function KisanHelplineCard() {
           </span>
           <div>
             <h2 className="text-base font-bold text-slate-900">
-              {t('advisory.faqTab') || 'Kisan Helpline & Support Desk'}
+              {t('advisory.faqTab')}
             </h2>
             <p className="text-xs text-slate-500">
-              Government farmer helpline & APMC assistance
+              {t('advisory.faqSub')}
             </p>
           </div>
         </div>
@@ -27,7 +27,7 @@ export default function KisanHelplineCard() {
           className="inline-flex items-center gap-2 rounded-2xl bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-800/20 transition hover:bg-emerald-800 hover:brightness-110"
         >
           <PhoneCall className="h-4 w-4" />
-          <span>Call 1800-180-1551</span>
+          <span>{t('advisory.callBtn')}</span>
         </a>
       </div>
 
@@ -37,13 +37,13 @@ export default function KisanHelplineCard() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-                Toll-Free Kisan Call Center
+                {t('advisory.kisanCenter')}
               </p>
               <p className="mt-1 font-mono text-lg font-extrabold text-emerald-950">
-                1800-180-1551
+                {t('advisory.kisanPhone') || '1800-180-1551'}
               </p>
               <p className="mt-0.5 text-xs text-emerald-700">
-                24x7 Free assistance in Hindi, Marathi & English
+                {t('advisory.kisanDesc')}
               </p>
             </div>
             <PhoneCall className="h-6 w-6 text-emerald-600 shrink-0" />
@@ -54,13 +54,13 @@ export default function KisanHelplineCard() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-teal-800">
-                APMC Mandi Grievance Cell
+                {t('advisory.apmcDesk')}
               </p>
               <p className="mt-1 font-mono text-lg font-extrabold text-teal-950">
-                1800-233-0244
+                {t('advisory.apmcPhone') || '1800-233-0244'}
               </p>
               <p className="mt-0.5 text-xs text-teal-700">
-                Mandi weighment, assaying & slot support
+                {t('advisory.apmcDesc')}
               </p>
             </div>
             <ShieldCheck className="h-6 w-6 text-teal-600 shrink-0" />
@@ -73,20 +73,20 @@ export default function KisanHelplineCard() {
         <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5">
           <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
             <HelpCircle className="h-4 w-4 text-emerald-700" />
-            {t('advisory.faq1Q') || 'How does the digital token and queue system work?'}
+            {t('advisory.faq1Q')}
           </h3>
           <p className="mt-1 text-xs text-slate-600 leading-relaxed pl-5.5">
-            {t('advisory.faq1A') || 'Your booked token reserves an hourly window. When your number approaches, you receive an automated SMS & notification to arrive at the weighbridge without standing in long lines.'}
+            {t('advisory.faq1A')}
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5">
           <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
             <HelpCircle className="h-4 w-4 text-emerald-700" />
-            {t('advisory.faq2Q') || 'How and when will the MSP payment be credited?'}
+            {t('advisory.faq2Q')}
           </h3>
           <p className="mt-1 text-xs text-slate-600 leading-relaxed pl-5.5">
-            {t('advisory.faq2A') || 'Payment is credited directly to your registered bank account via Direct Benefit Transfer (DBT) with an official PFMS UTR number within government settlement timelines.'}
+            {t('advisory.faq2A')}
           </p>
         </div>
       </div>

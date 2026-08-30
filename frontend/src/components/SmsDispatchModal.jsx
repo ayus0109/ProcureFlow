@@ -1,15 +1,3 @@
-/**
- * SmsDispatchModal.jsx
- *
- * Real-Time SMS & WhatsApp Dispatch Log & Live Message Simulator.
- *
- * Lets judges and farmers inspect all real-time outgoing mobile dispatches:
- * - Slot Booking Confirmation SMS & WhatsApp
- * - Counter Turn "CALLED" Urgent SMS
- * - DBT Payment Credited confirmation
- * - Aadhaar e-KYC One Time Passwords
- */
-
 import { useState, useEffect } from 'react';
 import {
   MessageSquare,
@@ -23,8 +11,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { api } from '../services/api';
+import { useLanguage } from '../i18n/LanguageContext.jsx';
 
 export function SmsDispatchModal({ farmerId, onClose }) {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,9 +40,9 @@ export function SmsDispatchModal({ farmerId, onClose }) {
               <Smartphone className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold">SMS & WhatsApp Dispatches</h3>
+              <h3 className="text-sm font-extrabold">{t('smsModal.title')}</h3>
               <p className="text-[11px] text-emerald-200 font-medium">
-                Live simulated mobile gateway log
+                {t('smsModal.sub')}
               </p>
             </div>
           </div>
@@ -81,7 +71,7 @@ export function SmsDispatchModal({ farmerId, onClose }) {
           {logs.length === 0 && !loading && (
             <div className="p-8 text-center text-slate-500">
               <MessageSquare className="mx-auto h-10 w-10 text-slate-300 mb-2" />
-              <p className="font-bold text-sm text-slate-700">No dispatches sent yet</p>
+              <p className="font-bold text-sm text-slate-700">{t('smsModal.empty')}</p>
               <p className="text-xs text-slate-400 mt-1">
                 Book a slot or advance queue to trigger automated SMS dispatches.
               </p>

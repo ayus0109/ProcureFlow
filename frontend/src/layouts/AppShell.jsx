@@ -33,7 +33,7 @@ export default function AppShell({ title, subtitle, children }) {
                   {t('app.name')}
                 </span>
                 <span className="hidden rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800 uppercase sm:inline-block">
-                  Gov e-Mandi
+                  {t('app.govMandi')}
                 </span>
               </div>
               <p className="text-[11px] font-medium text-slate-500 hidden sm:block">
@@ -98,7 +98,7 @@ export default function AppShell({ title, subtitle, children }) {
           </div>
           <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>Real-time APMC Sync</span>
+            <span>{t('app.realtimeSync')}</span>
           </div>
         </div>
 
@@ -107,7 +107,7 @@ export default function AppShell({ title, subtitle, children }) {
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white px-4 py-4 text-center text-xs text-slate-500">
-        <p>© 2026 ProcureFlow • Smart Agricultural Procurement Infrastructure</p>
+        <p>{t('app.footer')}</p>
       </footer>
     </div>
   );

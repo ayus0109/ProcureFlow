@@ -15,7 +15,7 @@ export default function RoleSelect() {
       title: t('role.farmer'),
       desc: t('role.farmerDesc'),
       color: 'from-emerald-500 to-green-600',
-      badge: 'Farmer Portal',
+      badge: t('role.farmerBadge'),
     },
     {
       to: '/admin/login',
@@ -23,7 +23,7 @@ export default function RoleSelect() {
       title: t('role.admin'),
       desc: t('role.adminDesc'),
       color: 'from-teal-600 to-cyan-700',
-      badge: 'APMC Staff Portal',
+      badge: t('role.staffBadge'),
     },
   ];
 
@@ -74,7 +74,7 @@ export default function RoleSelect() {
           <span>{t('lang.change')}</span>
         </button>
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-          Step 2 of 2
+          {t('common.step')} 2 {t('common.of')} 2
         </span>
       </div>
     </CenteredLayout>
