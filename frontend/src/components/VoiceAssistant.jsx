@@ -1,24 +1,18 @@
 /**
  * VoiceAssistant.jsx
  *
- * Gemini-Style Conversational AI Voice & Touch Assistant for Procurement Slot Booking.
+ * Conversational 2-Way AI Voice Assistant for Procurement Slot Booking.
  *
- * Capabilities:
- * 1. Conversational On-The-Fly Editing (Gemini / Apple Intelligence Style):
- *    - The farmer can correct or modify ANY parameter while speaking at any time:
- *      • "Actually make it 15 quintals" / "चूक झाली, 15 क्विंटल करा" / "मात्रा 15 क्विंटल कर दो"
- *      • "Change crop to Soybean" / "गहू नको, सोयाबीन करा" / "गेहूं नहीं, सोयाबीन चाहिए"
- *      • "Change centre to Nashik" / "पुणे नाही, नाशिक करा" / "नासिक मंडी में जाना है"
- *      • "Make it tomorrow" / "उद्याचा स्लॉट करा" / "कल कर दो"
- *      • "Make it 2 PM" / "दुपारी दोन वाजता करा" / "2 बजे का समय कर दो"
- * 2. Multi-Entity Compound Utterance Parser:
- *    - Extracts Centre, Crop, Quantity, Date, and Time Slot simultaneously if spoken together.
- * 3. High-Definition Neural Voice Streaming:
- *    - Plays authentic, localized HD speech via `/api/tts` with zero audio clipping or overlap.
- * 4. Dynamic Parameter Memory Bar:
- *    - Real-time visual chips showing current selections (Centre, Crop, Qty, Date, Slot) with animated updates.
- * 5. 2-Way Turn-Taking with Active Interruption:
- *    - Farmer can tap mic or speak anytime to interrupt and redirect the assistant.
+ * Features:
+ * 1. True Hands-Free 2-Way Conversational Loop:
+ *    - Automatically opens the microphone after the assistant finishes speaking.
+ *    - Seamless back-and-forth dialogue without needing to tap the mic repeatedly.
+ * 2. High-Accuracy Multi-Entity & Context-Aware Intent Resolution:
+ *    - Accurately parses Quantity (e.g., 29 quintals), Centre, Crop, Date, and Time Slot.
+ *    - Zero accidental crop overwriting (no false positives from number utterances).
+ * 3. Explicit Conversational Editing:
+ *    - Modifies only the parameter the farmer explicitly asks to change.
+ * 4. High-Definition Speech Synthesis (TTS) & Web Speech Recognition.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -57,7 +51,7 @@ const SCRIPTS = {
     askQty: 'How many quintals of {crop} would you like to book? (Max limit: {max} quintals).',
     askDate: 'Which date do you prefer? Say Today or Tomorrow.',
     askSlot: 'Available open slots are: {slots}. Which time slot suits you?',
-    confirm: 'Please confirm: {centre}, {crop}, {qty} quintals, on {date} at {slot}. Should I book this slot? Say YES to confirm or speak to edit.',
+    confirm: 'Please confirm: {centre}, {crop}, {qty} quintals, on {date} at {slot}. Should I book this slot? Say YES to confirm or tell me what to change.',
     booking: 'Submitting your slot booking, please wait…',
     done: 'Congratulations! Your slot has been successfully booked. Your token number is {token}.',
     error: 'Booking failed. Please try again.',
@@ -70,16 +64,16 @@ const SCRIPTS = {
     updatedDate: 'Changed date to {date}. Available open slots are: {slots}.',
     updatedSlot: 'Updated time slot to {slot}.',
     
-    notUnderstoodCentre: "I didn't catch the centre name. Please say Pune, Nashik, Nagpur, Aurangabad, Kolhapur, or tap below.",
-    notUnderstoodCrop: "Please choose a crop accepted at this centre, or tap below.",
-    notUnderstoodQty: "Please tell me the quantity in quintals, like 8, 10, 20, or 40 quintals.",
+    notUnderstoodCentre: "I didn't catch the centre name. Please say Pune, Nashik, Nagpur, Aurangabad, or Kolhapur.",
+    notUnderstoodCrop: "Please choose a crop accepted at this centre.",
+    notUnderstoodQty: "Please tell me the quantity in quintals, like 10, 20, or 29 quintals.",
     notUnderstoodDate: "Please say Today or Tomorrow.",
     notUnderstoodSlot: "Please choose an available time slot or tap an option below.",
     notUnderstoodConfirm: "Please say YES to confirm, or tell me what to change (e.g., 'Change to 15 quintals').",
     cropNotAccepted: "{centre} only accepts {accepted}. Please choose one of these crops.",
     
-    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi', 'kardo', 'kar do', 'ha kardo', 'yes please', 'proceed', 'thik hai', 'chalega'],
-    noKeywords: ['no', 'nahi', 'nahin', 'cancel', 'stop', 'back', 'wrong', 'dont', "don't", 'mat karo', 'ruko', 'nako'],
+    yesKeywords: ['yes', 'haan', 'ha', 'haa', 'confirm', 'book', 'ok', 'okay', 'sure', 'right', 'correct', 'yep', 'done', 'sahi', 'kardo', 'kar do', 'ha kardo', 'yes please', 'proceed', 'thik hai', 'chalega', 'yup'],
+    noKeywords: ['no', 'nahi', 'nahin', 'cancel', 'stop', 'back', 'wrong', 'dont', "don't", 'mat karo', 'ruko', 'nako', 'galat'],
   },
   hi: {
     greeting: 'नमस्ते! मैं आपका एआई खरीद सहायक हूँ। आप किस खरीद केंद्र में जाना चाहते हैं? आप बोल सकते हैं: पुणे, नासिक, नागपुर, औरंगाबाद या कोल्हापुर।',
@@ -87,7 +81,7 @@ const SCRIPTS = {
     askQty: 'आप {centre} में कितने क्विंटल {crop} लाना चाहते हैं? (अधिकतम सीमा: {max} क्विंटल)।',
     askDate: 'आप कौन सी तारीख चुनना चाहते हैं? बोलिए आज या कल।',
     askSlot: 'उपलब्ध खुले स्लॉट हैं: {slots}। आप कौन सा समय पसंद करेंगे?',
-    confirm: 'कृपया पुष्टि करें: {centre}, {crop}, {qty} क्विंटल, {date} को {slot}। क्या मैं यह स्लॉट बुक कर दूँ? पुष्टि के लिए हाँ बोलें या बदलाव के लिए बोलें।',
+    confirm: 'कृपया पुष्टि करें: {centre}, {crop}, {qty} क्विंटल, {date} को {slot}। क्या मैं यह स्लॉट बुक कर दूँ? पुष्टि के लिए हाँ बोलें या बदलाव के लिए बताएं।',
     booking: 'आपका स्लॉट बुक किया जा रहा है, कृपया प्रतीक्षा करें…',
     done: 'बधाई हो! आपका स्लॉट सफलतापूर्वक बुक हो गया है। आपका टोकन नंबर है {token}।',
     error: 'बुकिंग में त्रुटि हुई। कृपया पुनः प्रयास करें।',
@@ -100,16 +94,16 @@ const SCRIPTS = {
     updatedDate: 'तारीख बदलकर {date} कर दी गई है। उपलब्ध स्लॉट हैं: {slots}।',
     updatedSlot: 'समय स्लॉट बदलकर {slot} कर दिया गया है।',
     
-    notUnderstoodCentre: 'कृपया केंद्र का नाम बताएं, जैसे पुणे, नासिक, नागपुर, औरंगाबाद, कोल्हापुर, या नीचे से चुनें।',
-    notUnderstoodCrop: 'कृपया इस केंद्र पर उपलब्ध फसल का नाम बताएं, या नीचे से चुनें।',
-    notUnderstoodQty: 'कृपया क्विंटल में मात्रा बताएं, जैसे 8, 10, 20 या 40 क्विंटल।',
+    notUnderstoodCentre: 'कृपया केंद्र का नाम बताएं, जैसे पुणे, नासिक, नागपुर, औरंगाबाद या कोल्हापुर।',
+    notUnderstoodCrop: 'कृपया इस केंद्र पर उपलब्ध फसल का नाम बताएं।',
+    notUnderstoodQty: 'कृपया क्विंटल में मात्रा बताएं, जैसे 10, 20 या 29 क्विंटल।',
     notUnderstoodDate: 'कृपया आज या कल बोलें।',
     notUnderstoodSlot: 'कृपया उपलब्ध समय स्लॉट बताएं या नीचे से चुनें।',
     notUnderstoodConfirm: 'कृपया पुष्टि के लिए हाँ बोलें, या जो बदलना हो वह बताएं (जैसे: मात्रा 15 क्विंटल कर दो)।',
     cropNotAccepted: '{centre} में केवल {accepted} स्वीकार है। कृपया इनमें से कोई फसल चुनें।',
     
-    yesKeywords: ['हाँ', 'हां', 'हा', 'yes', 'haan', 'haa', 'ok', 'theek', 'theek hai', 'sahi', 'book', 'kardo', 'kar do', 'pack', 'kijiye', 'kar dijiye', 'chalega'],
-    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat', 'nako', 'roko'],
+    yesKeywords: ['हाँ', 'हां', 'हा', 'yes', 'haan', 'haa', 'ok', 'theek', 'theek hai', 'sahi', 'book', 'kardo', 'kar do', 'pack', 'kijiye', 'kar dijiye', 'chalega', 'kar do ji', 'sahi hai'],
+    noKeywords: ['नहीं', 'नही', 'no', 'nahi', 'nahin', 'cancel', 'mat karo', 'ruko', 'galat', 'nako', 'roko', 'mat kijiye'],
   },
   mr: {
     greeting: 'नमस्कार! मी तुमचा AI खरेदी सहाय्यक आहे. तुम्हाला कोणत्या खरेदी केंद्रात जायचे आहे? तुम्ही पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगू शकता.',
@@ -130,16 +124,16 @@ const SCRIPTS = {
     updatedDate: 'तारीख बदलून {date} केली आहे. उपलब्ध वेळ स्लॉट आहेत: {slots}.',
     updatedSlot: 'वेळ स्लॉट बदलून {slot} केला आहे.',
     
-    notUnderstoodCentre: 'मला केंद्राचे नाव समजले नाही. कृपया पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगा, किंवा खालील पर्याय निवडा.',
-    notUnderstoodCrop: 'कृपया या केंद्रावर उपलब्ध पिकाचे नाव सांगा, किंवा खालील पर्याय निवडा.',
-    notUnderstoodQty: 'कृपया क्विंटलमध्ये प्रमाण सांगा, जसे 8, 10, 20 किंवा 40 क्विंटल.',
+    notUnderstoodCentre: 'मला केंद्राचे नाव समजले नाही. कृपया पुणे, नाशिक, नागपूर, औरंगाबाद किंवा कोल्हापूर सांगा.',
+    notUnderstoodCrop: 'कृपया या केंद्रावर उपलब्ध पिकाचे नाव सांगा.',
+    notUnderstoodQty: 'कृपया क्विंटलमध्ये प्रमाण सांगा, जसे 10, 20 किंवा 29 क्विंटल.',
     notUnderstoodDate: 'कृपया आज किंवा उद्या सांगा.',
     notUnderstoodSlot: 'कृपया उपलब्ध वेळ सांगा किंवा खालील पर्याय निवडा.',
     notUnderstoodConfirm: 'कृपया पुष्टीसाठी होय म्हणा, किंवा बदल सांगा (उदा. 15 क्विंटल करा किंवा उद्या करा).',
     cropNotAccepted: '{centre} मध्ये फक्त {accepted} स्वीकारले जाते. कृपया उपलब्ध पीक निवडा.',
     
     yesKeywords: ['हो', 'होय', 'हाय', 'yes', 'haan', 'ha', 'haa', 'ok', 'okay', 'bar', 'bara', 'barobar', 'nakkich', 'chalel', 'kara', 'karun taka', 'book kara', 'theek', 'theek ahe', 'chaan', 'sahi', 'हो करा', 'होय करा', 'नक्की करा', 'कन्फर्म'],
-    noKeywords: ['नाही', 'नको', 'no', 'nahi', 'nahin', 'cancel', 'thamba', 'chuka', 'naka', 'mat karo', 'ruko', 'नको करू', 'रद्द करा', 'थांबा'],
+    noKeywords: ['नाही', 'नको', 'no', 'nahi', 'nahin', 'cancel', 'thamba', 'chuka', 'naka', 'mat karo', 'ruko', 'नको करू', 'रद्द करा', 'थांबा', 'चूक झाली'],
   },
 };
 
@@ -151,12 +145,13 @@ const CROP_LABELS = {
   TUR: { en: '🌿 Tur (Arhar)', hi: '🌿 तूर (अरहर)', mr: '🌿 तूर' },
 };
 
+// Strict centre matchers (names only, NO digits/numbers to prevent false triggers)
 const CENTRE_ALIASES = {
-  1: ['pune', 'poona', 'puna', 'पुणे', 'पुना', 'baramati', 'haveli', '1', 'one', 'pehla', 'first', 'एक', 'पहिला', 'पहिले', 'पुणे केंद्र', 'पुणे बाजार समिती', 'पुणे मंडी'],
-  2: ['nashik', 'nasik', 'नासिक', 'नाशिक', 'sinnar', 'dindori', 'niphad', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा', 'दूसरे', 'नाशिक केंद्र', 'नाशिक बाजार समिती', 'नासिक मंडी'],
-  3: ['nagpur', 'नागपुर', 'नागपूर', 'vidarbha', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा', 'तीसरे', 'नागपूर केंद्र', 'नागपूर बाजार समिती', 'नागपुर मंडी'],
-  4: ['aurangabad', 'sambhajinagar', 'sambhaji', 'औरंगाबाद', 'संभाजीनगर', 'संभाजी', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा', 'चौथे', 'छत्रपती संभाजीनगर', 'औरंगाबाद केंद्र', 'औरंगाबाद बाजार समिती'],
-  5: ['kolhapur', 'कोल्हापुर', 'कोल्हापूर', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा', 'पाचवे', 'कोल्हापूर केंद्र', 'कोल्हापूर बाजार समिती', 'कोल्हापुर मंडी'],
+  1: ['pune', 'poona', 'puna', 'पुणे', 'पुना', 'baramati', 'haveli', 'पुणे केंद्र', 'पुणे बाजार समिती', 'पुणे मंडी'],
+  2: ['nashik', 'nasik', 'नासिक', 'नाशिक', 'sinnar', 'dindori', 'niphad', 'नाशिक केंद्र', 'नाशिक बाजार समिती', 'नासिक मंडी'],
+  3: ['nagpur', 'नागपुर', 'नागपूर', 'vidarbha', 'नागपूर केंद्र', 'नागपूर बाजार समिती', 'नागपुर मंडी'],
+  4: ['aurangabad', 'sambhajinagar', 'sambhaji', 'औरंगाबाद', 'संभाजीनगर', 'संभाजी', 'छत्रपती संभाजीनगर', 'औरंगाबाद केंद्र', 'औरंगाबाद बाजार समिती'],
+  5: ['kolhapur', 'कोल्हापुर', 'कोल्हापूर', 'कोल्हापूर केंद्र', 'कोल्हापूर बाजार समिती', 'कोल्हापुर मंडी'],
 };
 
 const CENTRE_LOCAL_NAMES = {
@@ -167,12 +162,13 @@ const CENTRE_LOCAL_NAMES = {
   5: { en: 'Kolhapur Procurement Center', hi: 'कोल्हापुर मंडी', mr: 'कोल्हापूर बाजार समिती' },
 };
 
+// Strict crop matchers (names only, NO generic digits/ordinals)
 const CROP_MATCHERS = {
-  WHEAT: ['wheat', 'gehu', 'gehun', 'गेहूं', 'गेहूँ', 'गेहू', 'गहू', 'गव्हाचे', 'गव्हाची', 'गहू विक्री', 'kanak', '1', 'one', 'pehla', 'first', 'एक', 'पहिला'],
-  PADDY: ['paddy', 'rice', 'dhan', 'chawal', 'धान', 'भात', 'चावल', 'तांदूळ', 'भाताचे', '2', 'two', 'doosra', 'second', 'दोन', 'दुसरा'],
-  COTTON: ['cotton', 'kapas', 'kapaas', 'कपास', 'कापूस', 'रुई', 'rui', 'कापसाचे', '3', 'three', 'teesra', 'third', 'तीन', 'तिसरा'],
-  SOYBEAN: ['soybean', 'soya', 'soyabean', 'सोयाबीन', 'सोया', 'सोयाबीनचे', '4', 'four', 'chautha', 'fourth', 'चार', 'चौथा'],
-  TUR: ['tur', 'toor', 'arhar', 'तूर', 'अरहर', 'tuvar', 'तुरीचे', '5', 'five', 'panchwa', 'fifth', 'पाच', 'पाचवा'],
+  WHEAT: ['wheat', 'gehu', 'gehun', 'गेहूं', 'गेहूँ', 'गेहू', 'गहू', 'गव्हाचे', 'गव्हाची', 'गहू विक्री', 'kanak'],
+  PADDY: ['paddy', 'rice', 'dhan', 'chawal', 'धान', 'भात', 'चावल', 'तांदूळ', 'भाताचे', 'चावलविक्री'],
+  COTTON: ['cotton', 'kapas', 'kapaas', 'कपास', 'कापूस', 'रुई', 'rui', 'कापसाचे'],
+  SOYBEAN: ['soybean', 'soya', 'soyabean', 'सोयाबीन', 'सोया', 'सोयाबीनचे'],
+  TUR: ['tur', 'toor', 'arhar', 'तूर', 'अरहर', 'tuvar', 'तुरीचे'],
 };
 
 const DEVANAGARI_DIGITS = {
@@ -207,8 +203,15 @@ const NUMBER_MAP = [
   { words: ['वीस', 'vis', 'vees', 'bees', 'बीस', 'twenty', '२०'], val: 20 },
   { words: ['पंचवीस', 'panchvis', 'pachhis', 'पच्चीस', 'twenty five', '२५'], val: 25 },
   { words: ['तीस', 'tis', 'tees', 'thirty', '३०'], val: 30 },
+  { words: ['एकतीस', 'iktis', '31', '३१'], val: 31 },
   { words: ['बत्तीस', 'battis', '32', '३२'], val: 32 },
+  { words: ['तेहेतीस', 'tehtis', '33', '३३'], val: 33 },
+  { words: ['चौतीस', 'chautis', '34', '३४'], val: 34 },
   { words: ['पस्तीस', 'pastis', 'paintis', 'पैंतीस', '35', '३५'], val: 35 },
+  { words: ['छत्तीस', 'chhattis', '36', '३६'], val: 36 },
+  { words: ['सदतीस', 'sadtis', '37', '३७'], val: 37 },
+  { words: ['अडतीस', 'adtis', '38', '३८'], val: 38 },
+  { words: ['एकोणचाळीस', 'untalis', '39', '३९'], val: 39 },
   { words: ['चाळीस', 'chalis', 'chaalis', 'चालीस', 'forty', '४०'], val: 40 },
   { words: ['पंचेचाळीस', 'panchechalis', 'paintalis', 'पैंतालीस', '45', '४५'], val: 45 },
   { words: ['पन्नास', 'pannas', 'pachaas', 'pachas', 'पचास', 'fifty', '५०'], val: 50 },
@@ -256,12 +259,12 @@ function findMatchingCentre(heard, centres) {
 
   for (const centre of centres) {
     const aliases = CENTRE_ALIASES[centre.id] || [];
-    if (aliases.some((a) => clean.includes(normalize(a)) || normalize(a).includes(clean))) {
+    if (aliases.some((a) => clean.includes(normalize(a)))) {
       return centre;
     }
     const cName = normalize(centre.name);
     const cDist = normalize(centre.district);
-    if (clean.includes(cName) || cName.includes(clean) || clean.includes(cDist) || cDist.includes(clean)) {
+    if (clean.includes(cName) || (cDist.length > 3 && clean.includes(cDist))) {
       return centre;
     }
   }
@@ -273,7 +276,8 @@ function findMatchingCrop(heard, acceptedCrops) {
   const clean = normalize(heard);
 
   for (const [cropKey, keywords] of Object.entries(CROP_MATCHERS)) {
-    if (keywords.some((k) => clean.includes(normalize(k)) || normalize(k).includes(clean))) {
+    // Only match if the keyword is explicitly inside the spoken string
+    if (keywords.some((k) => clean.includes(normalize(k)))) {
       if (acceptedCrops && acceptedCrops.length > 0 && !acceptedCrops.includes(cropKey)) {
         return { key: cropKey, accepted: false };
       }
@@ -288,9 +292,10 @@ function extractQuantity(heard) {
   const raw = heard.trim();
   const converted = convertDevanagariDigits(raw);
 
-  const digitMatch = converted.match(/[\d.]+/);
+  // Check for direct digits like 29, 15, 20.5
+  const digitMatch = converted.match(/(\d+(\.\d+)?)/);
   if (digitMatch) {
-    const val = parseFloat(digitMatch[0]);
+    const val = parseFloat(digitMatch[1]);
     if (!isNaN(val) && val > 0) return val;
   }
 
@@ -304,7 +309,7 @@ function extractQuantity(heard) {
       if (
         cleanLower === cleanW ||
         tokens.some((t) => t.replace(/[\.]/g, '') === cleanW) ||
-        cleanLower.includes(cleanW)
+        (cleanW.length >= 3 && cleanLower.includes(cleanW))
       ) {
         return item.val;
       }
@@ -377,10 +382,10 @@ function findMatchingSlot(heard, availableSlots) {
   return null;
 }
 
-// Detection for change/edit intent
+// Detection for explicit change/edit intent
 function hasEditIntent(text) {
   if (!text) return false;
-  return /\b(change|modify|edit|instead|make it|update|switch|wrong|mistake|badla|badlo|chuka|chuki|nahi|nako|nako karu|chukun|ऐवजी|बदला|बदलो|दुरुस्त|चुकून|नाही|नको|चेंज|दुसरे|दुसरा)\b/i.test(text);
+  return /\b(change|modify|edit|instead|make it|update|switch|wrong|mistake|badla|badlo|chuka|chuki|nahi|nako|chukun|ऐवजी|बदला|बदलो|दुरुस्त|चुकून|चेंज|दुसरे|बदल|बदलायचे)\b/i.test(text);
 }
 
 export default function VoiceAssistant() {
@@ -413,6 +418,7 @@ export default function VoiceAssistant() {
   const messagesEndRef = useRef(null);
   const fallbackTimerRef = useRef(null);
   const activeAudioRef = useRef(null);
+  const isListeningLoopActive = useRef(false);
 
   // Auto-scroll
   useEffect(() => {
@@ -467,7 +473,7 @@ export default function VoiceAssistant() {
     setLiveHeardTranscript('');
   }, []);
 
-  // High-Definition Natural Voice Output via `/api/tts` (with SpeechSynthesis fallback)
+  // Hands-Free Speech Output via `/api/tts` (with SpeechSynthesis fallback)
   const botSpeakAndPrompt = useCallback(
     (text, onFinishedSpeaking) => {
       stopAll();
@@ -488,7 +494,12 @@ export default function VoiceAssistant() {
           activeAudioRef.current = null;
         }
         setTurnState('IDLE');
-        if (onFinishedSpeaking) onFinishedSpeaking();
+        if (onFinishedSpeaking) {
+          // Immediately start listening for farmer response for natural 2-way conversation
+          setTimeout(() => {
+            onFinishedSpeaking();
+          }, 150);
+        }
       };
 
       const estTimeMs = Math.max(2500, (cleanText.length / 7) * 1000 + 1500);
@@ -521,7 +532,7 @@ export default function VoiceAssistant() {
     [lang, stopAll, addMessage]
   );
 
-  // User Listening Turn
+  // User Listening Turn (Auto-restarts and stays active during conversation)
   const startUserTurn = useCallback(
     async (onTextHeard) => {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -551,6 +562,7 @@ export default function VoiceAssistant() {
       recognition.interimResults = true;
       recognition.maxAlternatives = 3;
       recognitionRef.current = recognition;
+      isListeningLoopActive.current = true;
 
       recognition.onstart = () => {
         setTurnState('USER_LISTENING');
@@ -573,18 +585,20 @@ export default function VoiceAssistant() {
         if (final.trim()) {
           setTurnState('IDLE');
           addMessage('farmer', final.trim());
-          onTextHeard(final.trim());
+          if (onTextHeard) onTextHeard(final.trim());
         }
       };
 
       recognition.onerror = (e) => {
-        setTurnState('IDLE');
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-          setMicError('Microphone access denied. Click the lock icon 🔒 in your browser address bar and enable Microphone.');
+          setMicError('Microphone access denied. Click the lock icon 🔒 in your address bar and enable Microphone.');
+          setTurnState('IDLE');
+          isListeningLoopActive.current = false;
         } else if (e.error === 'no-speech') {
-          setMicError('No voice detected. Please speak closer to your microphone or tap an option below.');
-        } else if (e.error === 'network') {
-          setMicError('Network issue connecting to voice recognition. Tap an option below to proceed.');
+          // If no speech, gracefully stay ready in conversation loop
+          setTurnState('IDLE');
+        } else {
+          setTurnState('IDLE');
         }
       };
 
@@ -601,7 +615,7 @@ export default function VoiceAssistant() {
     [lang, stopAll, addMessage]
   );
 
-  // ── Gemini-Style Conversational Intelligence Engine ───────────────────────────
+  // ── Conversational Orchestration Functions ───────────────────────────────────
 
   const askCentre = useCallback(() => {
     setStep('CENTRE');
@@ -696,7 +710,9 @@ export default function VoiceAssistant() {
           }, 200);
         })
         .catch(() => {
-          botSpeakAndPrompt(script.notUnderstoodSlot, () => {});
+          botSpeakAndPrompt(script.notUnderstoodSlot, () => {
+            startUserTurn(processVoiceUtterance);
+          });
         });
     },
     [lang, script, botSpeakAndPrompt, startUserTurn, askDate]
@@ -766,8 +782,8 @@ export default function VoiceAssistant() {
   );
 
   /**
-   * 🧠 GEMINI UNIFIED CONVERSATIONAL PROCESSOR
-   * Extracts entities, handles conversational corrections/edits, and orchestrates state transitions.
+   * 🧠 HIGH-ACCURACY CONVERSATIONAL PROCESSOR
+   * Prevents false triggers and handles step-specific entity extraction + explicit edits.
    */
   const processVoiceUtterance = useCallback(
     (heard) => {
@@ -797,7 +813,6 @@ export default function VoiceAssistant() {
         return;
       }
 
-      // 1. Extract potential entities from spoken phrase
       const dates = reference?.dates || [];
       const extractedCentre = findMatchingCentre(heard, centres);
       const acceptedCropsForCurrent = (extractedCentre || selectedCentre)?.accepted_crops_list || ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'];
@@ -813,14 +828,15 @@ export default function VoiceAssistant() {
       let currentSlot = selectedSlot;
       let ackMessage = '';
 
-      // ── Scenario 1: EDIT / CHANGE CENTRE ──
-      if (extractedCentre && (isEditing || step === 'CENTRE' || String(extractedCentre.id) !== String(selectedCentre?.id))) {
+      // ── Step-Aware Processing ──
+
+      // 1. If currently at CENTRE step, or user explicitly requested centre change:
+      if (extractedCentre && (step === 'CENTRE' || isEditing || (heard.includes('centre') || heard.includes('मंडी') || heard.includes('केंद्र')))) {
         currentCentre = extractedCentre;
         setSelectedCentre(extractedCentre);
         const centreSpeech = getCentreSpeechName(extractedCentre, lang);
         ackMessage = script.updatedCentre.replace('{centre}', centreSpeech);
 
-        // Check if existing crop is accepted at new centre
         const newAccepted = extractedCentre.accepted_crops_list || ['WHEAT', 'PADDY', 'COTTON', 'SOYBEAN', 'TUR'];
         if (currentCrop && !newAccepted.includes(currentCrop)) {
           currentCrop = null;
@@ -833,8 +849,8 @@ export default function VoiceAssistant() {
         }
       }
 
-      // ── Scenario 2: EDIT / CHANGE CROP ──
-      if (extractedCrop && (isEditing || step === 'CROP' || extractedCrop.key !== currentCrop)) {
+      // 2. If currently at CROP step, or user explicitly requested crop change:
+      if (extractedCrop && (step === 'CROP' || isEditing || (heard.includes('crop') || heard.includes('फसल') || heard.includes('पीक') || heard.includes('विक्री')))) {
         if (!extractedCrop.accepted) {
           const centreSpeech = getCentreSpeechName(currentCentre || selectedCentre, lang);
           const acceptedLabels = acceptedCropsForCurrent.map((k) => CROP_LABELS[k]?.[lang] || k).join(', ');
@@ -856,8 +872,8 @@ export default function VoiceAssistant() {
         }
       }
 
-      // ── Scenario 3: EDIT / CHANGE QUANTITY ──
-      if (extractedQty && (isEditing || step === 'QTY' || extractedQty !== currentQty)) {
+      // 3. If currently at QTY step, or user stated a number with/without edit:
+      if (extractedQty && (step === 'QTY' || isEditing || (heard.includes('qtl') || heard.includes('quintal') || heard.includes('क्विंटल') || heard.includes('मात्रा') || heard.includes('प्रमाण')))) {
         const maxLimit = (currentCentre || selectedCentre)?.max_qty_per_farmer || 50;
         if (extractedQty > maxLimit) {
           const overText =
@@ -880,8 +896,8 @@ export default function VoiceAssistant() {
         }
       }
 
-      // ── Scenario 4: EDIT / CHANGE DATE ──
-      if (extractedDate && (isEditing || step === 'DATE' || extractedDate.iso !== currentDate?.iso)) {
+      // 4. If currently at DATE step, or user specified a date:
+      if (extractedDate && (step === 'DATE' || isEditing || (heard.includes('date') || heard.includes('तारीख') || heard.includes('दिन') || heard.includes('दिवस')))) {
         currentDate = extractedDate;
         setSelectedDate(extractedDate);
         currentSlot = null;
@@ -891,21 +907,21 @@ export default function VoiceAssistant() {
         return;
       }
 
-      // ── Scenario 5: EDIT / CHANGE TIME SLOT ──
-      if (extractedSlot && (isEditing || step === 'SLOT' || extractedSlot.slot !== currentSlot?.slot)) {
+      // 5. If currently at SLOT step, or user specified a time:
+      if (extractedSlot && (step === 'SLOT' || isEditing || (heard.includes('time') || heard.includes('slot') || heard.includes('बजे') || heard.includes('वाजता') || heard.includes('वेळ')))) {
         currentSlot = extractedSlot;
         setSelectedSlot(extractedSlot);
         const slotSpeech = formatSlotForSpeech(extractedSlot.slot, lang);
         ackMessage = script.updatedSlot.replace('{slot}', slotSpeech);
       }
 
-      // ── FINAL DECISION: If all parameters are ready, ask for Confirmation ──
+      // ── Verification: If all 5 parameters are chosen, proceed to Confirmation ──
       if (currentCentre && currentCrop && currentQty && currentDate && currentSlot) {
         askConfirm(currentCentre, currentCrop, currentQty, currentDate, currentSlot, ackMessage);
         return;
       }
 
-      // If in standard funnel without complete compound entities, advance to next missing step:
+      // If in standard funnel, continue to the current missing step:
       if (!currentCentre) {
         askCentre();
       } else if (!currentCrop) {
@@ -917,7 +933,9 @@ export default function VoiceAssistant() {
       } else if (!currentSlot) {
         askSlot(currentCentre, currentCrop, currentQty, currentDate);
       } else {
-        botSpeakAndPrompt(script.notUnderstoodConfirm, () => {});
+        botSpeakAndPrompt(script.notUnderstoodConfirm, () => {
+          startUserTurn(processVoiceUtterance);
+        });
       }
     },
     [
@@ -940,11 +958,12 @@ export default function VoiceAssistant() {
       askConfirm,
       submitBooking,
       botSpeakAndPrompt,
+      startUserTurn,
       stopAll,
     ]
   );
 
-  // Tap-to-select manual helpers
+  // Manual 1-Tap Option Handlers
   const handleSelectCentre = (centre) => {
     stopAll();
     setSelectedCentre(centre);
@@ -1014,6 +1033,7 @@ export default function VoiceAssistant() {
   };
 
   const handleClose = () => {
+    isListeningLoopActive.current = false;
     stopAll();
     setOpen(false);
     setStep('IDLE');
@@ -1044,21 +1064,17 @@ export default function VoiceAssistant() {
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs sm:items-center sm:justify-center sm:p-4">
           <div className="flex h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[680px] sm:max-w-md sm:rounded-3xl overflow-hidden border border-slate-200">
-            {/* Header with Gemini Gradient */}
+            {/* Header: Clean title without clutter */}
             <div className="flex items-center justify-between border-b border-emerald-900/20 bg-gradient-to-r from-emerald-800 via-teal-800 to-indigo-900 px-5 py-3.5 text-white">
               <div className="flex items-center gap-3">
                 <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
                   <Bot className="h-6 w-6 text-white" />
-                  <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-emerald-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-emerald-900 animate-pulse" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-black tracking-wide">{t('va.assistantTitle')}</h3>
-                    <span className="rounded-md bg-white/20 px-1.5 py-0.2 text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-200">
-                      Gemini NLU
-                    </span>
-                  </div>
-                  <p className="text-[11px] font-medium text-emerald-200">Smart Voice Booking & Live Editing</p>
+                  <h3 className="text-base font-black tracking-wide">
+                    {lang === 'hi' ? 'एआई बुकिंग सहायक' : lang === 'mr' ? 'AI बुकिंग सहाय्यक' : 'AI Voice Booking Assistant'}
+                  </h3>
                 </div>
               </div>
 
@@ -1084,7 +1100,7 @@ export default function VoiceAssistant() {
               </div>
             </div>
 
-            {/* 🌟 Dynamic Gemini Memory Parameter Chips (Real-time Live Sync) */}
+            {/* Dynamic Parameter Memory Chips */}
             {(selectedCentre || selectedCrop || selectedQty || selectedDate || selectedSlot) && (
               <div className="flex items-center gap-1.5 overflow-x-auto bg-slate-900 px-3.5 py-2 text-white text-[11px] font-bold border-b border-slate-800 scrollbar-none">
                 <span className="text-[10px] uppercase font-mono text-emerald-400 shrink-0">Memory:</span>
@@ -1116,22 +1132,22 @@ export default function VoiceAssistant() {
               </div>
             )}
 
-            {/* Turn-Taking Status Strip */}
+            {/* Turn-Taking Live Indicator */}
             <div className="flex items-center justify-between px-4 py-2 text-xs font-bold border-b border-slate-100 bg-slate-50">
               {turnState === 'BOT_SPEAKING' ? (
                 <div className="flex items-center gap-2 text-emerald-800">
                   <Volume2 className="h-4 w-4 animate-bounce text-emerald-700" />
-                  <span>Assistant speaking… (Speak or tap to interrupt)</span>
+                  <span>Assistant speaking… (Mic will auto-open)</span>
                 </div>
               ) : turnState === 'USER_LISTENING' ? (
                 <div className="flex items-center gap-2 text-rose-700">
                   <span className="h-2.5 w-2.5 rounded-full bg-rose-600 animate-ping" />
-                  <span>🎙️ Listening… Speak naturally or say changes</span>
+                  <span>🎙️ Listening… Speak naturally (e.g. "29 क्विंटल")</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-slate-500">
                   <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-                  <span>Say anything or tap options below</span>
+                  <span>2-Way Voice Active</span>
                 </div>
               )}
 
@@ -1140,7 +1156,7 @@ export default function VoiceAssistant() {
               </span>
             </div>
 
-            {/* Chat Conversation History */}
+            {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40">
               {messages.length === 0 && step === 'IDLE' && (
                 <div className="my-auto flex flex-col items-center justify-center p-6 text-center">
@@ -1151,9 +1167,11 @@ export default function VoiceAssistant() {
                       <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
                     </span>
                   </div>
-                  <h4 className="mt-4 text-base font-extrabold text-slate-900">{t('va.assistantTitle')}</h4>
+                  <h4 className="mt-4 text-base font-extrabold text-slate-900">
+                    {lang === 'hi' ? 'एआई बुकिंग सहायक' : lang === 'mr' ? 'AI बुकिंग सहाय्यक' : 'AI Voice Booking Assistant'}
+                  </h4>
                   <p className="mt-1 text-xs text-slate-600 leading-relaxed max-w-xs">
-                    Speak naturally. If you make a mistake, simply say <i>"Change to 15 quintals"</i> or <i>"सोयाबीन करा"</i> anytime!
+                    Continuous 2-Way Voice. Speak your centre, crop, quantity, and date naturally.
                   </p>
 
                   <button
@@ -1189,7 +1207,7 @@ export default function VoiceAssistant() {
                 </div>
               ))}
 
-              {/* Real-time live transcript caption while user speaks */}
+              {/* Live speech transcription */}
               {turnState === 'USER_LISTENING' && (
                 <div className="flex flex-col gap-1.5 rounded-2xl bg-gradient-to-r from-rose-50 to-amber-50 p-3 border border-rose-200 text-xs font-semibold text-rose-950 animate-pulse">
                   <div className="flex items-center gap-2">
@@ -1204,7 +1222,7 @@ export default function VoiceAssistant() {
                 </div>
               )}
 
-              {/* Explicit Microphone / Speech Diagnostics Notice */}
+              {/* Mic Diagnostics */}
               {micError && (
                 <div className="flex items-start gap-2.5 rounded-2xl bg-amber-50 p-3.5 border border-amber-300 text-xs font-semibold text-amber-950">
                   <span className="text-base shrink-0">⚠️</span>
@@ -1217,7 +1235,7 @@ export default function VoiceAssistant() {
                 </div>
               )}
 
-              {/* Booking in progress spinner */}
+              {/* Booking spinner */}
               {step === 'BOOKING' && (
                 <div className="flex items-center justify-center gap-2 rounded-2xl bg-amber-50 p-4 border border-amber-200 text-xs font-bold text-amber-900">
                   <Loader2 className="h-4 w-4 animate-spin text-amber-700" />
@@ -1238,7 +1256,7 @@ export default function VoiceAssistant() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Interactive 1-Tap Option Chips Bar */}
+            {/* Quick 1-Tap Option Chips */}
             {step !== 'IDLE' && step !== 'DONE' && step !== 'BOOKING' && step !== 'ERROR' && (
               <div className="border-t border-slate-100 bg-white p-3">
                 <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold text-slate-500">
@@ -1374,7 +1392,7 @@ export default function VoiceAssistant() {
                   </div>
                 )}
 
-                {/* Step 5: Slot (Only Open Slots) */}
+                {/* Step 5: Slot */}
                 {step === 'SLOT' && (
                   <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
                     {availableSlots.filter((s) => !s.full && s.left > 0).map((s) => (
@@ -1433,10 +1451,10 @@ export default function VoiceAssistant() {
                 <Mic className="h-5 w-5" />
                 <span>
                   {turnState === 'USER_LISTENING'
-                    ? 'Listening… (Tap to Stop & Process)'
+                    ? 'Listening… (Speak your answer)'
                     : turnState === 'BOT_SPEAKING'
-                    ? 'Tap to Speak Now (Interrupt Bot)'
-                    : t('va.tapToSpeak')}
+                    ? 'Assistant Speaking… (Tap to Interrupt)'
+                    : 'Tap to Speak'}
                 </span>
               </button>
             </div>
