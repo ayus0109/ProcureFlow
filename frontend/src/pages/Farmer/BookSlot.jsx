@@ -292,6 +292,7 @@ export default function BookSlot() {
                     type="button"
                     onClick={() => {
                       setCentreId(String(c.id));
+                      setStep(2);
                     }}
                     aria-pressed={isSelected}
                     className={`relative flex flex-col justify-between rounded-2xl border-2 p-4 text-left transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
