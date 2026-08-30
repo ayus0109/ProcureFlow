@@ -30,7 +30,6 @@ import StageStepper from '../../components/StageStepper.jsx';
 import KisanHelplineCard from '../../components/KisanHelplineCard.jsx';
 import VoiceAssistant from '../../components/VoiceAssistant.jsx';
 import DisputeButton from '../../components/DisputeButton.jsx';
-import HelperAccountModal from '../../components/HelperAccountModal.jsx';
 import SpeakButton from '../../components/ui/SpeakButton.jsx';
 import OnlineStatus from '../../components/ui/OnlineStatus.jsx';
 import { PrintableTokenPass } from '../../components/PrintableTokenPass.jsx';
@@ -371,7 +370,6 @@ export default function FarmerHome() {
   const [showBankModal, setShowBankModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedPassBooking, setSelectedPassBooking] = useState(null);
-  const [helperModalOpen, setHelperModalOpen] = useState(false);
 
   const { data: booking, error, loading, setData: setBookingData } = usePoll(
     () => api('/bookings/mine'),
@@ -588,17 +586,6 @@ export default function FarmerHome() {
               </p>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setHelperModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-900 hover:bg-blue-100 transition shadow-2xs"
-            >
-              <Users className="h-4 w-4 text-blue-700" />
-              <span>Family Helpers</span>
-            </button>
-          </div>
         </div>
 
         <dl className="mt-2 divide-y divide-slate-100">
@@ -713,9 +700,6 @@ export default function FarmerHome() {
           }}
         />
       )}
-
-      {/* Helper Account Modal */}
-      <HelperAccountModal open={helperModalOpen} onClose={() => setHelperModalOpen(false)} />
 
       {/* AI Voice Booking Assistant — floating over page */}
       <VoiceAssistant />
