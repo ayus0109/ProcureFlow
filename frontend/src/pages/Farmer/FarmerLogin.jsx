@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   Phone,
@@ -10,6 +10,7 @@ import {
   Sparkles,
   RefreshCw,
   Edit2,
+  Loader2,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import CenteredLayout from '../../layouts/CenteredLayout.jsx';
@@ -19,8 +20,15 @@ import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 export default function FarmerLogin() {
   const { t } = useLanguage();
-  const { loginFarmer, registerFarmer } = useAuth();
+  const { user, isFarmer, loginFarmer, registerFarmer } = useAuth();
   const navigate = useNavigate();
+
+  // If already signed in as farmer, redirect immediately to dashboard
+  useEffect(() => {
+    if (isFarmer) {
+      navigate('/farmer', { replace: true });
+    }
+  }, [isFarmer, navigate]);
 
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [form, setForm] = useState({ name: '', phone: '', village: '', password: '' });

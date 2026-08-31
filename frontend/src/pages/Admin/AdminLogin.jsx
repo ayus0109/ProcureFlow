@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import CenteredLayout from '../../layouts/CenteredLayout.jsx';
@@ -31,8 +31,15 @@ function GoogleIcon() {
 
 export default function AdminLogin() {
   const { t } = useLanguage();
-  const { loginAdmin } = useAuth();
+  const { user, isAdmin, loginAdmin } = useAuth();
   const navigate = useNavigate();
+
+  // If already signed in as admin, redirect immediately to admin center
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, navigate]);
 
   const [form, setForm] = useState({ adminCode: '', password: '' });
   const [error, setError] = useState('');
