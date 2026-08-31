@@ -40,25 +40,25 @@ export default function SeasonTracker() {
 
       <div className="mt-4 space-y-4">
         {/* Total Revenue Hero Card */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 p-5 text-white shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-200 uppercase tracking-wider">
-              <TrendingUp className="h-4 w-4 text-emerald-400" />
-              {t('tracker.earned')}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 p-4 sm:p-5 text-white shadow-md">
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-200 uppercase tracking-wider truncate">
+              <TrendingUp className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span className="truncate">{t('tracker.earned')}</span>
             </span>
-            <span className="font-mono text-xs text-emerald-200 bg-emerald-950/60 px-2 py-0.5 rounded">
+            <span className="font-mono text-[11px] sm:text-xs text-emerald-200 bg-emerald-950/60 px-2 py-0.5 rounded shrink-0">
               {data.sales} Confirmed Sale{data.sales > 1 ? 's' : ''}
             </span>
           </div>
-          <p className="mt-2 font-mono text-3xl font-black tracking-tight sm:text-4xl">
+          <p className="mt-2 font-mono text-2xl sm:text-4xl font-black tracking-tight truncate">
             {money(data.earned)}
           </p>
 
           {/* Payout Progress Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between text-xs font-medium text-emerald-100 mb-1">
-              <span>Paid Out: <strong>{money(data.paid)}</strong> ({paidPct}%)</span>
-              <span>Awaiting: <strong>{money(data.awaiting)}</strong></span>
+          <div className="mt-3 sm:mt-4">
+            <div className="flex flex-wrap justify-between text-[11px] sm:text-xs font-medium text-emerald-100 mb-1 gap-1">
+              <span className="truncate">Paid Out: <strong>{money(data.paid)}</strong> ({paidPct}%)</span>
+              <span className="truncate">Awaiting: <strong>{money(data.awaiting)}</strong></span>
             </div>
             <div className="h-2 w-full rounded-full bg-emerald-950/80 overflow-hidden">
               <div
@@ -71,26 +71,26 @@ export default function SeasonTracker() {
 
         {/* Quick Metrics Grid */}
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-center">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('tracker.paid')}</span>
-            <p className="mt-0.5 font-mono text-base font-extrabold text-emerald-900">{money(data.paid)}</p>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2.5 sm:p-3 text-center overflow-hidden">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase block truncate">{t('tracker.paid')}</span>
+            <p className="mt-0.5 font-mono text-xs sm:text-base font-extrabold text-emerald-900 truncate" title={money(data.paid)}>{money(data.paid)}</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-center">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('tracker.awaiting')}</span>
-            <p className={`mt-0.5 font-mono text-base font-extrabold ${data.awaiting > 0 ? 'text-amber-700' : 'text-slate-700'}`}>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2.5 sm:p-3 text-center overflow-hidden">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase block truncate">{t('tracker.awaiting')}</span>
+            <p className={`mt-0.5 font-mono text-xs sm:text-base font-extrabold truncate ${data.awaiting > 0 ? 'text-amber-700' : 'text-slate-700'}`} title={money(data.awaiting)}>
               {money(data.awaiting)}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-center">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('tracker.sales')}</span>
-            <p className="mt-0.5 font-mono text-base font-extrabold text-slate-900">{data.sales}</p>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2.5 sm:p-3 text-center overflow-hidden">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase block truncate">{t('tracker.sales')}</span>
+            <p className="mt-0.5 font-mono text-xs sm:text-base font-extrabold text-slate-900 truncate">{data.sales}</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-center">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('tracker.qtlSold')}</span>
-            <p className="mt-0.5 font-mono text-base font-extrabold text-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2.5 sm:p-3 text-center overflow-hidden">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase block truncate">{t('tracker.qtlSold')}</span>
+            <p className="mt-0.5 font-mono text-xs sm:text-base font-extrabold text-slate-900 truncate">
               {Number(data.qtlSold || 0).toLocaleString('en-IN', { maximumFractionDigits: 1 })} qtl
             </p>
           </div>

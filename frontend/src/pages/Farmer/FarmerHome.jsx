@@ -144,7 +144,7 @@ function Receipt({ p, t }) {
             <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
               {t('receipt.amount')}
             </p>
-            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-950">
+            <p className="text-2xl sm:text-4xl font-extrabold tracking-tight text-emerald-950 truncate" title={money(p.total_amount)}>
               {money(p.total_amount)}
             </p>
             <p className="mt-1 text-sm font-semibold text-emerald-700">{t('receipt.doneSub')}</p>

@@ -28,13 +28,13 @@ const PILL = {
 
 function TotalCard({ label, value, sub, icon: Icon, tone = 'emerald' }) {
   return (
-    <div className={`rounded-2xl border border-${tone}-200/80 bg-gradient-to-br from-${tone}-50/80 to-white p-4 shadow-xs`}>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
-        {Icon && <Icon className="h-4 w-4 text-emerald-700" />}
+    <div className={`rounded-2xl border border-${tone}-200/80 bg-gradient-to-br from-${tone}-50/80 to-white p-3.5 sm:p-4 shadow-xs overflow-hidden`}>
+      <div className="flex items-center justify-between gap-1">
+        <span className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider truncate">{label}</span>
+        {Icon && <Icon className="h-4 w-4 text-emerald-700 shrink-0" />}
       </div>
-      <p className="mt-1 font-mono text-2xl font-black text-slate-900 tabular-nums">{value}</p>
-      <p className="mt-0.5 text-xs text-slate-500">{sub}</p>
+      <p className="mt-1 font-mono text-base sm:text-2xl font-black text-slate-900 tabular-nums truncate tracking-tight" title={typeof value === 'string' ? value : undefined}>{value}</p>
+      <p className="mt-0.5 text-[10px] sm:text-xs text-slate-500 truncate">{sub}</p>
     </div>
   );
 }

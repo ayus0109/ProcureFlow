@@ -505,17 +505,17 @@ export function AdminAnalytics({ centreId }) {
                     <CreditCard className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="mt-2 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                <div className="mt-2 text-xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono truncate" title={money(data.metrics.total_revenue_inr)}>
                   {money(data.metrics.total_revenue_inr)}
                 </div>
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-100">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-emerald-700 font-bold">
+                <div className="flex flex-wrap items-center justify-between text-[11px] gap-1">
+                  <span className="text-emerald-700 font-bold truncate">
                     Paid: {money(data.metrics.paid_revenue_inr)}
                   </span>
-                  <span className="text-amber-800 font-bold">
+                  <span className="text-amber-800 font-bold truncate">
                     Pending: {money(data.metrics.pending_payout_inr)}
                   </span>
                 </div>
