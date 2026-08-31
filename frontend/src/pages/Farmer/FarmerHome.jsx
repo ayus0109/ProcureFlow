@@ -424,14 +424,14 @@ export default function FarmerHome() {
 
       {/* Multi-Slot Switcher Tabs (when farmer holds multiple bookings) */}
       {allBookings.length > 1 && (
-        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-1.5 scrollbar-none">
-          <div className="flex gap-1.5 overflow-x-auto">
+        <div className="flex items-center justify-between gap-2 overflow-x-auto rounded-2xl bg-slate-100 p-1.5 scrollbar-none touch-pan-x">
+          <div className="flex gap-1.5 overflow-x-auto touch-pan-x py-0.5">
             {allBookings.map((b, idx) => (
               <button
                 key={b.id}
                 type="button"
                 onClick={() => setSelectedSlotIdx(idx)}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black transition ${
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black transition shrink-0 touch-manipulation ${
                   selectedSlotIdx === idx
                     ? 'bg-emerald-700 text-white shadow-xs'
                     : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'

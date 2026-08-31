@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   ArrowLeft,
   Calendar,
@@ -39,6 +39,7 @@ export default function BookSlot() {
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const locale = LOCALES[lang] || 'en-IN';
+  const confirmBoxRef = useRef(null);
 
   // 3-Step Wizard Navigation State: 1 = Centre, 2 = Crop & Qty, 3 = Date & Time Slot
   const [step, setStep] = useState(1);
@@ -55,6 +56,11 @@ export default function BookSlot() {
 
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // Auto-scroll to top smoothly whenever wizard step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   // Load reference metadata on mount
   useEffect(() => {
@@ -609,7 +615,7 @@ export default function BookSlot() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                 {slots.map((s) => {
                   const isSelected = slot === s.slot;
                   const isFull = s.full || s.left <= 0;
@@ -618,9 +624,14 @@ export default function BookSlot() {
                       key={s.slot}
                       type="button"
                       disabled={isFull}
-                      onClick={() => setSlot(s.slot)}
+                      onClick={() => {
+                        setSlot(s.slot);
+                        setTimeout(() => {
+                          confirmBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                      }}
                       aria-pressed={isSelected}
-                      className={`flex flex-col justify-between rounded-2xl border-2 p-3 text-left transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
+                      className={`flex flex-col justify-between rounded-2xl border-2 p-3 min-h-[62px] text-left transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 touch-manipulation ${
                         isFull
                           ? 'cursor-not-allowed border-slate-200 bg-slate-100/70 text-slate-400 opacity-60'
                           : isSelected
@@ -646,7 +657,7 @@ export default function BookSlot() {
 
             {/* 3. Final Summary Confirmation Box */}
             {slot && (
-              <div className="rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-slate-50 p-4 border border-emerald-300/80 shadow-2xs space-y-2 text-xs">
+              <div ref={confirmBoxRef} className="rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-slate-50 p-4 border border-emerald-300/80 shadow-2xs space-y-2 text-xs animate-fadeIn">
                 <span className="font-black text-emerald-950 uppercase tracking-wider text-[11px] block">
                   📋 {t('book.passSummary')}
                 </span>
