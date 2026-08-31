@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, ArrowRight, RefreshCw, KeyRound, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import CenteredLayout from '../../layouts/CenteredLayout.jsx';
 import FormField from '../../components/FormField.jsx';
@@ -47,6 +47,14 @@ export default function AdminLogin() {
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
+  function fillDemo() {
+    setForm({
+      adminCode: 'ADMIN001',
+      password: 'admin123',
+    });
+    setError('');
+  }
+
   async function submit(event) {
     event.preventDefault();
     setError('');
@@ -76,12 +84,12 @@ export default function AdminLogin() {
       <div className="flex items-center justify-between mb-4">
         <Link
           to="/role"
-          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-teal-800 transition hover:bg-teal-50 hover:text-teal-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-[#156637] transition hover:bg-[#f0f7f2] hover:text-[#133e2b] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
         >
           <ArrowLeft className="h-4.5 w-4.5" aria-hidden="true" />
           <span>{t('role.heading')}</span>
         </Link>
-        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-900 border border-teal-200">
+        <span className="rounded-full bg-[#f0f7f2] border border-[#d1e7dd] px-3 py-1 text-xs font-bold text-[#133e2b]">
           APMC Staff Portal
         </span>
       </div>
@@ -90,6 +98,28 @@ export default function AdminLogin() {
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t('auth.adminTitle')}</h1>
         <p className="mt-1 text-xs text-slate-600">{t('auth.adminSub')}</p>
       </div>
+
+      {/* Quick 1-Click Demo Admin Credentials Chip */}
+      <button
+        type="button"
+        onClick={fillDemo}
+        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-[#d1e7dd] bg-[#f0f7f2] p-3 text-left transition hover:border-[#156637] hover:shadow-2xs focus:outline-none"
+      >
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-[#156637] shrink-0" />
+          <div>
+            <span className="block text-xs font-black text-[#133e2b]">
+              Demo Account: Suresh Kale (Pune APMC)
+            </span>
+            <span className="block text-[11px] font-mono text-[#156637]">
+              ADMIN001 • admin123
+            </span>
+          </div>
+        </div>
+        <span className="rounded-lg bg-[#156637] px-2.5 py-1 text-[11px] font-extrabold text-white shadow-2xs">
+          Auto-Fill
+        </span>
+      </button>
 
       <form onSubmit={submit} className="mt-4 space-y-3.5">
         <FormField
@@ -125,7 +155,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={busy}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-700 text-sm font-bold text-white shadow-md shadow-teal-900/20 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#156637] hover:bg-[#133e2b] text-sm font-bold text-white shadow-md shadow-emerald-950/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
         >
           {busy ? t('auth.working') : t('auth.signIn')}
           {!busy && <ArrowRight className="h-4 w-4" />}
@@ -144,10 +174,10 @@ export default function AdminLogin() {
       <button
         type="button"
         onClick={handleGoogleWorkspaceLogin}
-        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none"
+        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-[#156637] hover:bg-slate-50 focus:outline-none"
       >
         <GoogleIcon />
-        <span>Continue with Government Google Workspace</span>
+        <span>Continue with APMC Official Google Account</span>
       </button>
     </CenteredLayout>
   );
