@@ -15,9 +15,16 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   const text = (req.query.text || '').trim();
-  const rawLang = (req.query.lang || 'en').toLowerCase();
-
-  const langCode = rawLang === 'mr' ? 'mr' : rawLang === 'hi' ? 'hi' : 'en-IN';
+  const langMap = {
+    mr: 'mr',
+    hi: 'hi',
+    pa: 'pa',
+    gu: 'gu',
+    te: 'te',
+    kn: 'kn',
+    en: 'en-IN',
+  };
+  const langCode = langMap[rawLang] || 'en-IN';
 
   if (!text) {
     return res.status(400).send('Missing text parameter');

@@ -30,7 +30,8 @@
 Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8–14 hour physical queues, extreme traffic congestion, price exploitation by middlemen, lack of moisture testing transparency, and delayed payment confirmations.
 
 ### Expected Solution Fulfillments:
-- ✅ **Kisan Sahayak (किसान सहायक) 24/7 Multilingual AI Chatbot**: Interactive doubt-clearing assistant in **Marathi (मराठी)**, **Hindi (हिंदी)**, and **English** for instant resolution of MSP rates, DBT timelines, moisture guidelines, and mandatory documents with optional voice input and HD voice readout.
+- ✅ **Complete i18n with 7 Major Regional Languages**: Full native localization across **English (en)**, **Hindi (हिंदी - hi)**, **Marathi (मराठी - mr)**, **Punjabi (ਪੰਜਾਬੀ - pa)**, **Gujarati (ગુજરાતી - gu)**, **Telugu (తెలుగు - te)**, and **Kannada (ಕನ್ನಡ - kn)** powered by `i18next` and `react-i18next`.
+- ✅ **Kisan Sahayak (किसान सहायक) 24/7 AI Chatbot**: Interactive doubt-clearing assistant in 7 regional languages for instant resolution of MSP rates, DBT timelines, moisture guidelines, and mandatory documents.
 - ✅ **Zero-Scroll 3-Step Booking Wizard**: Fast, frictionless slot booking (1-tap centre selection $\rightarrow$ crop & weight with live gross MSP calculator $\rightarrow$ 6 operating slot windows) issuing an instant scannable Digital Gate Pass.
 - ✅ **Dynamic Queue Management**: Transparent 7-stage FIFO state machine with explainable wait-time calculations and Server-Sent Events (SSE) live push sync.
 - ✅ **Instant Farmer Dossier & Aadhaar Lookup**: Sub-50ms search by Farmer Name, 12-digit Aadhaar Number (`XXXX-XXXX-XXXX`), Phone, PM-Kisan ID, or Token number.
@@ -41,14 +42,24 @@ Traditional APMC mandis suffer from uncoordinated farmer arrivals resulting in 8
 
 ## 🌟 Key Features & Innovations
 
-### 1. 🤖 Kisan Sahayak (किसान सहायक / शेतकरी सहाय्यक) 24/7 AI Help Chatbot
-- **Comprehensive GovTech Domain Knowledge**: Answers farmer queries in natural language regarding:
+### 1. 🌐 Full Regional i18n Infrastructure (7 Languages)
+- **Official i18next & react-i18next Integration**: Dynamic, non-hardcoded localization supporting 7 agricultural languages:
+  1. **English (`en`)**
+  2. **Hindi — हिंदी (`hi`)**
+  3. **Marathi — मराठी (`mr`)**
+  4. **Punjabi — ਪੰਜਾਬੀ (`pa`)**
+  5. **Gujarati — ગુજરાતી (`gu`)**
+  6. **Telugu — తెలుగు (`te`)**
+  7. **Kannada — ಕನ್ನಡ (`kn`)**
+- **Dynamic 1-Tap Switching**: Persisted in `localStorage`, synced across the top bar, landing page, Judge Demo toolkit, and inside the AI Chatbot.
+
+### 2. 🤖 Kisan Sahayak (किसान सहायक / शेतकरी सहाय्यक) 24/7 AI Help Chatbot
+- **Comprehensive GovTech Domain Knowledge**: Answers farmer queries in natural language across all 7 regional languages regarding:
   - **Government MSP Rates (2026)**: Wheat (₹2,425/qtl), Soybean (₹4,892/qtl), Cotton (₹7,521/qtl), Paddy (₹2,300/qtl), Tur (₹7,550/qtl).
   - **Direct Benefit Transfer (DBT)**: PFMS direct-to-bank credit timeline (24-48 hours), zero agent deductions, and UTR tracking.
   - **Quality & Moisture Norms**: Max 12.0% moisture threshold, Fair Average Quality (FAQ) vs Grade A +5% bonus criteria.
-  - **Gate Documents Checklist**: Aadhaar Card, Satbara 7/12 Land Record, Bank Passbook, and Digital Gate Pass token.
-- **Multilingual & Reactive**: Live instant switching across Marathi, Hindi, and English (synced with top bar and 1-tap in-chat pills).
-- **Accessibility**: Voice-to-Text mic input and Neural Text-to-Speech (`/api/tts`) readout.
+  - **Gate Documents Checklist**: Aadhaar Card, Satbara 7/12 Land Record / RTC, Bank Passbook, and Digital Gate Pass token.
+- **Multilingual & Reactive**: Instant live switching across all 7 regional languages.
 - **Touch-Friendly Suggestion Cards**: Large interactive cards with direct navigation links (e.g. `[📅 Book Slot Now]`).
 
 ### 2. 📅 Zero-Scroll 3-Step Farmer Booking Wizard

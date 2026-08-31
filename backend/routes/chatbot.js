@@ -2,7 +2,14 @@
  * backend/routes/chatbot.js
  *
  * Kisan Sahayak / Farmer Help & Support AI Chatbot Knowledge Engine.
- * Provides instant, highly accurate GovTech guidance in Marathi, Hindi & English.
+ * Provides instant, highly accurate GovTech guidance in 7 regional Indian languages:
+ * 1. English (en)
+ * 2. Hindi - हिंदी (hi)
+ * 3. Marathi - मराठी (mr)
+ * 4. Punjabi - ਪੰਜਾਬੀ (pa)
+ * 5. Gujarati - ગુજરાતી (gu)
+ * 6. Telugu - తెలుగు (te)
+ * 7. Kannada - ಕನ್ನಡ (kn)
  */
 
 const express = require('express');
@@ -12,11 +19,10 @@ const { db } = require('../db');
 
 const router = express.Router();
 
-// Knowledge Base Topics & Resolution
+// Knowledge Base Topics & Multi-Lingual Resolution
 function answerFarmerQuery(query = '', lang = 'mr') {
   const q = query.toLowerCase().trim();
-  const isMr = lang === 'mr';
-  const isHi = lang === 'hi';
+  const currentLang = ['en', 'hi', 'mr', 'pa', 'gu', 'te', 'kn'].includes(lang) ? lang : 'en';
 
   // 1. MSP Rates & Crop Prices
   if (
@@ -30,22 +36,41 @@ function answerFarmerQuery(query = '', lang = 'mr') {
     q.includes('भाव') ||
     q.includes('किंमत') ||
     q.includes('मूल्य') ||
+    q.includes('ਮੁੱਲ') ||
+    q.includes('ਰੇਟ') ||
+    q.includes('ભાવ') ||
+    q.includes('ధర') ||
+    q.includes('బెಲೆ') ||
+    q.includes('wheat') ||
     q.includes('गेहूं') ||
     q.includes('गहू') ||
-    q.includes('wheat') ||
+    q.includes('ਕਣਕ') ||
+    q.includes('ઘઉં') ||
+    q.includes('గోధుమ') ||
+    q.includes('ಗೋಧಿ') ||
     q.includes('soybean') ||
     q.includes('सोयाबीन') ||
     q.includes('cotton') ||
     q.includes('कापूस') ||
     q.includes('कपास') ||
+    q.includes('ਕਪਾਹ') ||
+    q.includes('పత్తి') ||
+    q.includes('ಹತ್ತಿ') ||
     q.includes('paddy') ||
     q.includes('धान') ||
     q.includes('भात') ||
+    q.includes('ਝੋਨਾ') ||
+    q.includes('ડાંગર') ||
+    q.includes('వరి') ||
+    q.includes('ಭತ್ತ') ||
     q.includes('tur') ||
     q.includes('तूर') ||
-    q.includes('अरहर')
+    q.includes('अरहर') ||
+    q.includes('તુવેર') ||
+    q.includes('కందులు') ||
+    q.includes('ತೊಗರಿ')
   ) {
-    if (isMr) {
+    if (currentLang === 'mr') {
       return {
         reply: `🌾 **चालू हंगाम शासकीय हमीभाव (MSP 2026)**:\n\n` +
           `• 🌾 **गहू (Wheat)**: ₹२,४२५ / क्विंटल\n` +
@@ -54,14 +79,10 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `• 🍚 **भात / धान (Paddy)**: ₹२,३०० / क्विंटल\n` +
           `• 🌿 **तूर / अरहर (Tur)**: ₹७,५५० / क्विंटल\n\n` +
           `💡 *टीप: जर तुमचा माल 'Grade A' गुणवत्तेचा असेल, तर हमीभावावर अतिरिक्त +५% गुणवत्ता बोनस थेट बँक खात्यात मिळतो!*`,
-        suggestions: [
-          'स्लॉट कसा बुक करावा?',
-          'गुणवत्ता आणि आर्द्रता नियम काय आहेत?',
-          'पैसे खात्यात कधी जमा होतात?'
-        ],
+        suggestions: ['स्लॉट कसा बुक करावा?', 'गुणवत्ता आणि आर्द्रता नियम काय आहेत?', 'पैसे खात्यात कधी जमा होतात?'],
         action: { label: '📅 स्लॉट बुक करा', link: '/farmer/book' }
       };
-    } else if (isHi) {
+    } else if (currentLang === 'hi') {
       return {
         reply: `🌾 **वर्तमान सरकारी न्यूनतम समर्थन मूल्य (MSP 2026)**:\n\n` +
           `• 🌾 **गेहूं (Wheat)**: ₹२,४२५ / क्विंटल\n` +
@@ -70,12 +91,56 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `• 🍚 **धान (Paddy)**: ₹२,३०० / क्विंटल\n` +
           `• 🌿 **तूर / अरहर (Tur)**: ₹७,५५० / क्विंटल\n\n` +
           `💡 *सुझाव: 'Grade A' गुणवत्ता होने पर आधार दर पर +५% अतिरिक्त बोनस सीधे बैंक खाते में दिया जाता है!*`,
-        suggestions: [
-          'स्लॉट कैसे बुक करें?',
-          'नमी और गुणवत्ता नियम क्या हैं?',
-          'पैसे कब तक खाते में आएंगे?'
-        ],
-        action: { label: '📅 स्लॉट बुक करें', link: '/farmer/book' }
+        suggestions: ['स्लॉट कैसे बुक करें?', 'नमी और गुणवत्ता नियम क्या हैं?', 'पैसे कब तक खाते में आएंगे?'],
+        action: { label: '📅 अभी स्लॉट बुक करें', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'pa') {
+      return {
+        reply: `🌾 **ਮੌਜੂਦਾ ਸਰਕਾਰੀ ਘੱਟੋ-ਘੱਟ ਸਮਰਥਨ ਮੁੱਲ (MSP 2026)**:\n\n` +
+          `• 🌾 **ਕਣਕ (Wheat)**: ₹੨,੪੨੫ / ਕੁਇੰਟਲ\n` +
+          `• 🌱 **ਸੋਇਆਬੀਨ (Soybean)**: ₹੪,੮੯੨ / ਕੁਇੰਟਲ\n` +
+          `• ☁️ **ਨਰਮਾ / ਕਪਾਹ (Cotton)**: ₹੭,੫੨੧ / ਕੁਇੰਟਲ\n` +
+          `• 🍚 **ਝੋਨਾ / ਧਾਨ (Paddy)**: ₹੨,੩੦੦ / ਕੁਇੰਟਲ\n` +
+          `• 🌿 **ਤੂਰ / ਅਰਹਰ (Tur)**: ₹੭,੫੫੦ / ਕੁਇੰਟਲ\n\n` +
+          `💡 *ਸੁਝਾਅ: 'Grade A' ਗੁਣਵੱਤਾ ਹੋਣ ਤੇ ਮੂਲ ਦਰ ਤੇ +੫% ਵਾਧੂ ਬੋਨਸ ਸਿੱਧਾ ਬੈਂਕ ਖਾਤੇ ਵਿੱਚ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ!*`,
+        suggestions: ['ਸਲਾਟ ਕਿਵੇਂ ਬੁੱਕ ਕਰੀਏ?', 'ਨਮੀ ਅਤੇ ਗੁਣਵੱਤਾ ਨਿਯਮ ਕੀ ਹਨ?', 'ਪੈਸੇ ਖਾਤੇ ਵਿੱਚ ਕਦੋਂ ਆਉਣਗੇ?'],
+        action: { label: '📅 ਸਲਾਟ ਬੁੱਕ ਕਰੋ', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'gu') {
+      return {
+        reply: `🌾 **વર્તમાન સરકારી ટેકાના ભાવ (MSP 2026)**:\n\n` +
+          `• 🌾 **ઘઉં (Wheat)**: ₹૨,૪૨૫ / ક્વિન્ટલ\n` +
+          `• 🌱 **સોયાબીન (Soybean)**: ₹૪,૮૯૨ / ક્વિન્ટલ\n` +
+          `• ☁️ **કપાસ (Cotton)**: ₹૭,૫૨૧ / ક્વિન્ટલ\n` +
+          `• 🍚 **ડાંગર (Paddy)**: ₹૨,૩૦૦ / ક્વિન્ટલ\n` +
+          `• 🌿 **તુવેર (Tur)**: ₹૭,૫૫૦ / ક્વિન્ટલ\n\n` +
+          `💡 *સુઝાવ: 'Grade A' ગુણવત્તા હોવા પર મૂળ ભાવ પર +૫% વધારાનું બોનસ સીધા બેંક ખાતામાં મળે છે!*`,
+        suggestions: ['સ્લોટ કેવી રીતે બુક કરવો?', 'ભેજ અને ગુણવત્તા નિયમો શું છે?', 'પૈસા ખાતામાં ક્યારે આવશે?'],
+        action: { label: '📅 સ્લોટ બુક કરો', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'te') {
+      return {
+        reply: `🌾 **ప్రభుత్వ కనీస మద్దతు ధరలు (MSP 2026)**:\n\n` +
+          `• 🌾 **గోధుమలు (Wheat)**: ₹੨,౪੨੫ / క్వింటాల్\n` +
+          `• 🌱 **సోయాబీన్ (Soybean)**: ₹౪,౮౯౨ / క్వింటాల్\n` +
+          `• ☁️ **పత్తి (Cotton)**: ₹౭,౫౨౧ / క్వింటాల్\n` +
+          `• 🍚 **వరి (Paddy)**: ₹੨,౩౦౦ / క్వింటాల్\n` +
+          `• 🌿 **కందులు (Tur)**: ₹౭,౫౫౦ / క్వింటాల్\n\n` +
+          `💡 *గమనిక: 'Grade A' నాణ్యత కలిగిన పంటకు కనీస మద్దతు ధరపై అదనంగా +੫% బోనస్ నేరుగా ఖాతాలో జమ అవుతుంది!*`,
+        suggestions: ['స్లాట్‌ను ఎలా బుక్ చేయాలి?', 'తేమ మరియు నాణ్యత నిబంధనలు ఏమిటి?', 'డబ్బులు ఎప్పుడు వస్తాయి?'],
+        action: { label: '📅 స్లాట్ బుక్ చేయండి', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'kn') {
+      return {
+        reply: `🌾 **ಸರ್ಕಾರಿ ಕನಿಷ್ಠ ಬೆಂಬಲ ಬೆಲೆಗಳು (MSP 2026)**:\n\n` +
+          `• 🌾 **ಗೋಧಿ (Wheat)**: ₹೨,೪೨೫ / ಕ್ವಿಂಟಾಲ್\n` +
+          `• 🌱 **ಸೋಯಾಬೀನ್ (Soybean)**: ₹೪,೮೯೨ / ಕ್ವಿಂಟಾಲ್\n` +
+          `• ☁️ **ಹತ್ತಿ (Cotton)**: ₹೭,೫೨೧ / ಕ್ವಿಂಟಾಲ್\n` +
+          `• 🍚 **ಭತ್ತ (Paddy)**: ₹೨,೩೦೦ / ಕ್ವಿಂಟಾಲ್\n` +
+          `• 🌿 **ತೊಗರಿ (Tur)**: ₹೭,೫೫೦ / ಕ್ವಿಂಟಾಲ್\n\n` +
+          `💡 *ಸೂಚನೆ: 'Grade A' ಗುಣಮಟ್ಟದ ಬೆಳೆಗೆ ಮೂಲ ಬೆಂಬಲ ಬೆಲೆಯ ಮೇಲೆ +೫% ಹೆಚ್ಚುವರಿ ಬೋನಸ್ ನೇರವಾಗಿ ಖಾತೆಗೆ ಜಮೆಯಾಗುತ್ತದೆ!*`,
+        suggestions: ['ಸ್ಲಾಟ್ ಬುಕ್ ಮಾಡುವುದು ಹೇಗೆ?', 'ತೇವಾಂಶ ಮತ್ತು ಗುಣಮಟ್ಟ ನಿಯಮಗಳು ಯಾವುವು?', 'ಹಣ ಯಾವಾಗ ಜಮೆಯಾಗುತ್ತದೆ?'],
+        action: { label: '📅 ಸ್ಲಾಟ್ ಬುಕ್ ಮಾಡಿ', link: '/farmer/book' }
       };
     } else {
       return {
@@ -85,12 +150,8 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `• ☁️ **Cotton**: ₹7,521 / Quintal\n` +
           `• 🍚 **Paddy (Rice)**: ₹2,300 / Quintal\n` +
           `• 🌿 **Tur (Arhar)**: ₹7,550 / Quintal\n\n` +
-          `💡 *Note: Crops meeting 'Grade A' standards receive a +5% quality bonus over the base MSP!*`,
-        suggestions: [
-          'How do I book a slot?',
-          'What are moisture and quality rules?',
-          'How does DBT payment work?'
-        ],
+          `💡 *Note: Crops meeting 'Grade A' standards receive a +5% quality bonus directly into your bank account!*`,
+        suggestions: ['How do I book a slot?', 'What are moisture and quality rules?', 'How does DBT payment work?'],
         action: { label: '📅 Book Slot Now', link: '/farmer/book' }
       };
     }
@@ -106,12 +167,12 @@ function answerFarmerQuery(query = '', lang = 'mr') {
     q.includes('कसे') ||
     q.includes('बुक') ||
     q.includes('स्लॉट') ||
-    q.includes('तारीख') ||
-    q.includes('वेळ') ||
-    q.includes('नोंदणी') ||
-    q.includes('बुकिंग')
+    q.includes('ਸਲਾਟ') ||
+    q.includes('બુક') ||
+    q.includes('స్లాట్') ||
+    q.includes('ಬುಕ್')
   ) {
-    if (isMr) {
+    if (currentLang === 'mr') {
       return {
         reply: `📋 **खरेदी स्लॉट बुकिंग प्रक्रिया (३ सोपे टप्पे)**:\n\n` +
           `१. **केंद्र निवडा**: जवळचे APMC खरेदी केंद्र (उदा. पुणे, नाशिक, नागपूर) निवडा.\n` +
@@ -119,14 +180,10 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `३. **तारीख व वेळ**: आज किंवा उद्याचा १ तासाचा सोयीचा स्लॉट निवडून कन्फर्म करा.\n\n` +
           `⏰ **कामाचे स्लॉट**: १०:००-११:००, ११:००-१२:००, १२:००-१३:००, १४:००-१५:००, १५:००-१६:००, १६:००-१७:०० (दुपारी १ ते २ भोजन सुट्टी).\n\n` +
           `🎫 बुकिंग पूर्ण होताच डिजिटल गेट पास (उदा. PF-1476) त्वरित तयार होतो!`,
-        suggestions: [
-          'हमीभाव दर काय आहेत?',
-          'कोणती कागदपत्रे सोबत आणावी?',
-          'पैसे खात्यात कधी जमा होतात?'
-        ],
+        suggestions: ['हमीभाव दर काय आहेत?', 'कोणती कागदपत्रे सोबत आणावी?', 'पैसे खात्यात कधी जमा होतात?'],
         action: { label: '📅 आताच स्लॉट बुक करा', link: '/farmer/book' }
       };
-    } else if (isHi) {
+    } else if (currentLang === 'hi') {
       return {
         reply: `📋 **स्लॉट बुकिंग प्रक्रिया (३ आसान चरण)**:\n\n` +
           `१. **केंद्र चुनें**: अपना नजदीकी सरकारी खरीद केंद्र चुनें (जैसे पुणे, नासिक, नागपुर).\n` +
@@ -134,12 +191,48 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `३. **तारीख और समय**: आज या कल का १ घंटे का समय स्लॉट चुनकर पुष्टि करें.\n\n` +
           `⏰ **कार्य समय स्लॉट**: १०:००-११:००, ११:००-१२:००, १२:००-१३:००, १४:००-१५:००, १५:००-१६:००, १६:००-१७:०० (दोपहर १ से २ लंच ब्रेक).\n\n` +
           `🎫 बुकिंग होते ही डिजिटल गेट पास (जैसे PF-1476) तुरंत मिल जाता है!`,
-        suggestions: [
-          'समर्थन मूल्य क्या है?',
-          'मंडी में कौन से दस्तावेज चाहिए?',
-          'डीबीटी भुगतान कैसे मिलता है?'
-        ],
+        suggestions: ['समर्थन मूल्य क्या है?', 'मंडी में कौन से दस्तावेज चाहिए?', 'डीबीटी भुगतान कैसे मिलता है?'],
         action: { label: '📅 अभी स्लॉट बुक करें', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'pa') {
+      return {
+        reply: `📋 **ਸਲਾਟ ਬੁਕਿੰਗ ਪ੍ਰਕਿਰਿਆ (੩ ਆਸਾਨ ਕਦਮ)**:\n\n` +
+          `੧. **ਕੇਂਦਰ ਚੁਣੋ**: ਆਪਣਾ ਨਜ਼ਦੀਕੀ ਖਰੀਦ ਕੇਂਦਰ ਚੁਣੋ।\n` +
+          `੨. **ਫ਼ਸਲ ਅਤੇ ਮਾਤਰਾ**: ਫ਼ਸਲ ਅਤੇ ਕੁਇੰਟਲ ਵਿੱਚ ਮਾਤਰਾ ਚੁਣੋ (ਵੱਧ ਤੋਂ ਵੱਧ ੫੦ ਕੁਇੰਟਲ/ਬੁਕਿੰਗ)।\n` +
+          `੩. **ਮਿਤੀ ਅਤੇ ਸਮਾਂ**: ਅੱਜ ਜਾਂ ਕੱਲ੍ਹ ਦਾ ੧ ਘੰਟੇ ਦਾ ਸਲਾਟ ਚੁਣ ਕੇ ਪੁਸ਼ਟੀ ਕਰੋ।\n\n` +
+          `🎫 ਬੁਕਿੰਗ ਹੁੰਦੇ ਹੀ ਡਿਜੀਟਲ ਗੇਟ ਪਾਸ ਤੁਰੰਤ ਮਿਲ ਜਾਂਦਾ ਹੈ!`,
+        suggestions: ['ਸਮਰਥਨ ਮੁੱਲ ਕੀ ਹੈ?', 'ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਕਿਹੜੇ ਹਨ?', 'ਭੁਗਤਾਨ ਕਿਵੇਂ ਹੁੰਦਾ ਹੈ?'],
+        action: { label: '📅 ਸਲਾਟ ਬੁੱਕ ਕਰੋ', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'gu') {
+      return {
+        reply: `📋 **સ્લોટ બુકિંગ પ્રક્રિયા (૩ સરળ પગલાં)**:\n\n` +
+          `૧. **કેન્દ્ર પસંદ કરો**: નજીકનું સરકારી ખરીદ કેન્દ્ર પસંદ કરો.\n` +
+          `૨. **પાક અને જથ્થો**: પાક અને ક્વિન્ટલમાં જથ્થો દાખલ કરો (મહત્તમ ૫૦ ક્વિન્ટલ).\n` +
+          `૩. **તારીખ અને સમય**: અનુકૂળ ૧ કલાકનો સ્લોટ પસંદ કરીને પુષ્ટિ કરો.\n\n` +
+          `🎫 બુકિંગ થતાં જ ડિજિટલ ગેટ પાસ તરત મળી જાય છે!`,
+        suggestions: ['ટેકાના ભાવ શું છે?', 'જરૂરી દસ્તાવેજો કયા છે?', 'DBT ચુકવણી કેવી રીતે મળે?'],
+        action: { label: '📅 સ્લોટ બુક કરો', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'te') {
+      return {
+        reply: `📋 **స్లాట్ బుకింగ్ ప్రక్రియ (౩ సులభమైన దశలు)**:\n\n` +
+          `੧. **కేంద్రాన్ని ఎంచుకోండి**: సమీప ప్రభుత్వ సేకరణ కేంద్రాన్ని ఎంచుకోండి.\n` +
+          `੨. **పంట & పరిమాణం**: పంట మరియు క్వింటాళ్లలో పరిమాణాన్ని నమోదు చేయండి (గరిష్టంగా ੫౦ క్వింటాళ్లు).\n` +
+          `੩. **తేదీ & సమయం**: అనుకూలమైన ੧ గంట సమయ స్లాట్‌ను ఎంచుకుని నిర్ధారించండి.\n\n` +
+          `🎫 బుకింగ్ పూర్తయిన వెంటనే డిజిటల్ గేట్ పాస్ జారీ చేయబడుతుంది!`,
+        suggestions: ['మద్దతు ధర ఎంత?', 'ఏ పత్రాలు అవసరం?', 'డబ్బులు ఎప్పుడు వస్తాయి?'],
+        action: { label: '📅 స్లాట్ బుక్ చేయండి', link: '/farmer/book' }
+      };
+    } else if (currentLang === 'kn') {
+      return {
+        reply: `📋 **ಸ್ಲಾಟ್ ಬುಕಿಂಗ್ ಪ್ರಕ್ರಿಯೆ (೩ ಸುಲಭ ಹಂತಗಳು)**:\n\n` +
+          `೧. **ಕೇಂದ್ರ ಆಯ್ಕೆಮಾಡಿ**: ಹತ್ತಿರದ ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.\n` +
+          `೨. **ಬೆಳೆ ಮತ್ತು ಪ್ರಮಾಣ**: ಬೆಳೆ ಮತ್ತು ಕ್ವಿಂಟಾಲ್ ಪ್ರಮಾಣವನ್ನು ನಮೂದಿಸಿ (ಗರಿಷ್ಠ ೫೦ ಕ್ವಿಂಟಾಲ್).\n` +
+          `೩. **ದಿನಾಂಕ ಮತ್ತು ಸಮಯ**: ಅನುಕೂಲಕರ ೧ ಗಂಟೆಯ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಿ ದೃಢೀಕರಿಸಿ.\n\n` +
+          `🎫 ಬುಕಿಂಗ್ ಆದ ತಕ್ಷಣ ಡಿಜಿಟಲ್ ಗೇಟ್ ಪಾಸ್ ದೊರೆಯುತ್ತದೆ!`,
+        suggestions: ['ಬೆಂಬಲ ಬೆಲೆ ಎಷ್ಟು?', 'ಯಾವ ದಾಖಲೆಗಳು ಬೇಕು?', 'ಪಾವತಿ ಹೇಗೆ ಸಿಗುತ್ತದೆ?'],
+        action: { label: '📅 ಸ್ಲಾಟ್ ಬುಕ್ ಮಾಡಿ', link: '/farmer/book' }
       };
     } else {
       return {
@@ -149,11 +242,7 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `3. **Pick Date & Time**: Choose Today/Tomorrow and a 1-hour operating window.\n\n` +
           `⏰ **Operating Windows**: 10:00-11:00, 11:00-12:00, 12:00-13:00, 14:00-15:00, 15:00-16:00, 16:00-17:00 (13:00-14:00 Lunch break).\n\n` +
           `🎫 You receive an instant Digital Gate Pass with Token Number (e.g. PF-1476)!`,
-        suggestions: [
-          'What are current MSP rates?',
-          'What documents should I bring?',
-          'How does DBT payment work?'
-        ],
+        suggestions: ['What are current MSP rates?', 'What documents should I bring?', 'How does DBT payment work?'],
         action: { label: '📅 Book a Slot', link: '/farmer/book' }
       };
     }
@@ -173,33 +262,63 @@ function answerFarmerQuery(query = '', lang = 'mr') {
     q.includes('पेमेंट') ||
     q.includes('खाता') ||
     q.includes('भुगतान') ||
-    q.includes('जमा')
+    q.includes('ਪੈਸੇ') ||
+    q.includes('ਖਾਤਾ') ||
+    q.includes('પૈસા') ||
+    q.includes('డబ్బు') ||
+    q.includes('ఖాతా') ||
+    q.includes('ಹಣ') ||
+    q.includes('ಖಾತೆ')
   ) {
-    if (isMr) {
+    if (currentLang === 'mr') {
       return {
         reply: `💳 **शासकीय DBT बँक पेमेंट माहिती**:\n\n` +
           `• **थेट बँक जमा**: खरेदी पूर्ण झाल्यानंतर PFMS द्वारे २४ ते ४८ तासांच्या आत थेट तुमच्या आधार-लिंक्ड बँक खात्यात रक्कम जमा होते.\n` +
           `• **कोणतेही कमिशन नाही**: मध्यस्थ किंवा दलालांशिवाय १००% पूर्ण रक्कम हमीभावानुसार मिळते.\n` +
           `• **SMS अलर्ट**: पेमेंट जमा होताच PFMS UTR संदर्भासह मोबाईलवर तात्काळ SMS मिळतो.\n` +
           `• **स्थिती तपासा**: तुमच्या होम स्क्रीनवर 'सीझन विक्री ट्रॅकर' मध्ये पावती आणि पेमेंट स्थिती (PROCESSING / PAID) पाहू शकता.`,
-        suggestions: [
-          'हमीभाव दर काय आहेत?',
-          'कागदपत्रे कोणती लागतात?',
-          'खरेदी पावती कशी डाउनलोड करावी?'
-        ]
+        suggestions: ['हमीभाव दर काय आहेत?', 'कागदपत्रे कोणती लागतात?', 'खरेदी पावती कशी डाउनलोड करावी?']
       };
-    } else if (isHi) {
+    } else if (currentLang === 'hi') {
       return {
         reply: `💳 **सरकारी DBT बैंक भुगतान विवरण**:\n\n` +
           `• **सीधे बैंक खाते में**: तुलाई पूरी होने के बाद २४ से ४८ घंटों में PFMS के माध्यम से आधार-लिंक्ड बैंक खाते में राशि ट्रांसफर होती है।\n` +
           `• **शून्य कमीशन**: बिना किसी बिचौलिये के सरकार द्वारा १००% राशि सीधे आपके खाते में दी जाती है।\n` +
           `• **SMS सूचना**: भुगतान होते ही PFMS UTR नंबर के साथ आपके मोबाइल पर तुरंत SMS आता है।\n` +
           `• **स्टेटस जांच**: होम पेज पर 'सीजन ट्रैकर' में आप रसीद और भुगतान की स्थिति (PROCESSING / PAID) देख सकते हैं।`,
-        suggestions: [
-          'समर्थन मूल्य क्या है?',
-          'कौन से दस्तावेज आवश्यक हैं?',
-          'स्लॉट कैसे बुक करें?'
-        ]
+        suggestions: ['समर्थन मूल्य क्या है?', 'कौन से दस्तावेज आवश्यक हैं?', 'स्लॉट कैसे बुक करें?']
+      };
+    } else if (currentLang === 'pa') {
+      return {
+        reply: `💳 **ਸਰਕਾਰੀ DBT ਬੈਂਕ ਭੁਗਤਾਨ ਵੇਰਵੇ**:\n\n` +
+          `• **ਸਿੱਧਾ ਬੈਂਕ ਖਾਤੇ ਵਿੱਚ**: ਤੋਲ ਪੂਰਾ ਹੋਣ ਤੋਂ ਬਾਅਦ ੨੪ ਤੋਂ ੪੮ ਘੰਟਿਆਂ ਵਿੱਚ PFMS ਰਾਹੀਂ ਆਧਾਰ-ਲਿੰਕਡ ਬੈਂਕ ਖਾਤੇ ਵਿੱਚ ਰਕਮ ਟਰਾਂਸਫਰ ਹੁੰਦੀ ਹੈ।\n` +
+          `• **ਜ਼ੀਰੋ ਕਮਿਸ਼ਨ**: ਬਿਨਾਂ ਕਿਸੇ ਵਿਚੋਲੇ ਦੇ ੧੦੦% ਪੂਰੀ ਰਕਮ ਸਰਕਾਰੀ MSP ਅਨੁਸਾਰ ਮਿਲਦੀ ਹੈ।\n` +
+          `• **SMS ਅਲਰਟ**: ਭੁਗਤਾਨ ਹੁੰਦੇ ਹੀ PFMS UTR ਨੰਬਰ ਨਾਲ ਮੋਬਾਈਲ ਤੇ SMS ਆਉਂਦਾ ਹੈ।`,
+        suggestions: ['ਸਮਰਥਨ ਮੁੱਲ ਕੀ ਹੈ?', 'ਦਸਤਾਵੇਜ਼ ਕਿਹੜੇ ਚਾਹੀਦੇ ਹਨ?']
+      };
+    } else if (currentLang === 'gu') {
+      return {
+        reply: `💳 **સરકારી DBT બેંક ચુકવણી વિગતો**:\n\n` +
+          `• **સીધા બેંક ખાતામાં**: વજન પૂર્ણ થયા પછી ૨૪ થી ૪૮ કલાકમાં PFMS દ્વારા આધાર-લિંક્ડ બેંક ખાતામાં રકમ જમા થાય છે.\n` +
+          `• **ઝીરો કમિશન**: કોઈ પણ વચેટીયા વગર ૧૦૦% સંપૂર્ણ રકમ સરકાર તરફથી મળે છે.\n` +
+          `• **SMS ચેતવણી**: ચુકવણી થતાં જ PFMS UTR સંદર્ભ સાથે SMS આવે છે.`,
+        suggestions: ['ટેકાના ભાવ શું છે?', 'જરૂરી દસ્તાવેજો કયા છે?']
+      };
+    } else if (currentLang === 'te') {
+      return {
+        reply: `💳 **ప్రభుత్వ DBT బ్యాంక్ చెల్లింపు వివరాలు**:\n\n` +
+          `• **నేరుగా బ్యాంక్ ఖాతాలో**: తూకం పూర్తయిన తర్వాత ੨౪ నుండి ౪౮ గంటల్లో PFMS ద్వారా ఆధార్-లింక్డ్ బ్యాంక్ ఖాతాలో డబ్బు జమ అవుతుంది.\n` +
+          `• **జీరో కమీషన్**: ఎలాంటి దళారులు లేకుండా ੧౦౦% పూర్తి మద్దతు ధర నేరుగా లభిస్తుంది.\n` +
+          `• **SMS సమాచారం**: చెల్లింపు జరగగానే అధికారిక PFMS UTR నంబర్‌తో SMS అందుతుంది.`,
+        suggestions: ['మద్దతు ధర ఎంత?', 'ఏ పత్రాలు అవసరం?']
+      };
+    } else if (currentLang === 'kn') {
+      return {
+        reply: `💳 **ಸರ್ಕಾರಿ DBT ಬ್ಯಾಂಕ್ ಪಾವತಿ ವಿವರಗಳು**:\n\n` +
+          `• **ನೇರವಾಗಿ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ**: ತೂಕ ಪೂರ್ಣಗೊಂಡ ನಂತರ ೨೪ ರಿಂದ ೪೮ ಗಂಟೆಗಳಲ್ಲಿ PFMS ಮೂಲಕ ಆಧಾರ್-ಲಿಂಕ್ಡ್ ಖಾತೆಗೆ ಹಣ ಜಮೆಯಾಗುತ್ತದೆ.\n` +
+          `• **ಶೂನ್ಯ ಕಮಿಷನ್**: ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲದೆ ೧೦೦% ಸಂಪೂರ್ಣ ಬೆಂಬಲ ಬೆಲೆ ಲಭ್ಯವಿದೆ.\n` +
+          `• **SMS ಎಚ್ಚರಿಕೆ**: ಪಾವತಿಯಾದ ತಕ್ಷಣ ಅಧಿಕೃತ PFMS UTR ಸಂಖ್ಯೆಯೊಂದಿಗೆ SMS ಬರುತ್ತದೆ.`,
+        suggestions: ['ಬೆಂಬಲ ಬೆಲೆ ಎಷ್ಟು?', 'ಯಾವ ದಾಖಲೆಗಳು ಬೇಕು?']
       };
     } else {
       return {
@@ -208,16 +327,12 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `• **Zero Middlemen**: 100% full MSP payment with no agent fees or hidden deductions.\n` +
           `• **Instant SMS**: Receive an SMS notification with official PFMS UTR transfer reference as soon as payment is dispatched.\n` +
           `• **Track Live**: Check payment state (PROCESSING / PAID) and download digital receipts in your Season Tracker.`,
-        suggestions: [
-          'What are current MSP rates?',
-          'What documents should I bring?',
-          'How do I book a slot?'
-        ]
+        suggestions: ['What are current MSP rates?', 'What documents should I bring?', 'How do I book a slot?']
       };
     }
   }
 
-  // 4. Documents Required (Aadhaar, 7/12, Passbook)
+  // 4. Documents Required
   if (
     q.includes('document') ||
     q.includes('aadhaar') ||
@@ -225,13 +340,16 @@ function answerFarmerQuery(query = '', lang = 'mr') {
     q.includes('satbara') ||
     q.includes('paper') ||
     q.includes('कागदपत्र') ||
-    q.includes('कागदपत्रे') ||
     q.includes('आधार') ||
     q.includes('सातबारा') ||
     q.includes('दस्तावेज') ||
-    q.includes('कागजात')
+    q.includes('ਦਸਤਾਵੇਜ਼') ||
+    q.includes('ਆਧਾਰ') ||
+    q.includes('દસ્તાવેજ') ||
+    q.includes('ಆಧಾರ್') ||
+    q.includes('ದಾಖಲೆ')
   ) {
-    if (isMr) {
+    if (currentLang === 'mr') {
       return {
         reply: `📄 **खरेदी केंद्रावर जाताना आणायची आवश्यक कागदपत्रे**:\n\n` +
           `१. 🪪 **आधार कार्ड** (मूळ प्रत किंवा झेरॉक्स)\n` +
@@ -239,231 +357,82 @@ function answerFarmerQuery(query = '', lang = 'mr') {
           `३. 🏦 **बँक पासबुक झेरॉक्स** (किंवा कॅन्सल्ड चेक DBT साठी)\n` +
           `४. 🎫 **KisanSathi डिजिटल गेट पास / टोकन नंबर** (मोबाईलमध्ये दाखवला तरी चालतो)\n\n` +
           `💡 *टीप: ई-केवायसी (e-KYC) पूर्ण असल्यास पडताळणी केवळ २ मिनिटांत पूर्ण होते!*`,
-        suggestions: [
-          'आर्द्रता व गुणवत्ता निकष काय आहेत?',
-          'स्लॉट कसा बुक करावा?',
-          'केंद्राची वेळ काय आहे?'
-        ]
+        suggestions: ['आर्द्रता व गुणवत्ता निकष काय आहेत?', 'स्लॉट कसा बुक करावा?']
       };
-    } else if (isHi) {
+    } else if (currentLang === 'hi') {
       return {
         reply: `📄 **खरीद केंद्र पर आवश्यक दस्तावेज चेकलिस्ट**:\n\n` +
           `१. 🪪 **आधार कार्ड** (मूल प्रति या फोटोकॉपी)\n` +
-          `२. 📜 **७/१२ खतौनी / भूलेख रिकॉर्ड** (फसल प्रविष्टि सहित)\n` +
-          `३. 🏦 **बैंक पासबुक फोटोकॉपी** (DBT भुगतान हेतु)\n` +
-          `४. 🎫 **KisanSathi डिजिटल गेट पास / टोकन नंबर** (मोबाइल स्क्रीन मान्य है)\n\n` +
-          `💡 *सुझाव: e-KYC सत्यापित होने पर गेट वेरिफिकेशन मात्र २ मिनट में हो जाता है!*`,
-        suggestions: [
-          'नमी की अधिकतम सीमा क्या है?',
-          'स्लॉट कैसे बुक करें?',
-          'भुगतान कब मिलेगा?'
-        ]
+          `२. 📜 **खतौनी / ७/१२ भू-अभिलेख** (चालू सीजन की फसल प्रविष्टि)\n` +
+          `३. 🏦 **बैंक पासबुक प्रति** (DBT ट्रांसफर हेतु)\n` +
+          `४. 🎫 **KisanSathi डिजिटल गेट पास / टोकन**\n\n` +
+          `💡 *सुझाव: e-KYC पूरा होने पर गेट वेरिफिकेशन में केवल २ मिनट लगते हैं!*`,
+        suggestions: ['नमी के नियम क्या हैं?', 'स्लॉट कैसे बुक करें?']
       };
     } else {
       return {
-        reply: `📄 **Required Documents Checklist at APMC Centre**:\n\n` +
-          `1. 🪪 **Aadhaar Card** (Original or copy)\n` +
-          `2. 📜 **7/12 Land Record (Satbara Extract)** with current crop sowing record\n` +
-          `3. 🏦 **Bank Passbook Copy / Cancelled Cheque** for DBT credit\n` +
-          `4. 🎫 **KisanSathi Digital Gate Pass / Token Number** (on mobile screen)\n\n` +
-          `💡 *Tip: e-KYC verified farmers pass gate verification in under 2 minutes!*`,
-        suggestions: [
-          'What is the moisture limit?',
-          'How do I book a slot?',
-          'What are current MSP rates?'
-        ]
+        reply: `📄 **Required Mandi Gate Documents Checklist**:\n\n` +
+          `1. 🪪 **Aadhaar Card** (Original or copy for identity verification)\n` +
+          `2. 📜 **7/12 Land Record / RTC** (Showing current season crop registration)\n` +
+          `3. 🏦 **Bank Passbook / Cancelled Cheque** (For DBT payment processing)\n` +
+          `4. 🎫 **KisanSathi Digital Gate Pass / Token Number** (On your mobile screen)\n\n` +
+          `💡 *Tip: Completed Aadhaar e-KYC speeds up entry verification to under 2 minutes!*`,
+        suggestions: ['What are moisture rules?', 'How do I book a slot?']
       };
     }
   }
 
-  // 5. Moisture & Quality Standards (FAQ Norms)
+  // 5. Moisture Norms & Grade A Quality Rules
   if (
     q.includes('moisture') ||
     q.includes('quality') ||
-    q.includes('faq') ||
     q.includes('grade') ||
-    q.includes('reject') ||
-    q.includes('आर्द्रता') ||
+    q.includes('bonus') ||
     q.includes('ओलावा') ||
+    q.includes('आर्द्रता') ||
     q.includes('गुणवत्ता') ||
     q.includes('नमी') ||
-    q.includes('क्वालिटी') ||
-    q.includes('ग्रेड')
+    q.includes('ਗੁਣਵੱਤਾ') ||
+    q.includes('ਨਮੀ') ||
+    q.includes('ભેજ') ||
+    q.includes('తేమ') ||
+    q.includes('ತೇವಾಂಶ')
   ) {
-    if (isMr) {
+    if (currentLang === 'mr') {
       return {
-        reply: `💧 **शासकीय गुणवत्ता व आर्द्रता (Moisture) निकष**:\n\n` +
-          `• 💧 **कमाल आर्द्रता मर्यादा**: १२.०% (Moisture $\\le 12.0\\%$)\n` +
-          `• 🌾 **FAQ प्रत (Fair Average Quality)**: १००% हमीभाव मिळतो (उदा. गहू ₹२,४२५/क्विंटल).\n` +
-          `• ⭐ **Grade A प्रत**: उच्च गुणवत्तेसाठी अतिरिक्त +५% बोनस मिळतो (उदा. गहू ₹२,५४६.२५/क्विंटल).\n` +
-          `• 🚫 **कचरा व इतर घटक**: कचरा/माती १% पेक्षा कमी आणि किडलेले दाणे २% पेक्षा कमी असावेत.\n\n` +
-          `💡 *सुझाव: माल केंद्रावर आणण्यापूर्वी उन्हात व्यवस्थित वाळवून आणावा, जेणेकरून आर्द्रता १२% पेक्षा कमी राहील.*`,
-        suggestions: [
-          'हमीभाव दर काय आहेत?',
-          'कागदपत्रे कोणती लागतात?',
-          'स्लॉट कसा बुक करावा?'
-        ]
+        reply: `💧 **शासकीय आर्द्रता (Moisture) आणि गुणवत्ता नियम**:\n\n` +
+          `• ⚖️ **कमाल आर्द्रता मर्यादा**: **१२.०%** किंवा त्यापेक्षा कमी असावी. (१२% पेक्षा जास्त ओलावा असल्यास माल नाकारला जाऊ शकतो).\n` +
+          `• 🏆 **Grade A गुणवत्ता (उत्कृष्ट माल)**: हमीभावावर **+५% अतिरिक्त रोख बोनस** मिळतो!\n` +
+          `• 🌾 **FAQ (Fair Average Quality)**: १००% पूर्ण शासकीय हमीभाव दर मिळतो.\n` +
+          `• ⚠️ **Grade B**: -५% प्रतवारी समायोजन.\n\n` +
+          `💡 *सल्ला: केंद्रावर येण्यापूर्वी धान्य उन्हात चांगले वाळवून आणल्यास हमखास Grade A मिळून जास्तीत जास्त नफा मिळतो!*`,
+        suggestions: ['चालू हमीभाव काय आहेत?', 'कागदपत्रे कोणती लागतात?']
       };
-    } else if (isHi) {
+    } else if (currentLang === 'hi') {
       return {
-        reply: `💧 **सरकारी गुणवत्ता और नमी (Moisture) मानक**:\n\n` +
-          `• 💧 **अधिकतम नमी सीमा**: १२.०% (Moisture $\\le 12.0\\%$)\n` +
-          `• 🌾 **FAQ मानक**: १००% आधार समर्थन मूल्य (जैसे गेहूं ₹२,४२५/क्विंटल).\n` +
-          `• ⭐ **Grade A गुणवत्ता**: उत्कृष्ट अनाज पर +५% अतिरिक्त प्रीमियम बोनस (जैसे गेहूं ₹२,५४६.२५/क्विंटल).\n` +
-          `• 🚫 **विदेशी तत्व**: मिट्टी/कचरा १% से कम और क्षतिग्रस्त दाने २% से कम होने चाहिए।\n\n` +
-          `💡 *सुझाव: मंडी लाने से पहले फसल को अच्छी तरह सुखा लें ताकि नमी १२% के भीतर रहे।*`,
-        suggestions: [
-          'समर्थन मूल्य क्या है?',
-          'दस्तावेज कौन से चाहिए?',
-          'स्लॉट कैसे बुक करें?'
-        ]
+        reply: `💧 **सरकारी नमी (Moisture) एवं गुणवत्ता मानक**:\n\n` +
+          `• ⚖️ **अधिकतम नमी सीमा**: **१२.०%** या उससे कम होनी चाहिए।\n` +
+          `• 🏆 **Grade A गुणवत्ता**: न्यूनतम समर्थन मूल्य पर **+५% अतिरिक्त बोनस** दिया जाता है!\n` +
+          `• 🌾 **FAQ (साधारण गुणवत्ता)**: १००% पूर्ण समर्थन मूल्य दर मिलता है।\n` +
+          `• ⚠️ **Grade B**: -५% गुणवत्ता समायोजन।\n\n` +
+          `💡 *सलाह: मंडी लाने से पहले फसल को धूप में अच्छी तरह सुखा लें ताकि अधिकतम समर्थन मूल्य मिल सके!*`,
+        suggestions: ['वर्तमान समर्थन मूल्य क्या हैं?', 'स्लॉट कैसे बुक करें?']
       };
     } else {
       return {
-        reply: `💧 **Government Quality & Moisture (FAQ) Standards**:\n\n` +
-          `• 💧 **Max Moisture Limit**: $\\le 12.0\\%$\n` +
-          `• 🌾 **FAQ Grade (Fair Average Quality)**: Receives 100% base MSP (e.g. Wheat ₹2,425/qtl).\n` +
-          `• ⭐ **Grade A Standard**: Receives an extra +5% quality bonus (e.g. Wheat ₹2,546.25/qtl).\n` +
-          `• 🚫 **Foreign Matter**: Dust/stones $\\le 1.0\\%$, damaged grains $\\le 2.0\\%$.\n\n` +
-          `💡 *Tip: Dry grains under direct sunlight before bringing to the mandi to ensure moisture is under 12%.*`,
-        suggestions: [
-          'What are current MSP rates?',
-          'What documents should I bring?',
-          'How do I book a slot?'
-        ]
+        reply: `💧 **Official Moisture Norms & Quality Standards**:\n\n` +
+          `• ⚖️ **Maximum Moisture Limit**: **12.0%** or lower. Lots exceeding 12% moisture may be rejected.\n` +
+          `• 🏆 **Grade A Quality**: Receives an automatic **+5% Cash Bonus** above the base MSP!\n` +
+          `• 🌾 **FAQ (Fair Average Quality)**: Receives 100% full Government MSP rate.\n` +
+          `• ⚠️ **Grade B**: Subject to a -5% quality discount.\n\n` +
+          `💡 *Recommendation: Dry your produce thoroughly in the sun before bringing it to the procurement centre to secure Grade A!*`,
+        suggestions: ['What are current MSP rates?', 'How do I book a slot?']
       };
     }
   }
 
-  // 6. Centres, Locations & Congestion
-  if (
-    q.includes('centre') ||
-    q.includes('center') ||
-    q.includes('location') ||
-    q.includes('mandi') ||
-    q.includes('pune') ||
-    q.includes('nashik') ||
-    q.includes('nagpur') ||
-    q.includes('aurangabad') ||
-    q.includes('kolhapur') ||
-    q.includes('केंद्र') ||
-    q.includes('मंडी') ||
-    q.includes('पुणे') ||
-    q.includes('नाशिक') ||
-    q.includes('नागपूर') ||
-    q.includes('औरंगाबाद') ||
-    q.includes('कोल्हापूर') ||
-    q.includes('गर्दी') ||
-    q.includes('भीड़')
-  ) {
-    if (isMr) {
-      return {
-        reply: `🏛️ **सक्रिय APMC खरेदी केंद्रे आणि स्थिती**:\n\n` +
-          `• 🏛️ **पुणे केंद्र (Pune)**: कमी गर्दी (Low) • सरासरी प्रतीक्षा ~३०-३५ मिनिटे\n` +
-          `• 🏛️ **औरंगाबाद केंद्र (Aurangabad)**: कमी गर्दी (Low) • सरासरी प्रतीक्षा ~३५-४० मिनिटे\n` +
-          `• 🏛️ **नाशिक केंद्र (Nashik)**: मध्यम गर्दी (Moderate) • सरासरी प्रतीक्षा ~१.५ तास\n` +
-          `• 🏛️ **कोल्हापूर केंद्र (Kolhapur)**: मध्यम गर्दी (Moderate) • सरासरी प्रतीक्षा ~२ तास\n` +
-          `• 🏛️ **नागपूर केंद्र (Nagpur)**: जास्त गर्दी (High) • सरासरी प्रतीक्षा ~४ तास\n\n` +
-          `💡 *सुझाव: 'Low' गर्दी असलेले केंद्र निवडल्यास तुमचा माल ३० मिनिटांत मोजून होतो!*`,
-        suggestions: [
-          'कमी गर्दीच्या केंद्रात स्लॉट बुक करा',
-          'हमीभाव दर काय आहेत?',
-          'कामाची वेळ काय आहे?'
-        ],
-        action: { label: '📍 खरेदी केंद्रे तपासा', link: '/farmer/book' }
-      };
-    } else if (isHi) {
-      return {
-        reply: `🏛️ **सक्रिय APMC खरीद केंद्र और स्थिति**:\n\n` +
-          `• 🏛️ **पुणे केंद्र (Pune)**: कम भीड़ (Low) • औसत प्रतीक्षा ~३०-३५ मिनट\n` +
-          `• 🏛️ **औरंगाबाद केंद्र (Aurangabad)**: कम भीड़ (Low) • औसत प्रतीक्षा ~३५-४० मिनट\n` +
-          `• 🏛️ **नासिक केंद्र (Nashik)**: मध्यम भीड़ (Moderate) • औसत प्रतीक्षा ~१.५ घंटे\n` +
-          `• 🏛️ **कोल्हापुर केंद्र (Kolhapur)**: मध्यम भीड़ (Moderate) • औसत प्रतीक्षा ~२ घंटे\n` +
-          `• 🏛️ **नागपुर केंद्र (Nagpur)**: अधिक भीड़ (High) • औसत प्रतीक्षा ~४ घंटे\n\n` +
-          `💡 *सुझाव: 'Low' भीड़ वाला केंद्र चुनने पर तुलाई ३० मिनट के भीतर पूरी हो जाती है!*`,
-        suggestions: [
-          'कम भीड़ वाले केंद्र पर स्लॉट बुक करें',
-          'समर्थन मूल्य क्या है?',
-          'कार्य समय क्या है?'
-        ],
-        action: { label: '📍 खरीद केंद्र देखें', link: '/farmer/book' }
-      };
-    } else {
-      return {
-        reply: `🏛️ **Active APMC Centres & Live Congestion**:\n\n` +
-          `• 🏛️ **Pune Center**: Low Congestion • Avg. wait ~30-35 mins\n` +
-          `• 🏛️ **Aurangabad Center**: Low Congestion • Avg. wait ~35-40 mins\n` +
-          `• 🏛️ **Nashik Center**: Moderate Congestion • Avg. wait ~1.5 hrs\n` +
-          `• 🏛️ **Kolhapur Center**: Moderate Congestion • Avg. wait ~2 hrs\n` +
-          `• 🏛️ **Nagpur Center**: High Congestion • Avg. wait ~4 hrs\n\n` +
-          `💡 *Tip: Selecting a 'Low' congestion centre ensures you finish weighment in under 35 minutes!*`,
-        suggestions: [
-          'Book slot at Low congestion centre',
-          'What are current MSP rates?',
-          'What are operating hours?'
-        ],
-        action: { label: '📍 View Centres', link: '/farmer/book' }
-      };
-    }
-  }
-
-  // 7. Token & Live Queue Tracker
-  if (
-    q.includes('queue') ||
-    q.includes('token') ||
-    q.includes('live') ||
-    q.includes('wait') ||
-    q.includes('रांग') ||
-    q.includes('टोकन') ||
-    q.includes('नंबर') ||
-    q.includes('प्रतीक्षा') ||
-    q.includes('गेट पास') ||
-    q.includes('पास')
-  ) {
-    if (isMr) {
-      return {
-        reply: `⏳ **लाइव्ह रांग व डिजिटल टोकन प्रणाली**:\n\n` +
-          `• **डिजिटल टोकन (उदा. PF-1476)**: स्लॉट बुक करताच तुम्हाला टोकन आणि रांगेतील अचूक क्रमांक मिळतो.\n` +
-          `• **थेट ट्रॅकिंग**: शेतकरी होम पेजवर तुमची रांग आपोआप पुढे जाताना लाइव्ह दिसते (रिफ्रेश करण्याची गरज नाही).\n` +
-          `• **अचूक वेळ (Reach By Time)**: जेव्हा तुमचा नंबर जवळ येतो, तेव्हा 'केंद्रावर पोहचा' अशी अचूक वेळ दाखवली जाते.\n` +
-          `• **काऊंटरवर बोलाविणे**: तुमचा नंबर आल्यावर काऊंटरचा रंग बदलतो व आवाजी सूचना मिळते.`,
-        suggestions: [
-          'स्लॉट कसा बुक करावा?',
-          'कागदपत्रे कोणती लागतात?',
-          'पैसे खात्यात कधी जमा होतात?'
-        ]
-      };
-    } else if (isHi) {
-      return {
-        reply: `⏳ **लाइव कतार और डिजिटल टोकन सिस्टम**:\n\n` +
-          `• **डिजिटल टोकन (जैसे PF-1476)**: स्लॉट बुक करते ही आपको टोकन और कतार में स्थान मिल जाता है।\n` +
-          `• **रियल-टाइम ट्रैकिंग**: किसान होम पेज पर कतार लाइव अपडेट होती है (पेज रिफ्रेश करने की जरूरत नहीं)।\n` +
-          `• **पहुंचने का समय (Reach By Time)**: स्लॉट के अनुसार केंद्र पर पहुंचने का सही समय स्क्रीन पर दिखता है।\n` +
-          `• **काउंटर कॉल**: आपकी बारी आते ही काउंटर पर बुलावा आता है और SMS सूचना मिलती है।`,
-        suggestions: [
-          'स्लॉट कैसे बुक करें?',
-          'दस्तावेज कौन से चाहिए?',
-          'डीबीटी भुगतान कब मिलता है?'
-        ]
-      };
-    } else {
-      return {
-        reply: `⏳ **Live Queue & Digital Token System**:\n\n` +
-          `• **Digital Token (e.g. PF-1476)**: Automatically assigned upon booking with exact queue position.\n` +
-          `• **Real-Time Tracking**: Your queue moves forward live on your home screen without refreshing.\n` +
-          `• **Reach-By Time**: Displays the exact recommended arrival time inside your booked window.\n` +
-          `• **Counter Call**: Your token flashes with an alert when the weighment counter calls you forward.`,
-        suggestions: [
-          'How do I book a slot?',
-          'What documents should I bring?',
-          'How does DBT payment work?'
-        ]
-      };
-    }
-  }
-
-  // 8. General Help / Default Fallback
-  if (isMr) {
+  // 6. General Help / Default Fallback in 7 Languages
+  if (currentLang === 'mr') {
     return {
       reply: `🌾 **मी 'किसान सहाय्यक' - तुमचा सरकारी खरेदी मदतनीस आहे!**\n\n` +
         `मी तुम्हाला खालील बाबतीत मदत करू शकतो:\n` +
@@ -473,14 +442,9 @@ function answerFarmerQuery(query = '', lang = 'mr') {
         `४. 📄 **आवश्यक कागदपत्रे** (आधार, ७/१२, बँक पासबुक)\n` +
         `५. 💧 **आर्द्रता व गुणवत्ता नियम** (१२% मर्यादा, Grade A बोनस)\n\n` +
         `कृपया तुमचा प्रश्न विचारा किंवा खालील पर्यायांवर टॅप करा!`,
-      suggestions: [
-        'चालू हमीभाव दर काय आहेत?',
-        'स्लॉट कसा बुक करावा?',
-        'पैसे खात्यात कधी जमा होतात?',
-        'कोणती कागदपत्रे सोबत आणावी?'
-      ]
+      suggestions: ['चालू हमीभाव दर काय आहेत?', 'स्लॉट कसा बुक करावा?', 'पैसे खात्यात कधी जमा होतात?', 'कोणती कागदपत्रे सोबत आणावी?']
     };
-  } else if (isHi) {
+  } else if (currentLang === 'hi') {
     return {
       reply: `🌾 **मैं 'किसान सहायक' - आपकी सरकारी खरीद सहायता के लिए तत्पर हूँ!**\n\n` +
         `मैं आपकी इन विषयों में मदद कर सकता हूँ:\n` +
@@ -490,12 +454,51 @@ function answerFarmerQuery(query = '', lang = 'mr') {
         `४. 📄 **आवश्यक दस्तावेज** (आधार, खतौनी, बैंक पासबुक)\n` +
         `५. 💧 **नमी और गुणवत्ता मानक** (१२% नमी, Grade A बोनस)\n\n` +
         `कृपया अपना प्रश्न लिखें या नीचे दिए गए विकल्पों पर टैप करें!`,
-      suggestions: [
-        'वर्तमान समर्थन मूल्य क्या हैं?',
-        'स्लॉट कैसे बुक करें?',
-        'पैसे कब तक खाते में आएंगे?',
-        'कौन से दस्तावेज आवश्यक हैं?'
-      ]
+      suggestions: ['वर्तमान समर्थन मूल्य क्या हैं?', 'स्लॉट कैसे बुक करें?', 'पैसे कब तक खाते में आएंगे?', 'कौन से दस्तावेज आवश्यक हैं?']
+    };
+  } else if (currentLang === 'pa') {
+    return {
+      reply: `🌾 **ਮੈਂ 'ਕਿਸਾਨ ਸਹਾਇਕ' — ਤੁਹਾਡੀ ਸਰਕਾਰੀ ਖਰੀਦ ਸਹਾਇਤਾ ਲਈ ਹਾਜ਼ਰ ਹਾਂ!**\n\n` +
+        `ਮੈਂ ਤੁਹਾਡੀ ਇਹਨਾਂ ਵਿਸ਼ਿਆਂ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ:\n` +
+        `੧. 💰 **ਸਮਰਥਨ ਮੁੱਲ (MSP)** (ਕਣਕ, ਝੋਨਾ, ਨਰਮਾ, ਸੋਇਆਬੀਨ, ਤੂਰ)\n` +
+        `੨. 📅 **ਸਲਾਟ ਬੁਕਿੰਗ** (ਸਮਾਂ, ਮਿਤੀ ਅਤੇ ਕੋਟਾ)\n` +
+        `੩. 💳 **DBT ਬੈਂਕ ਭੁਗਤਾਨ** (ਸਿੱਧਾ ਖਾਤੇ ਵਿੱਚ ਪੈਸੇ ਆਉਣ ਦੀ ਪ੍ਰਕਿਰਿਆ)\n` +
+        `੪. 📄 **ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼** (ਆਧਾਰ, ਜ਼ਮੀਨ ਰਿਕਾਰਡ, ਬੈਂਕ ਪਾਸਬੁੱਕ)\n` +
+        `੫. 💧 **ਨਮੀ ਅਤੇ ਗੁਣਵੱਤਾ ਮਿਆਰ** (੧੨% ਨਮੀ, Grade A ਬੋਨਸ)`,
+      suggestions: ['ਮੌਜੂਦਾ MSP ਰੇਟ ਕੀ ਹਨ?', 'ਸਲਾਟ ਕਿਵੇਂ ਬੁੱਕ ਕਰੀਏ?', 'ਪੈਸੇ ਖਾਤੇ ਵਿੱਚ ਕਦੋਂ ਆਉਣਗੇ?']
+    };
+  } else if (currentLang === 'gu') {
+    return {
+      reply: `🌾 **હું 'કિસાન સહાયક' — તમારી સરકારી ખરીદ સહાય માટે ઉપલબ્ધ છું!**\n\n` +
+        `હું તમને નીચેની બાબતોમાં મદદ કરી શકું છું:\n` +
+        `૧. 💰 **ટેકાના ભાવ (MSP)** (ઘઉં, ડાંગર, કપાસ, સોયાબીન, તુવેર)\n` +
+        `૨. 📅 **સ્લોટ બુકિંગ** (સમય, તારીખ અને મર્યાદા)\n` +
+        `૩. 💳 **DBT બેંક ચુકવણી** (સીધા ખાતામાં પૈસા જમા થવાની વિગત)\n` +
+        `૪. 📄 **જરૂરી દસ્તાવેજો** (આધાર કાર્ડ, ૭/૧૨, બેંક પાસબુક)\n` +
+        `૫. 💧 **ભેજ અને ગુણવત્તા નિયમો** (૧૨% ભેજ, Grade A બોનસ)`,
+      suggestions: ['ટેકાના ભાવ શું છે?', 'સ્લોટ કેવી રીતે બુક કરવો?', 'પૈસા ખાતામાં ક્યારે આવશે?']
+    };
+  } else if (currentLang === 'te') {
+    return {
+      reply: `🌾 **నేను 'కిసాన్ సహాయక్' — మీ ప్రభుత్వ సేకరణ సహాయకుడిని!**\n\n` +
+        `నేను మీకు ఈ క్రింది విషయాలలో సహాయం చేయగలను:\n` +
+        `੧. 💰 **కనీస మద్దతు ధరలు (MSP)** (గోధుమలు, వరి, పత్తి, సోయాబీన్, కందులు)\n` +
+        `੨. 📅 **స్లాట్ బుకింగ్** (తేదీ, సమయం మరియు కోటా)\n` +
+        `੩. 💳 **DBT బ్యాంక్ చెల్లింపులు** (ఖాతాలో డబ్బు జమ ప్రక్రియ)\n` +
+        `੪. 📄 **అవసరమైన పత్రాలు** (ఆధార్, భూమి రికార్డులు, బ్యాంక్ పాస్‌బుక్)\n` +
+        `੫. 💧 **తేమ & నాణ్యత నిబంధనలు** (੧੨% తేమ పరిమితి, Grade A బోనస్)`,
+      suggestions: ['మద్దతు ధరలు ఎంత?', 'స్లాట్ ఎలా బుక్ చేయాలి?', 'డబ్బులు ఎప్పుడు వస్తాయి?']
+    };
+  } else if (currentLang === 'kn') {
+    return {
+      reply: `🌾 **ನಾನು 'ಕಿಸಾನ್ ಸಹಾಯಕ' — ನಿಮ್ಮ ಸರ್ಕಾರಿ ಖರೀದಿ ಸಹಾಯ ಸಹಾಯಕ!**\n\n` +
+        `ನಾನು ನಿಮಗೆ ಈ ಕೆಳಗಿನ ವಿಷಯಗಳಲ್ಲಿ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ:\n` +
+        `೧. 💰 **ಕನಿಷ್ಠ ಬೆಂಬಲ ಬೆಲೆಗಳು (MSP)** (ಗೋಧಿ, ಭತ್ತ, ಹತ್ತಿ, ಸೋಯಾಬೀನ್, ತೊಗರಿ)\n` +
+        `೨. 📅 **ಸ್ಲಾಟ್ ಬುಕಿಂಗ್** (ದಿನಾಂಕ, ಸಮಯ ಮತ್ತು ಕೋಟಾ)\n` +
+        `೩. 💳 **DBT ಬ್ಯಾಂಕ್ ಪಾವತಿ** (ಖಾತೆಗೆ ಹಣ ಜಮೆ ವಿವರ)\n` +
+        `೪. 📄 **ಅಗತ್ಯ ದಾಖಲೆಗಳು** (ಆಧಾರ್, ಪಹಣಿ/RTC, ಬ್ಯಾಂಕ್ ಪಾಸ್‌ಬುಕ್)\n` +
+        `೫. 💧 **ತೇವಾಂಶ ಮತ್ತು ಗುಣಮಟ್ಟ ನಿಯಮಗಳು** (೧೨% ತೇವಾಂಶ ಮಿತಿ, Grade A ಬೋನಸ್)`,
+      suggestions: ['ಬೆಂಬಲ ಬೆಲೆಗಳು ಎಷ್ಟು?', 'ಸ್ಲಾಟ್ ಬುಕ್ ಮಾಡುವುದು ಹೇಗೆ?', 'ಹಣ ಯಾವಾಗ ಜಮೆಯಾಗುತ್ತದೆ?']
     };
   } else {
     return {
@@ -507,12 +510,7 @@ function answerFarmerQuery(query = '', lang = 'mr') {
         `4. 📄 **Documents Required** (Aadhaar, 7/12 Land Record, Bank passbook)\n` +
         `5. 💧 **Moisture & Quality Norms** (12% moisture limit, Grade A bonus)\n\n` +
         `Feel free to ask any question or tap a suggestion below!`,
-      suggestions: [
-        'What are current MSP rates?',
-        'How do I book a slot?',
-        'How does DBT payment work?',
-        'What documents should I bring?'
-      ]
+      suggestions: ['What are current MSP rates?', 'How do I book a slot?', 'How does DBT payment work?', 'What documents should I bring?']
     };
   }
 }

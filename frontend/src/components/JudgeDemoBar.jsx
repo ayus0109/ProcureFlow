@@ -176,7 +176,7 @@ export default function JudgeDemoBar() {
                 <Languages className="h-3.5 w-3.5 text-emerald-700" />
                 Language
               </span>
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1 justify-end max-w-[220px]">
                 {languages.map((l) => (
                   <button
                     key={l.code}

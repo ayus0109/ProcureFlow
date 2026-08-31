@@ -1,33 +1,47 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import i18n from './i18n';
 import { LANGUAGES, translations } from './translations';
 
 /**
- * Holds the chosen language and hands every screen a `t()` lookup.
- * The choice is remembered in localStorage, so a page refresh mid-demo
- * does not throw the UI back to English.
+ * LanguageContext
+ * Holds the active regional language across all 7 supported languages:
+ * English (en), Hindi (hi), Marathi (mr), Punjabi (pa), Gujarati (gu), Telugu (te), Kannada (kn).
+ *
+ * Synchronizes with i18next and persists the choice in localStorage.
  */
 
 const LanguageContext = createContext(null);
 const STORAGE_KEY = 'procureflow.lang';
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+  const [lang, setLangState] = useState(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : 'en';
     return translations[saved] ? saved : 'en';
   });
 
+  const setLang = (newLang) => {
+    if (translations[newLang]) {
+      setLangState(newLang);
+      try {
+        i18n.changeLanguage(newLang);
+      } catch {}
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, lang);
-    document.documentElement.lang = lang; // helps screen readers pick the right voice
+    document.documentElement.lang = lang;
+    try {
+      i18n.changeLanguage(lang);
+    } catch {}
   }, [lang]);
 
   const value = useMemo(
     () => ({
       lang,
+      language: lang,
       setLang,
       languages: LANGUAGES,
-      // Falls back to English, then to the key itself, so a missing
-      // translation is visible in review but never renders as blank.
       t: (key) => translations[lang]?.[key] ?? translations.en[key] ?? key,
     }),
     [lang]

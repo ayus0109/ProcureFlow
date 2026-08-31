@@ -5,27 +5,32 @@
  * Answers any questions, doubts, or issues regarding APMC procurement, MSP rates,
  * slot booking, DBT payments, moisture norms, required documents, and mandi operations.
  *
- * Multilingual: Marathi (मराठी), Hindi (हिंदी), and English.
+ * Multilingual: 7 Regional Languages:
+ * 1. English (en)
+ * 2. Hindi - हिंदी (hi)
+ * 3. Marathi - मराठी (mr)
+ * 4. Punjabi - ਪੰਜਾਬੀ (pa)
+ * 5. Gujarati - ગુજરાતી (gu)
+ * 6. Telugu - తెలుగు (te)
+ * 7. Kannada - ಕನ್ನಡ (kn)
+ *
  * Features:
+ * - Dynamic i18n integration across all 7 Indian languages
  * - Clean text-based chat interface with instant send
  * - Large touch-friendly suggestion cards with high contrast for mobile screens
- * - 1-tap reactive language switching (Marathi / Hindi / English)
+ * - 1-tap reactive language switching pills
  * - Direct navigation action buttons
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  MessageSquare,
   X,
   Send,
   Bot,
   RotateCcw,
   Sparkles,
-  ExternalLink,
   Loader2,
   ChevronRight,
-  HelpCircle,
-  Globe,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
@@ -56,10 +61,52 @@ const SUGGESTIONS = {
     '💧 What is the maximum moisture percentage allowed?',
     '🏛️ Which procurement centres have low waiting times?',
   ],
+  pa: [
+    '🌾 ਮੌਜੂਦਾ ਸਰਕਾਰੀ ਘੱਟੋ-ਘੱਟ ਸਮਰਥਨ ਮੁੱਲ (MSP) ਕੀ ਹਨ?',
+    '📋 ਸਰਕਾਰੀ ਖਰੀਦ ਸਲਾਟ ਕਿਵੇਂ ਬੁੱਕ ਕਰੀਏ?',
+    '💳 DBT ਬੈਂਕ ਖਾਤੇ ਵਿੱਚ ਪੈਸੇ ਕਦੋਂ ਆਉਣਗੇ?',
+    '📄 ਮੰਡੀ ਵਿੱਚ ਕਿਹੜੇ ਦਸਤਾਵੇਜ਼ ਲੈ ਕੇ ਜਾਣੇ ਹਨ?',
+    '💧 ਵੱਧ ਤੋਂ ਵੱਧ ਨਮੀ (Moisture) ਸੀਮਾ ਕੀ ਹੈ?',
+    '🏛️ ਕਿਸ ਖਰੀਦ ਕੇਂਦਰ ਤੇ ਘੱਟ ਭੀੜ ਹੈ?',
+  ],
+  gu: [
+    '🌾 વર્તમાન સરકારી ટેકાના ભાવ (MSP) શું છે?',
+    '📋 સરકારી ખરીદ સ્લોટ કેવી રીતે બુક કરવો?',
+    '💳 DBT બેંક ખાતામાં પૈસા ક્યારે આવશે?',
+    '📄 માર્કેટ યાર્ડમાં કયા દસ્તાવેજો લઈ જવાના છે?',
+    '💧 મહત્તમ ભેજ (Moisture) મર્યાદા શું છે?',
+    '🏛️ કયા ખરીદ કેન્દ્ર પર ઓછી ભીડ છે?',
+  ],
+  te: [
+    '🌾 ప్రస్తుత ప్రభుత్వ కనీస మద్దతు ధరలు (MSP) ఎంత?',
+    '📋 ప్రభుత్వ సేకరణ స్లాట్‌ను ఎలా బుక్ చేయాలి?',
+    '💳 DBT బ్యాంక్ ఖాతాలో డబ్బులు ఎప్పుడు వస్తాయి?',
+    '📄 మార్కెట్ యార్డుకు ఏ పత్రాలు తీసుకురావాలి?',
+    '💧 గరిష్ట తేమ శాతం (Moisture) పరిమితి ఎంత?',
+    '🏛️ ఏ సేకరణ కేంద్రంలో తక్కువ రద్దీ ఉంది?',
+  ],
+  kn: [
+    '🌾 ಪ್ರಸ್ತುತ ಸರ್ಕಾರಿ ಕನಿಷ್ಠ ಬೆಂಬಲ ಬೆಲೆಗಳು (MSP) ಎಷ್ಟು?',
+    '📋 ಸರ್ಕಾರಿ ಖರೀದಿ ಸ್ಲಾಟ್ ಬುಕ್ ಮಾಡುವುದು ಹೇಗೆ?',
+    '💳 DBT ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಹಣ ಯಾವಾಗ ಜಮೆಯಾಗುತ್ತದೆ?',
+    '📄 ಮಂಡಿಗೆ ಯಾವ ದಾಖಲೆಗಳನ್ನು ತರಬೇಕು?',
+    '💧 ಗರಿಷ್ಠ ತೇವಾಂಶ (Moisture) ಮಿತಿ ಎಷ್ಟು?',
+    '🏛️ ಯಾವ ಖರೀದಿ ಕೇಂದ್ರದಲ್ಲಿ ಕಡಿಮೆ ಜನಸಂದಣಿಯಿದೆ?',
+  ],
+};
+
+const BOT_TITLES = {
+  mr: { title: 'किसान सहाय्यक AI', sub: 'शासकीय APMC मदत व शंका निवारण', selectLang: 'भाषा निवडा:' },
+  hi: { title: 'किसान सहायक AI', sub: 'सरकारी APMC सहायता केंद्र', selectLang: 'भाषा चुनें:' },
+  en: { title: 'Kisan Sahayak AI', sub: 'APMC Procurement Helpdesk', selectLang: 'Select Language:' },
+  pa: { title: 'ਕਿਸਾਨ ਸਹਾਇਕ AI', sub: 'ਸਰਕਾਰੀ ਮੰਡੀ ਸਹਾਇਤਾ ਕੇਂਦਰ', selectLang: 'ਭਾਸ਼ਾ ਚੁਣੋ:' },
+  gu: { title: 'કિસાન સહાયક AI', sub: 'સરકારી ખરીદ સહાયતા કેન્દ્ર', selectLang: 'ભાષા પસંદ કરો:' },
+  te: { title: 'కిసాన్ సహాయక్ AI', sub: 'ప్రభుత్వ సేకరణ సహాయ కేంద్రం', selectLang: 'భాషను ఎంచుకోండి:' },
+  kn: { title: 'ಕಿಸಾನ್ ಸಹಾಯಕ AI', sub: 'ಸರ್ಕಾರಿ ಖರೀದಿ ಸಹಾಯ ಕೇಂದ್ರ', selectLang: 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:' },
 };
 
 export default function FarmerChatbot() {
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang, languages, t } = useLanguage();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -85,6 +132,22 @@ export default function FarmerChatbot() {
       welcomeText =
         `नमस्ते! 🙏 मैं **'किसान सहायक' (Kisan Sahayak)** हूँ — आपका २४/७ सरकारी मंडी खरीद सहायक।\n\n` +
         `आपको न्यूनतम समर्थन मूल्य (MSP), स्लॉट बुकिंग, बैंक भुगतान, आवश्यक दस्तावेज या नमी मानकों से जुड़ा कोई भी प्रश्न या समस्या हो, तो बेझिझक पूछें!`;
+    } else if (currentLang === 'pa') {
+      welcomeText =
+        `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! 🙏 ਮੈਂ **'ਕਿਸਾਨ ਸਹਾਇਕ' (Kisan Sahayak)** ਹਾਂ — ਤੁਹਾਡਾ ੨੪/੭ ਸਰਕਾਰੀ ਮੰਡੀ ਖਰੀਦ ਸਹਾਇਕ।\n\n` +
+        `ਤੁਹਾਨੂੰ ਘੱਟੋ-ਘੱਟ ਸਮਰਥਨ ਮੁੱਲ (MSP), ਸਲਾਟ ਬੁਕਿੰਗ, ਬੈਂਕ ਭੁਗਤਾਨ, ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ਾਂ ਜਾਂ ਨਮੀ ਦੇ ਮਿਆਰਾਂ ਬਾਰੇ ਕੋਈ ਵੀ ਸਵਾਲ ਹੋਵੇ, ਤਾਂ ਬੇਝਿਜਕ ਪੁੱਛੋ!`;
+    } else if (currentLang === 'gu') {
+      welcomeText =
+        `નમસ્તે! 🙏 હું **'કિસાન સહાયક' (Kisan Sahayak)** છું — તમારો ૨૪/૭ સરકારી ખરીદ સહાયક.\n\n` +
+        `તમને ટેકાના ભાવ (MSP), સ્લોટ બુકિંગ, બેંક ચુકવણી, જરૂરી દસ્તાવેજો કે ભેજના નિયમો અંગે કોઈ પણ પ્રશ્ન હોય, તો પૂછો!`;
+    } else if (currentLang === 'te') {
+      welcomeText =
+        `నమస్కారం! 🙏 నేను **'కిసాన్ సహాయక్' (Kisan Sahayak)** — మీ ੨੪/੭ ప్రభుత్వ సేకరణ సహాయకుడిని.\n\n` +
+        `మీకు కనీస మద్దతు ధరలు (MSP), స్లాట్ బుకింగ్, బ్యాంక్ చెల్లింపులు, అవసరమైన పత్రాలు లేదా తేమ నిబంధనల గురించి ఏవైనా సందేహాలు ఉంటే అడగండి!`;
+    } else if (currentLang === 'kn') {
+      welcomeText =
+        `ನಮಸ್ಕಾರ! 🙏 ನಾನು **'ಕಿಸಾನ್ ಸಹಾಯಕ' (Kisan Sahayak)** — ನಿಮ್ಮ ೨೪/೭ ಸರ್ಕಾರಿ ಖರೀದಿ ಸಹಾಯ ಸಹಾಯಕ.\n\n` +
+        `ನಿಮಗೆ ಕನಿಷ್ಠ ಬೆಂಬಲ ಬೆಲೆ (MSP), ಸ್ಲಾಟ್ ಬುಕಿಂಗ್, ಬ್ಯಾಂಕ್ ಪಾವತಿ, ಅಗತ್ಯ ದಾಖಲೆಗಳು ಅಥವಾ ತೇವಾಂಶ ಮಾನದಂಡಗಳ ಬಗ್ಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆಗಳಿದ್ದರೂ ಕೇಳಿ!`;
     } else {
       welcomeText =
         `Hello! 🙏 I am **'Kisan Sahayak'** — your 24/7 APMC Procurement AI Assistant.\n\n` +
@@ -153,6 +216,14 @@ export default function FarmerChatbot() {
               ? 'माफ करा, सर्व्हरशी संपर्क होऊ शकला नाही. कृपया थोड्या वेळाने प्रयत्न करा.'
               : lang === 'hi'
               ? 'क्षमा करें, सर्वर से संपर्क नहीं हो पाया। कृपया पुनः प्रयास करें।'
+              : lang === 'pa'
+              ? 'ਮਾਫ਼ ਕਰਨਾ, ਸਰਵਰ ਨਾਲ ਸੰਪਰਕ ਨਹੀਂ ਹੋ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਕੋਸ਼ਿਸ਼ ਕਰੋ।'
+              : lang === 'gu'
+              ? 'ક્ષમા કરશો, સર્વર સાથે સંપર્ક થઈ શક્યો નથી. કૃપા કરીને થોડી વાર પછી પ્રયાસ કરો.'
+              : lang === 'te'
+              ? 'క్షమించండి, సర్వర్‌తో కనెక్ట్ కాలేకపోయాము. దయచేసి కాసేపటి తర్వాత మళ్ళీ ప్రయత్నించండి.'
+              : lang === 'kn'
+              ? 'ಕ್ಷಮಿಸಿ, ಸರ್ವರ್ ಸಂಪರ್ಕ ಸಾಧಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.'
               : 'Sorry, could not connect to server. Please try again.',
         },
       ]);
@@ -199,6 +270,8 @@ export default function FarmerChatbot() {
     );
   };
 
+  const currentBotTitle = BOT_TITLES[lang] || BOT_TITLES.en;
+
   return (
     <>
       {/* Floating Trigger Button (Compact Floating Circle) */}
@@ -230,13 +303,13 @@ export default function FarmerChatbot() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black tracking-wide flex items-center gap-2">
-                    <span>{lang === 'mr' ? 'किसान सहाय्यक AI' : lang === 'hi' ? 'किसान सहायक AI' : 'Kisan Sahayak AI'}</span>
+                    <span>{currentBotTitle.title}</span>
                     <span className="rounded-full bg-emerald-500/40 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-100 border border-emerald-400/40">
                       Online
                     </span>
                   </h3>
                   <p className="text-xs font-medium text-emerald-200">
-                    {lang === 'mr' ? 'सरकारी APMC मदत व शंका निवारण' : lang === 'hi' ? 'सरकारी APMC सहायता केंद्र' : 'APMC Procurement Helpdesk'}
+                    {currentBotTitle.sub}
                   </p>
                 </div>
               </div>
@@ -260,59 +333,32 @@ export default function FarmerChatbot() {
               </div>
             </div>
 
-            {/* In-Chat 1-Tap Language Switcher Strip */}
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-slate-200 bg-emerald-50/90 text-xs sm:text-sm font-bold text-emerald-950">
-              <div className="flex items-center gap-1.5 text-xs text-emerald-900">
-                <Sparkles className="h-4 w-4 text-emerald-700" />
-                <span>{lang === 'mr' ? 'भाषा निवडा:' : lang === 'hi' ? 'भाषा चुनें:' : 'Language:'}</span>
+            {/* In-Chat 1-Tap Language Switcher Strip (All 7 Regional Languages) */}
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-slate-200 bg-emerald-50/90 text-xs font-bold text-emerald-950 gap-2">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-900 shrink-0">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-700" />
+                <span className="hidden sm:inline">{currentBotTitle.selectLang}</span>
               </div>
 
-              {/* 1-Tap Language Switcher Pills */}
-              <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-emerald-200 shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLang('mr');
-                    setMessages([getWelcomeMessage('mr')]);
-                  }}
-                  className={`rounded-lg px-3 py-1 text-xs font-black transition-all ${
-                    lang === 'mr'
-                      ? 'bg-emerald-800 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
-                  }`}
-                >
-                  मराठी
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLang('hi');
-                    setMessages([getWelcomeMessage('hi')]);
-                  }}
-                  className={`rounded-lg px-3 py-1 text-xs font-black transition-all ${
-                    lang === 'hi'
-                      ? 'bg-emerald-800 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
-                  }`}
-                >
-                  हिंदी
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLang('en');
-                    setMessages([getWelcomeMessage('en')]);
-                  }}
-                  className={`rounded-lg px-3 py-1 text-xs font-black transition-all ${
-                    lang === 'en'
-                      ? 'bg-emerald-800 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
-                  }`}
-                >
-                  English
-                </button>
+              {/* 1-Tap Dynamic Regional Language Switcher Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-white border border-emerald-200 shadow-2xs max-w-full no-scrollbar">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => {
+                      setLang(l.code);
+                      setMessages([getWelcomeMessage(l.code)]);
+                    }}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-black transition-all shrink-0 ${
+                      lang === l.code
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50'
+                    }`}
+                  >
+                    {l.native}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -359,7 +405,19 @@ export default function FarmerChatbot() {
                     {m.suggestions && m.suggestions.length > 0 && (
                       <div className="pt-2 flex flex-col gap-2.5 w-full">
                         <p className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
-                          {lang === 'mr' ? '👇 महत्त्वाचे प्रश्न (टॅप करा):' : lang === 'hi' ? '👇 मुख्य प्रश्न (टैप करें):' : '👇 Common Questions (Tap to ask):'}
+                          {lang === 'mr'
+                            ? '👇 महत्त्वाचे प्रश्न (टॅप करा):'
+                            : lang === 'hi'
+                            ? '👇 मुख्य प्रश्न (टैप करें):'
+                            : lang === 'pa'
+                            ? '👇 ਮੁੱਖ ਸਵਾਲ (ਟੈਪ ਕਰੋ):'
+                            : lang === 'gu'
+                            ? '👇 મુખ્ય પ્રશ્નો (ટેપ કરો):'
+                            : lang === 'te'
+                            ? '👇 ముఖ్యమైన ప్రశ్నలు (నొక్కండి):'
+                            : lang === 'kn'
+                            ? '👇 ಪ್ರಮುಖ ಪ್ರಶ್ನೆಗಳು (ಟ್ಯಾಪ್ ಮಾಡಿ):'
+                            : '👇 Common Questions (Tap to ask):'}
                         </p>
                         {m.suggestions.map((s, sIdx) => (
                           <button
@@ -387,7 +445,19 @@ export default function FarmerChatbot() {
                   <div className="flex items-center gap-2 rounded-2xl bg-white p-4 border border-slate-200 shadow-xs">
                     <Loader2 className="h-5 w-5 animate-spin text-emerald-700" />
                     <span className="font-bold text-slate-800">
-                      {lang === 'mr' ? 'माहिती शोधत आहे…' : lang === 'hi' ? 'उत्तर तैयार कर रहा है…' : 'Finding answer…'}
+                      {lang === 'mr'
+                        ? 'माहिती शोधत आहे…'
+                        : lang === 'hi'
+                        ? 'उत्तर तैयार कर रहा है…'
+                        : lang === 'pa'
+                        ? 'ਜਾਣਕਾਰੀ ਲੱਭ ਰਿਹਾ ਹੈ…'
+                        : lang === 'gu'
+                        ? 'માહિતી શોધી રહ્યું છે…'
+                        : lang === 'te'
+                        ? 'సమాచారం వెతుకుతోంది…'
+                        : lang === 'kn'
+                        ? 'ಮಾಹಿತಿ ಹುಡುಕಲಾಗುತ್ತಿದೆ…'
+                        : 'Finding answer…'}
                     </span>
                   </div>
                 </div>
@@ -415,6 +485,14 @@ export default function FarmerChatbot() {
                       ? 'तुमचा प्रश्न इथे विचारा (गहू, हमीभाव, DBT)...'
                       : lang === 'hi'
                       ? 'अपना प्रश्न यहाँ लिखें (गेहूं, MSP, DBT)...'
+                      : lang === 'pa'
+                      ? 'ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ (ਕਣਕ, MSP, DBT)...'
+                      : lang === 'gu'
+                      ? 'તમારો પ્રશ્ન અહીં લખો (ઘઉં, MSP, DBT)...'
+                      : lang === 'te'
+                      ? 'మీ ప్రశ్నను ఇక్కడ రాయండి (గోధుమలు, MSP, DBT)...'
+                      : lang === 'kn'
+                      ? 'ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ (ಗೋಧಿ, MSP, DBT)...'
                       : 'Ask your doubt here (MSP, Slots, DBT)...'
                   }
                   className="h-13 sm:h-14 flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 text-sm sm:text-base font-bold text-slate-900 outline-none focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 placeholder:font-medium placeholder:text-slate-400"
