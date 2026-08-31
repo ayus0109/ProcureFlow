@@ -566,7 +566,7 @@ export default function FarmerHome() {
         </button>
       </div>
 
-      <AlertsPanel />
+      <AlertsPanel onOpenSmsModal={() => setShowSmsModal(true)} />
 
       <SeasonTracker />
 
