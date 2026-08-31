@@ -11,11 +11,14 @@ import { LANGUAGES, translations } from './translations';
  */
 
 const LanguageContext = createContext(null);
-const STORAGE_KEY = 'procureflow.lang';
+const STORAGE_KEY = 'kisansathi.lang';
 
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : 'en';
+    const saved =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(STORAGE_KEY) || localStorage.getItem('procureflow.lang')
+        : 'en';
     return translations[saved] ? saved : 'en';
   });
 

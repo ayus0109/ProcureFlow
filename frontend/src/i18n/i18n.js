@@ -16,7 +16,10 @@ for (const [code, dict] of Object.entries(translations)) {
   };
 }
 
-const savedLang = typeof window !== 'undefined' ? localStorage.getItem('procureflow.lang') || 'en' : 'en';
+const savedLang =
+  typeof window !== 'undefined'
+    ? localStorage.getItem('kisansathi.lang') || localStorage.getItem('procureflow.lang') || 'en'
+    : 'en';
 
 i18n.use(initReactI18next).init({
   resources,

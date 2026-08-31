@@ -7,11 +7,11 @@ import { api, getToken, setToken } from '../services/api';
  */
 
 const AuthContext = createContext(null);
-const USER_KEY = 'procureflow.user';
+const USER_KEY = 'kisansathi.user';
 
 function readStoredUser() {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = localStorage.getItem(USER_KEY) || localStorage.getItem('procureflow.user');
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;

@@ -1,7 +1,7 @@
 services:
-  procureflow:
+  kisansathi:
     build: .
-    container_name: procureflow-app
+    container_name: kisansathi-app
     ports:
       - "4000:4000"
     environment:

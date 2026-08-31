@@ -5,15 +5,19 @@
  * Express on port 4000, so no CORS and no hardcoded ports anywhere in React.
  */
 
-const TOKEN_KEY = 'procureflow.token';
+const TOKEN_KEY = 'kisansathi.token';
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(TOKEN_KEY) || localStorage.getItem('procureflow.token');
 }
 
 export function setToken(token) {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem('procureflow.token');
+  }
 }
 
 export async function api(path, { method = 'GET', body } = {}) {

@@ -1,7 +1,7 @@
 {
-  "name": "procureflow",
+  "name": "kisansathi",
   "version": "1.0.0",
-  "description": "Smart Digital Agricultural Procurement & Queue Management Platform",
+  "description": "KisanSathi — Smart Digital Agricultural Procurement & Transparent Queue Management Platform",
   "private": true,
   "main": "backend/server.js",
   "scripts": {
@@ -18,12 +18,13 @@
     "node": ">=22.0.0"
   },
   "keywords": [
+    "kisansathi",
     "agritech",
     "govtech",
     "procurement",
     "queue-management",
     "smart-india-hackathon"
   ],
-  "author": "ProcureFlow Team",
+  "author": "KisanSathi Team",
   "license": "MIT"
 }
