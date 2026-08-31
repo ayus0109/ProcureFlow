@@ -63,49 +63,85 @@ function StatCard({ label, value, sub, icon: Icon, color = 'emerald' }) {
 
 function QueueRow({ row, t, onAdvance, onRecord, busy }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 p-4 transition hover:bg-slate-50/80">
-      <div className="flex items-center gap-3">
-        <span
-          className={`grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-sm font-black shadow-xs ${
-            row.atCounter
-              ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white'
-              : 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white'
-          }`}
-          title={row.atCounter ? t('admin.atCounter') : undefined}
-        >
-          {row.atCounter ? '⚡' : `#${row.position}`}
-        </span>
+    <li className="flex flex-wrap items-center justify-between gap-3 p-4 transition hover:bg-slate-50/80 border-b border-slate-100 last:border-b-0">
+      <div className="flex items-start sm:items-center gap-3 min-w-0">
+        {/* Queue Rank Badge */}
+        <div className="flex flex-col items-center shrink-0">
+          <span
+            className={`grid h-11 w-11 place-items-center rounded-2xl text-sm font-black shadow-xs ${
+              row.atCounter
+                ? 'bg-amber-500 text-white'
+                : 'bg-[#133e2b] text-white'
+            }`}
+            title={row.atCounter ? t('admin.atCounter') : `Queue Rank #${row.position}`}
+          >
+            {row.atCounter ? '⚡' : `#${row.position}`}
+          </span>
+          <span className="mt-1 text-[9px] font-extrabold uppercase text-slate-500 tracking-wider">
+            {row.atCounter ? 'Counter' : `Rank #${row.position}`}
+          </span>
+        </div>
 
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-sm font-extrabold text-emerald-950">{row.token}</span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-sm font-black text-[#133e2b]">{row.token}</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 border ${
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 border ${
                 STAGE_STYLES[row.status] || 'bg-slate-100 text-slate-700'
               }`}
             >
               {t(`stage.${row.status}`) || row.status}
             </span>
+            {row.waitLabel && !row.atCounter && (
+              <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                ⏳ ~{row.waitLabel}
+              </span>
+            )}
           </div>
 
-          <p className="text-sm font-bold text-slate-900 mt-0.5">
-            {row.farmer_name}
-            {row.village && <span className="text-xs font-normal text-slate-500"> ({row.village})</span>}
-          </p>
+          {/* Farmer Name, Village, and Phone Number */}
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <p className="text-sm font-bold text-slate-900">
+              {row.farmer_name}
+              {row.village && <span className="text-xs font-normal text-slate-500"> ({row.village})</span>}
+            </p>
 
-          <p className="text-xs text-slate-500 mt-0.5">
+            {row.phone && (
+              <a
+                href={`tel:${row.phone}`}
+                className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#156637] bg-[#f0f7f2] border border-[#d1e7dd] px-2 py-0.5 rounded-md hover:bg-[#d8edd9] transition"
+                title={`Call farmer: ${row.phone}`}
+              >
+                <Phone className="h-3 w-3 text-[#156637]" />
+                <span>{row.phone}</span>
+              </a>
+            )}
+          </div>
+
+          <p className="text-xs text-slate-500 mt-1">
             {t(`crop.${row.crop}`)} • <span className="font-semibold text-slate-700">{row.quantity_qtl} {t('booking.qtl')}</span> • Slot: <span className="font-mono">{row.slot_time}</span>
           </p>
         </div>
       </div>
 
+      {/* Action Controls + Direct Phone Call Button */}
       <div className="flex items-center gap-2">
+        {row.phone && (
+          <a
+            href={`tel:${row.phone}`}
+            className="grid h-10 w-10 place-items-center rounded-xl bg-[#f0f7f2] border border-[#d1e7dd] text-[#156637] hover:bg-[#d8edd9] transition shrink-0"
+            title={`Call ${row.farmer_name} (${row.phone})`}
+          >
+            <Phone className="h-4 w-4" />
+          </a>
+        )}
+
         {row.nextStatus ? (
           <button
             type="button"
             onClick={() => onAdvance(row.id)}
             disabled={busy}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 px-4 text-xs font-bold text-white shadow-xs transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[#156637] hover:bg-[#133e2b] px-4 text-xs font-bold text-white shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-50"
           >
             <span>{t(`action.${row.nextStatus}`) || `Advance to ${row.nextStatus}`}</span>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -114,7 +150,7 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
           <button
             type="button"
             onClick={() => onRecord(row)}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 text-xs font-bold text-white shadow-xs transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 text-xs font-bold text-white shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200"
           >
             <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
             <span>{t('admin.recordProcurement')}</span>
