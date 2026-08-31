@@ -2,33 +2,27 @@ import { Sprout } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
 
 /**
- * Shared shell for entry/auth screens: ambient gradient backdrop,
- * brand header, and centered glass card.
+ * Shared shell for entry/auth screens: Organic warm agricultural background,
+ * clean brand header, and natural card.
  */
 export default function CenteredLayout({ children }) {
   const { t } = useLanguage();
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-950/10 via-slate-50 to-teal-950/10 px-4 py-8 text-slate-900">
-      {/* Background Decorative Rings */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-300/20 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-teal-300/20 blur-3xl" />
-      </div>
-
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#f4f7f4] px-4 py-8 text-slate-900">
       <header className="relative z-10 mb-6 flex flex-col items-center text-center">
         <div className="flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-700/25 ring-4 ring-emerald-600/15">
-            <Sprout className="h-7 w-7" aria-hidden="true" />
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#133e2b] border border-[#206346] text-[#a3e635] shadow-xs">
+            <Sprout className="h-6 w-6" aria-hidden="true" />
           </span>
-          <span className="text-3xl font-extrabold tracking-tight text-emerald-950">
+          <span className="text-3xl font-black tracking-tight text-[#133e2b]">
             {t('app.name')}
           </span>
         </div>
         <p className="mt-2 text-sm font-semibold text-slate-600 max-w-sm">{t('app.tagline')}</p>
       </header>
 
-      <main className="relative z-10 w-full max-w-md rounded-3xl border border-emerald-100/80 bg-white/95 p-6 shadow-xl shadow-slate-200/50 backdrop-blur-md sm:p-8">
+      <main className="relative z-10 w-full max-w-md rounded-3xl border border-[#e2e8e0] bg-white p-6 shadow-sm sm:p-8">
         {children}
       </main>
     </div>

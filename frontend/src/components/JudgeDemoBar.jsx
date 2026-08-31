@@ -86,22 +86,22 @@ export default function JudgeDemoBar() {
 
   return (
     <aside aria-label="Demo Controls" className="fixed bottom-3 left-3 z-50 max-w-xs sm:max-w-sm sm:bottom-4 sm:left-4 sm:right-auto touch-manipulation">
-      <div className="overflow-hidden rounded-2xl border border-emerald-300/80 bg-white/95 shadow-xl backdrop-blur-md ring-1 ring-emerald-950/10 max-h-[85vh] flex flex-col">
+      <div className="overflow-hidden rounded-2xl border border-[#e2e8e0] bg-white shadow-xl max-h-[85vh] flex flex-col">
         {/* Bar Header / Toggle */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center justify-between gap-3 bg-gradient-to-r from-emerald-900 to-teal-900 px-3.5 py-2.5 text-left text-xs font-semibold text-white transition hover:brightness-110 shrink-0"
+          className="flex w-full items-center justify-between gap-3 bg-[#133e2b] px-3.5 py-2.5 text-left text-xs font-bold text-white transition hover:bg-[#0d2a1d] shrink-0"
         >
           <span className="flex items-center gap-1.5 font-mono tracking-wide">
-            <Sparkles className="h-4 w-4 text-emerald-300 animate-pulse" />
-            <span className="truncate">JUDGE TOOLKIT</span>
+            <Sparkles className="h-4 w-4 text-[#a3e635]" />
+            <span className="truncate font-black">JUDGE TOOLKIT</span>
           </span>
           <span className="flex items-center gap-1 shrink-0">
-            <span className="rounded bg-emerald-700/80 px-1.5 py-0.5 text-[10px] text-emerald-100 uppercase">
+            <span className="rounded bg-[#1c563c] border border-[#2b7956] px-1.5 py-0.5 text-[10px] text-emerald-100 uppercase font-mono font-bold">
               {role ? `${role}: ${user?.name?.split(' ')[0]}` : 'Guest'}
             </span>
-            {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+            {isOpen ? <ChevronDown className="h-3.5 w-3.5 text-emerald-200" /> : <ChevronUp className="h-3.5 w-3.5 text-emerald-200" />}
           </span>
         </button>
 

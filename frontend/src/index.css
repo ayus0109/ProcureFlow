@@ -2,6 +2,11 @@
 
 :root {
   color-scheme: light;
+  --bg-sand: #f8faf7;
+  --forest-dark: #133e2b;
+  --forest-primary: #156637;
+  --forest-accent: #2e8540;
+  --amber-harvest: #b45309;
 }
 
 html,
@@ -12,18 +17,46 @@ body,
 
 body {
   margin: 0;
-  background-color: #f4f7f4;
-  color: #16241c;
-  /* Nirmala UI ships with Windows and renders Devanagari properly, which
-     matters because the UI switches to Hindi and Marathi. */
-  font-family: system-ui, -apple-system, 'Segoe UI', 'Nirmala UI',
-    'Noto Sans Devanagari', Roboto, sans-serif;
+  background-color: #f7f9f6;
+  color: #1a2e22;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Nirmala UI',
+    'Noto Sans Devanagari', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* If the device asks for reduced motion, honour it — our transitions are
-   decorative, so nothing is lost by switching them off. */
+/* Subtle, organic card borders & clean shadows */
+.card-natural {
+  background-color: #ffffff;
+  border: 1px solid #e2e8e0;
+  box-shadow: 0 1px 3px rgba(19, 62, 43, 0.04), 0 4px 12px rgba(19, 62, 43, 0.02);
+}
+
+.card-natural-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-natural-hover:hover {
+  border-color: #a3cfbb;
+  box-shadow: 0 4px 16px rgba(19, 62, 43, 0.07);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Accessible reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

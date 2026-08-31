@@ -217,14 +217,15 @@ function Receipt({ p, t }) {
 
 /** Digital Gate Pass with Scannable QR & Stepper */
 function BookingCard({ booking, t, onOpenPass }) {
+  const { lang } = useLanguage();
   const closed = booking.status === 'CONFIRMED' || booking.status === 'REJECTED';
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-emerald-200/80 bg-white p-5 shadow-lg shadow-slate-200/40 sm:p-6">
+    <section className="relative overflow-hidden rounded-3xl border border-[#e2e8e0] bg-white p-5 shadow-xs sm:p-6">
       {/* Top Pass Brand Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#f0f7f2] text-[#156637] border border-[#d1e7dd]">
             <Wheat className="h-6 w-6" />
           </div>
           <div>
@@ -232,12 +233,12 @@ function BookingCard({ booking, t, onOpenPass }) {
               <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
                 {t('booking.token')}
               </p>
-              <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
+              <span className="rounded-md bg-[#f0f7f2] border border-[#d1e7dd] px-2 py-0.5 text-xs font-bold text-[#133e2b]">
                 {t('booking.passBadge')}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <p className="font-mono text-2xl font-extrabold tracking-tight text-emerald-950 sm:text-3xl">
+              <p className="font-mono text-2xl font-black tracking-tight text-[#133e2b] sm:text-3xl">
                 {booking.token}
               </p>
               <SpeakButton
@@ -268,9 +269,9 @@ function BookingCard({ booking, t, onOpenPass }) {
           <button
             type="button"
             onClick={onOpenPass}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#156637] hover:text-[#0d2a1d] hover:underline"
           >
-            <Printer className="h-4 w-4 text-emerald-700" />
+            <Printer className="h-4 w-4 text-[#156637]" />
             <span>{t('booking.printPass')}</span>
           </button>
         </div>

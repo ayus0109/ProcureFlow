@@ -19,50 +19,50 @@ export default function SeasonTracker() {
   const paidPct = data.earned > 0 ? Math.round((data.paid / data.earned) * 100) : 100;
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+    <section className="overflow-hidden rounded-3xl border border-[#e2e8e0] bg-white p-4 sm:p-6 shadow-xs">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-50 text-emerald-800">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#f0f7f2] text-[#156637] border border-[#d1e7dd]">
             <Wallet className="h-4 w-4" />
           </span>
           <div>
-            <h2 className="text-sm font-bold tracking-wider text-slate-800 uppercase">
+            <h2 className="text-xs sm:text-sm font-black tracking-wider text-[#133e2b] uppercase">
               {t('tracker.title')}
             </h2>
-            <p className="text-xs text-slate-500">Official seasonal sales & DBT payout ledger</p>
+            <p className="text-[11px] sm:text-xs text-slate-500">Official seasonal sales & DBT payout ledger</p>
           </div>
         </div>
-        <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
+        <span className="rounded-full bg-[#f0f7f2] border border-[#d1e7dd] px-2.5 py-0.5 text-[11px] font-bold text-[#156637]">
           Kharif / Rabi 2026
         </span>
       </div>
 
       <div className="mt-4 space-y-4">
         {/* Total Revenue Hero Card */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 p-4 sm:p-5 text-white shadow-md">
+        <div className="relative overflow-hidden rounded-2xl bg-[#133e2b] border border-[#206346] p-4 sm:p-5 text-white shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-200 uppercase tracking-wider truncate">
-              <TrendingUp className="h-4 w-4 text-emerald-400 shrink-0" />
+              <TrendingUp className="h-4 w-4 text-[#a3e635] shrink-0" />
               <span className="truncate">{t('tracker.earned')}</span>
             </span>
-            <span className="font-mono text-[11px] sm:text-xs text-emerald-200 bg-emerald-950/60 px-2 py-0.5 rounded shrink-0">
+            <span className="font-mono text-[11px] sm:text-xs text-emerald-200 bg-[#0d2a1d] px-2 py-0.5 rounded shrink-0 border border-[#1b5139]">
               {data.sales} Confirmed Sale{data.sales > 1 ? 's' : ''}
             </span>
           </div>
-          <p className="mt-2 font-mono text-2xl sm:text-4xl font-black tracking-tight truncate">
+          <p className="mt-2 font-mono text-2xl sm:text-4xl font-black tracking-tight truncate text-white">
             {money(data.earned)}
           </p>
 
           {/* Payout Progress Bar */}
           <div className="mt-3 sm:mt-4">
-            <div className="flex flex-wrap justify-between text-[11px] sm:text-xs font-medium text-emerald-100 mb-1 gap-1">
-              <span className="truncate">Paid Out: <strong>{money(data.paid)}</strong> ({paidPct}%)</span>
-              <span className="truncate">Awaiting: <strong>{money(data.awaiting)}</strong></span>
+            <div className="flex flex-wrap justify-between text-[11px] sm:text-xs font-medium text-emerald-200 mb-1.5 gap-1">
+              <span className="truncate">Paid Out: <strong className="text-white">{money(data.paid)}</strong> ({paidPct}%)</span>
+              <span className="truncate">Awaiting: <strong className="text-white">{money(data.awaiting)}</strong></span>
             </div>
-            <div className="h-2 w-full rounded-full bg-emerald-950/80 overflow-hidden">
+            <div className="h-2.5 w-full rounded-full bg-[#0d2a1d] overflow-hidden border border-[#1b5139]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#a3e635] transition-all duration-500"
                 style={{ width: `${paidPct}%` }}
               />
             </div>

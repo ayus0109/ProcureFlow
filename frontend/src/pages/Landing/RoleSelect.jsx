@@ -14,7 +14,7 @@ export default function RoleSelect() {
       Icon: Wheat,
       title: t('role.farmer'),
       desc: t('role.farmerDesc'),
-      color: 'from-emerald-500 to-green-600',
+      iconBg: 'bg-[#133e2b] text-[#a3e635] border border-[#206346]',
       badge: t('role.farmerBadge'),
     },
     {
@@ -22,7 +22,7 @@ export default function RoleSelect() {
       Icon: ClipboardCheck,
       title: t('role.admin'),
       desc: t('role.adminDesc'),
-      color: 'from-teal-600 to-cyan-700',
+      iconBg: 'bg-[#1e3a47] text-cyan-300 border border-[#2e5363]',
       badge: t('role.staffBadge'),
     },
   ];
@@ -30,7 +30,7 @@ export default function RoleSelect() {
   return (
     <CenteredLayout>
       <div className="mb-5">
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#133e2b]">
           {t('role.heading')}
         </h1>
         <p className="text-sm font-medium text-slate-600 mt-1">
@@ -39,27 +39,27 @@ export default function RoleSelect() {
       </div>
 
       <div className="space-y-3.5">
-        {roles.map(({ to, Icon, title, desc, color, badge }) => (
+        {roles.map(({ to, Icon, title, desc, iconBg, badge }) => (
           <Link
             key={to}
             to={to}
-            className="group relative flex min-h-22 items-center gap-4 rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-md hover:shadow-emerald-900/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+            className="group relative flex min-h-22 items-center gap-4 rounded-2xl border border-[#e2e8e0] bg-white p-4 transition-all duration-150 hover:border-[#156637] hover:bg-[#fafcfa] hover:shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
           >
-            <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${color} text-white shadow-md shadow-emerald-900/10`}>
+            <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${iconBg} shadow-xs`}>
               <Icon className="h-7 w-7" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="mb-0.5 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 uppercase">
+              <span className="mb-0.5 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
                 {badge}
               </span>
-              <span className="block text-base font-bold text-slate-900 group-hover:text-emerald-950">
+              <span className="block text-base font-bold text-slate-900 group-hover:text-[#133e2b]">
                 {title}
               </span>
               <span className="block text-xs text-slate-500 line-clamp-1">
                 {desc}
               </span>
             </span>
-            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-emerald-600" aria-hidden="true" />
+            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-[#156637]" aria-hidden="true" />
           </Link>
         ))}
       </div>

@@ -35,14 +35,14 @@ export default function LanguageSelect() {
                 onClick={() => choose(l.code)}
                 lang={l.code}
                 aria-current={active ? 'true' : undefined}
-                className={`group flex min-h-14 w-full items-center justify-between rounded-2xl border-2 px-4 py-2.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 touch-manipulation ${
+                className={`group flex min-h-14 w-full items-center justify-between rounded-2xl border-2 px-4 py-2.5 text-left transition-all duration-150 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 touch-manipulation ${
                   active
-                    ? 'border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-xs ring-1 ring-emerald-500/30'
-                    : 'border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50/40'
+                    ? 'border-[#156637] bg-[#f0f7f2] shadow-xs'
+                    : 'border-[#e2e8e0] bg-white hover:border-[#84a98c] hover:bg-[#f9fbf9]'
                 }`}
               >
                 <div>
-                  <span className="block text-lg font-extrabold text-slate-900 group-hover:text-emerald-950">
+                  <span className="block text-lg font-extrabold text-[#133e2b] group-hover:text-[#0d2a1d]">
                     {l.native}
                   </span>
                   <span className="block text-[11px] font-medium text-slate-500">

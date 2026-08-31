@@ -274,18 +274,17 @@ export default function FarmerChatbot() {
 
   return (
     <>
-      {/* Floating Trigger Button (Compact Floating Circle) */}
+      {/* Floating Trigger Button (Clean Natural Assistant) */}
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-5 z-50 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 shadow-2xl shadow-emerald-950/50 ring-4 ring-emerald-300/40 transition-all hover:scale-105 active:scale-95 group"
-          aria-label="Kisan Sahayak Chatbot"
+          className="fixed bottom-6 right-5 z-50 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-[#133e2b] border-2 border-[#2b7956] text-white shadow-xl transition-all hover:scale-105 hover:bg-[#0d2a1d] active:scale-95 group touch-manipulation"
+          aria-label="Kisan Sahayak Assistant"
         >
-          <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-50 animate-ping" />
-          <Bot className="relative h-7 w-7 text-white" />
-          <span className="absolute -top-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950 shadow-xs">
-            AI
+          <Bot className="h-7 w-7 text-[#a3e635]" />
+          <span className="absolute -top-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-[#f59e0b] text-[10px] font-black text-slate-950 shadow-xs border border-white">
+            💬
           </span>
         </button>
       )}
@@ -293,22 +292,22 @@ export default function FarmerChatbot() {
       {/* Interactive Chat Window Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs sm:items-center sm:justify-center sm:p-4 animate-fadeIn">
-          <div className="flex h-[95dvh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[700px] sm:max-w-xl sm:rounded-3xl overflow-hidden border border-slate-200">
+          <div className="flex h-[95dvh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:h-[700px] sm:max-w-xl sm:rounded-3xl overflow-hidden border border-[#e2e8e0]">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-emerald-900/20 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 px-4 sm:px-5 py-4 text-white">
+            <div className="flex items-center justify-between border-b border-[#0d2a1d] bg-[#133e2b] px-4 sm:px-5 py-4 text-white">
               <div className="flex items-center gap-3">
-                <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
-                  <Bot className="h-7 w-7 text-white" />
-                  <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-emerald-900" />
+                <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#1c563c] border border-[#2b7956] text-[#a3e635]">
+                  <Bot className="h-6 w-6" />
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#a3e635] ring-2 ring-[#133e2b]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black tracking-wide flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black tracking-wide flex items-center gap-2 text-white">
                     <span>{currentBotTitle.title}</span>
-                    <span className="rounded-full bg-emerald-500/40 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-100 border border-emerald-400/40">
+                    <span className="rounded-full bg-[#1c563c] px-2 py-0.5 text-[10px] font-bold text-emerald-200 border border-[#2b7956]">
                       Online
                     </span>
                   </h3>
-                  <p className="text-xs font-medium text-emerald-200">
+                  <p className="text-xs font-medium text-emerald-200/90">
                     {currentBotTitle.sub}
                   </p>
                 </div>
@@ -319,14 +318,14 @@ export default function FarmerChatbot() {
                   type="button"
                   onClick={() => setMessages([getWelcomeMessage(lang)])}
                   title="Reset Chat"
-                  className="grid h-10 w-10 place-items-center rounded-2xl bg-white/15 text-emerald-100 hover:bg-white/25 transition shadow-2xs"
+                  className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c563c] text-emerald-100 hover:bg-[#256f4e] transition"
                 >
-                  <RotateCcw className="h-5 w-5" />
+                  <RotateCcw className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-2xl bg-white/15 text-emerald-100 hover:bg-white/25 transition shadow-2xs"
+                  className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c563c] text-emerald-100 hover:bg-[#256f4e] transition"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -394,7 +393,7 @@ export default function FarmerChatbot() {
                           setOpen(false);
                           navigate(m.action.link);
                         }}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-5 py-3 text-sm font-black text-white shadow-md hover:brightness-110 transition"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-[#156637] hover:bg-[#133e2b] px-5 py-3 text-sm font-black text-white shadow-xs transition"
                       >
                         <span>{m.action.label}</span>
                         <ChevronRight className="h-4 w-4" />
@@ -403,7 +402,7 @@ export default function FarmerChatbot() {
 
                     {/* Touch-Friendly Suggestion Cards */}
                     {m.suggestions && m.suggestions.length > 0 && (
-                      <div className="pt-2 flex flex-col gap-2.5 w-full">
+                      <div className="pt-2 flex flex-col gap-2 w-full">
                         <p className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
                           {lang === 'mr'
                             ? '👇 महत्त्वाचे प्रश्न (टॅप करा):'
@@ -424,10 +423,10 @@ export default function FarmerChatbot() {
                             key={sIdx}
                             type="button"
                             onClick={() => handleSend(s)}
-                            className="w-full rounded-2xl border-2 border-emerald-200/90 bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-white p-3.5 sm:p-4 text-xs sm:text-sm font-extrabold text-emerald-950 hover:border-emerald-500 hover:bg-emerald-100 shadow-xs hover:shadow-sm transition-all active:scale-98 flex items-center justify-between text-left group"
+                            className="w-full rounded-2xl border border-[#e2e8e0] bg-[#f9fbf9] p-3.5 sm:p-4 text-xs sm:text-sm font-bold text-[#133e2b] hover:border-[#156637] hover:bg-white shadow-xs transition-all active:scale-98 flex items-center justify-between text-left group"
                           >
                             <span className="leading-snug pr-2">{s}</span>
-                            <ChevronRight className="h-5 w-5 shrink-0 text-emerald-700 group-hover:translate-x-1 transition-transform" />
+                            <ChevronRight className="h-4 w-4 shrink-0 text-[#156637] group-hover:translate-x-1 transition-transform" />
                           </button>
                         ))}
                       </div>
@@ -439,11 +438,11 @@ export default function FarmerChatbot() {
               {/* Bot typing loading state */}
               {loading && (
                 <div className="flex items-center gap-3 text-sm text-slate-500">
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-emerald-800">
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-[#f0f7f2] text-[#156637]">
                     <Bot className="h-5 w-5" />
                   </div>
-                  <div className="flex items-center gap-2 rounded-2xl bg-white p-4 border border-slate-200 shadow-xs">
-                    <Loader2 className="h-5 w-5 animate-spin text-emerald-700" />
+                  <div className="flex items-center gap-2 rounded-2xl bg-white p-4 border border-[#e2e8e0] shadow-xs">
+                    <Loader2 className="h-5 w-5 animate-spin text-[#156637]" />
                     <span className="font-bold text-slate-800">
                       {lang === 'mr'
                         ? 'माहिती शोधत आहे…'
@@ -495,14 +494,14 @@ export default function FarmerChatbot() {
                       ? 'ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ (ಗೋಧಿ, MSP, DBT)...'
                       : 'Ask your doubt here (MSP, Slots, DBT)...'
                   }
-                  className="h-13 sm:h-14 flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 text-sm sm:text-base font-bold text-slate-900 outline-none focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 placeholder:font-medium placeholder:text-slate-400"
+                  className="h-13 sm:h-14 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm sm:text-base font-bold text-slate-900 outline-none focus:border-[#156637] focus:bg-white focus:ring-2 focus:ring-emerald-100 placeholder:font-medium placeholder:text-slate-400"
                 />
 
                 {/* Send Button */}
                 <button
                   type="submit"
                   disabled={!input.trim() || loading}
-                  className="grid h-13 w-13 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 text-white shadow-md hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="grid h-13 w-13 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-[#156637] hover:bg-[#133e2b] text-white shadow-xs disabled:opacity-40 disabled:cursor-not-allowed transition"
                   title="Send"
                 >
                   <Send className="h-5 w-5" />

@@ -179,7 +179,7 @@ export default function BookSlot() {
   return (
     <AppShell title={t('book.title')} subtitle={t('book.sub')}>
       {/* 🧭 STEP INDICATOR PROGRESS BAR (1 -> 2 -> 3) */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-5 shadow-xs">
+      <div className="rounded-3xl border border-[#e2e8e0] bg-white p-3 sm:p-5 shadow-xs">
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {/* Step 1 Pill */}
           <button
@@ -187,14 +187,14 @@ export default function BookSlot() {
             onClick={() => setStep(1)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 1
-                ? 'bg-emerald-800 text-white shadow-sm ring-2 ring-emerald-600/30'
+                ? 'bg-[#133e2b] text-white shadow-xs'
                 : centreId
-                ? 'bg-emerald-50 text-emerald-950 border border-emerald-200 hover:bg-emerald-100/70'
+                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd] hover:bg-[#e4f2e8]'
                 : 'bg-slate-50 text-slate-400'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 1 ? 'bg-white text-emerald-950' : centreId ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+              step === 1 ? 'bg-white text-[#133e2b]' : centreId ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {centreId && step !== 1 ? <Check className="h-4 w-4" /> : '1'}
             </div>
@@ -215,14 +215,14 @@ export default function BookSlot() {
             onClick={() => centreId && setStep(2)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 2
-                ? 'bg-emerald-800 text-white shadow-sm ring-2 ring-emerald-600/30'
+                ? 'bg-[#133e2b] text-white shadow-xs'
                 : isStep2Valid
-                ? 'bg-emerald-50 text-emerald-950 border border-emerald-200 hover:bg-emerald-100/70'
+                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd] hover:bg-[#e4f2e8]'
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 2 ? 'bg-white text-emerald-950' : isStep2Valid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+              step === 2 ? 'bg-white text-[#133e2b]' : isStep2Valid ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep2Valid && step !== 2 ? <Check className="h-4 w-4" /> : '2'}
             </div>
@@ -243,14 +243,14 @@ export default function BookSlot() {
             onClick={() => centreId && isStep2Valid && setStep(3)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 3
-                ? 'bg-emerald-800 text-white shadow-sm ring-2 ring-emerald-600/30'
+                ? 'bg-[#133e2b] text-white shadow-xs'
                 : isStep3Valid
-                ? 'bg-emerald-50 text-emerald-950 border border-emerald-200'
+                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd]'
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 3 ? 'bg-white text-emerald-950' : isStep3Valid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+              step === 3 ? 'bg-white text-[#133e2b]' : isStep3Valid ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep3Valid && step !== 3 ? <Check className="h-4 w-4" /> : '3'}
             </div>
