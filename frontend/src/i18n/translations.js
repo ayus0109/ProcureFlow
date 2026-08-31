@@ -350,7 +350,7 @@ export const translations = {
     'ekycModal.success': 'Aadhaar e-KYC Verified Successfully!',
 
     'smsModal.title': 'SMS & WhatsApp Dispatch Logs',
-    'smsModal.sub': 'Live simulated notifications sent to your registered mobile number',
+    'smsModal.sub': 'Alerts sent to your mobile',
     'smsModal.empty': 'No messages dispatched yet.',
 
     'historyModal.title': 'All Bookings & Procurement History',
@@ -711,7 +711,7 @@ export const translations = {
     'ekycModal.success': 'आधार e-KYC सफलतापूर्वक सत्यापित हो गया!',
 
     'smsModal.title': 'SMS एवं WhatsApp संदेश लॉग',
-    'smsModal.sub': 'आपके पंजीकृत मोबाइल नंबर पर भेजे गए लाइव संदेश',
+    'smsModal.sub': 'मोबाइल पर भेजे गए संदेश',
     'smsModal.empty': 'अभी तक कोई संदेश नहीं भेजा गया है।',
 
     'historyModal.title': 'समस्त बुकिंग एवं खरीद इतिहास',
@@ -1072,7 +1072,7 @@ export const translations = {
     'ekycModal.success': 'आधार e-KYC यशस्वीरीत्या पूर्ण झाले!',
 
     'smsModal.title': 'SMS व WhatsApp संदेश इतिहास',
-    'smsModal.sub': 'तुमच्या मोबाईलवर पाठवण्यात आलेल्या अधिकृत संदेशांची नोंद',
+    'smsModal.sub': 'मोबाईलवर पाठवलेले संदेश',
     'smsModal.empty': 'अद्याप कोणतेही संदेश पाठवले नाहीत.',
 
     'historyModal.title': 'सर्व नोंदणी व खरेदी इतिहास',
@@ -1433,7 +1433,7 @@ export const translations = {
     'ekycModal.success': 'ਆਧਾਰ e-KYC ਸਫਲਤਾਪੂਰਵਕ ਤਸਦੀਕ ਹੋ ਗਿਆ!',
 
     'smsModal.title': 'SMS ਅਤੇ WhatsApp ਸੁਨੇਹੇ ਲੌਗ',
-    'smsModal.sub': 'ਤੁਹਾਡੇ ਮੋਬਾਈਲ ਤੇ ਭੇਜੇ ਗਏ ਸਰਕਾਰੀ ਸੁਨੇਹਿਆਂ ਦਾ ਰਿਕਾਰਡ',
+    'smsModal.sub': 'ਮੋਬਾਈਲ ਤੇ ਭੇਜੇ ਗਏ ਸੁਨੇਹੇ',
     'smsModal.empty': 'ਅਜੇ ਤੱਕ ਕੋਈ ਸੁਨੇਹਾ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ ਹੈ।',
 
     'historyModal.title': 'ਸਾਰੀਆਂ ਬੁਕਿੰਗਾਂ ਅਤੇ ਖਰੀਦ ਇਤਿਹਾਸ',
@@ -1794,7 +1794,7 @@ export const translations = {
     'ekycModal.success': 'આધાર e-KYC સફળતાપૂર્વક પૂર્ણ થયું!',
 
     'smsModal.title': 'SMS અને WhatsApp સંદેશ લોગ',
-    'smsModal.sub': 'તમારા મોબાઇલ પર મોકલવામાં આવેલા સરકારી સંદેશાઓનો રેકોર્ડ',
+    'smsModal.sub': 'મોબાઇલ પર મોકલેલ સંદેશાઓ',
     'smsModal.empty': 'હજી સુધી કોઈ સંદેશ મોકલવામાં આવ્યો નથી.',
 
     'historyModal.title': 'તમામ બુકિંગ અને ખરીદ ઇતિહાસ',
@@ -2155,7 +2155,7 @@ export const translations = {
     'ekycModal.success': 'ఆధార్ e-KYC విజయవంతంగా ధృవీకరించబడింది!',
 
     'smsModal.title': 'SMS & WhatsApp సందేశాల లాగ్',
-    'smsModal.sub': 'మీ మొబైల్‌కు పంపబడిన ప్రభుత్వ సందేశాల రికార్డు',
+    'smsModal.sub': 'మొబైల్‌కు పంపిన సందేశాలు',
     'smsModal.empty': 'ఇంకా ఎలాంటి సందేశాలు పంపబడలేదు.',
 
     'historyModal.title': 'అన్ని బుకింగ్‌లు & సేకరణ చరిత్ర',
@@ -2516,7 +2516,7 @@ export const translations = {
     'ekycModal.success': 'ಆಧಾರ್ e-KYC ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಂಡಿದೆ!',
 
     'smsModal.title': 'SMS ಮತ್ತು WhatsApp ಸಂದೇಶಗಳ ಲಾಗ್',
-    'smsModal.sub': 'ನಿಮ್ಮ ಮೊಬೈಲ್‌ಗೆ ಕಳುಹಿಸಲಾದ ಸರ್ಕಾರಿ ಸಂದೇಶಗಳ ದಾಖಲೆ',
+    'smsModal.sub': 'ಮೊಬೈಲ್‌ಗೆ ಕಳುಹಿಸಲಾದ ಸಂದೇಶಗಳು',
     'smsModal.empty': 'ಇನ್ನೂ ಯಾವುದೇ ಸಂದೇಶಗಳನ್ನು ಕಳುಹಿಸಲಾಗಿಲ್ಲ.',
 
     'historyModal.title': 'ಎಲ್ಲಾ ಬುಕಿಂಗ್‌ಗಳು ಮತ್ತು ಖರೀದಿ ಇತಿಹಾಸ',
