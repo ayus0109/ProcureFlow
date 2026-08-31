@@ -25,10 +25,7 @@ export default function CenteredLayout({ children }) {
             {t('app.name')}
           </span>
         </div>
-        <p className="mt-2 text-sm font-medium text-slate-600">{t('app.tagline')}</p>
-        <span className="mt-1 rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 border border-emerald-300/50">
-          Smart APMC Procurement Portal
-        </span>
+        <p className="mt-2 text-sm font-semibold text-slate-600 max-w-sm">{t('app.tagline')}</p>
       </header>
 
       <main className="relative z-10 w-full max-w-md rounded-3xl border border-emerald-100/80 bg-white/95 p-6 shadow-xl shadow-slate-200/50 backdrop-blur-md sm:p-8">
