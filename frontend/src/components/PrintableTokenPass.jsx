@@ -28,10 +28,11 @@ import {
 } from 'lucide-react';
 import QRCode from './QRCode.jsx';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
+import { formatWhatsAppPass } from '../utils/localizedMessages.js';
 
 export function PrintableTokenPass({ booking, farmer, onClose }) {
   const printRef = useRef(null);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   if (!booking) return null;
 
@@ -40,19 +41,7 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
   };
 
   const handleWhatsAppShare = () => {
-    const text =
-      `🌾 *KisanSathi Official Mandi Pass*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `🎟️ *Token Number:* ${booking.token}\n` +
-      `👨‍🌾 *Farmer:* ${farmer?.name || 'Farmer'}\n` +
-      `🏛️ *Centre:* ${t(`centre.${booking.centre_id}`) || booking.centre_name} (${booking.district})\n` +
-      `📅 *Date:* ${booking.slot_date}\n` +
-      `⏰ *Time Slot:* ${booking.slot_time}\n` +
-      `🌾 *Crop:* ${t(`crop.${booking.crop}`) || booking.crop} (${booking.quantity_qtl} Quintals)\n` +
-      `📍 *Arrive By:* ${booking.arriveBy || booking.slot_time.split('-')[0]}\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `Please carry your Aadhaar card and bank passbook. Track live status at https://kisansathi.gov.in`;
-
+    const text = formatWhatsAppPass(booking, farmer, lang, t);
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };

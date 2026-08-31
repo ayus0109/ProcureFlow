@@ -66,10 +66,11 @@ function dispatchBookingSms(farmer, booking) {
     farmerId: farmer.id,
     phone: farmer.phone,
     message: `🌾 *KisanSathi Mandi Pass*\n` +
-      `नमस्ते ${farmer.name} जी, आपका टोकन *${booking.token}* बुक हो चुका है।\n` +
-      `📅 दिनांक: ${booking.slot_date} [${booking.slot_time}]\n` +
-      `🏛️ केंद्र: ${booking.centre_name}\n` +
-      `🌾 फसल: ${booking.cropLabel || booking.crop} (${booking.quantity_qtl} क्विंटल)`,
+      `Dear ${farmer.name}, your token *${booking.token}* has been booked successfully.\n` +
+      `📅 Date: ${booking.slot_date} [${booking.slot_time}]\n` +
+      `🏛️ Centre: ${booking.centre_name}\n` +
+      `🌾 Crop: ${booking.cropLabel || booking.crop} (${booking.quantity_qtl} qtl)\n` +
+      `⏰ Arrive by: ${booking.arriveBy || booking.slot_time.split('-')[0]}`,
     channel: 'WHATSAPP',
     type: 'BOOKING_CONFIRMED',
   });

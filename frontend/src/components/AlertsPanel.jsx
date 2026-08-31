@@ -12,6 +12,7 @@ import {
 import { api } from '../services/api';
 import { usePoll } from '../hooks/usePoll.js';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
+import { formatAlertMessage } from '../utils/localizedMessages.js';
 
 const TYPES = {
   ACTION: { Icon: BellRing, tint: 'bg-amber-100 text-amber-900 ring-1 ring-amber-300' },
@@ -23,7 +24,7 @@ const TYPES = {
 const clock = (s) => (typeof s === 'string' ? s.slice(11, 16) : '');
 
 export default function AlertsPanel({ onOpenSmsModal }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { data, loading, setData } = usePoll(() => api('/notifications'), 5000, []);
   const [marking, setMarking] = useState(false);
   const [justMarked, setJustMarked] = useState(false);
@@ -138,12 +139,12 @@ export default function AlertsPanel({ onOpenSmsModal }) {
                   <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="leading-relaxed">{item.message}</p>
+                  <p className="leading-relaxed">{formatAlertMessage(item.message, lang)}</p>
                   <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400 font-mono">
                     <span>{clock(item.created_at)}</span>
                     {!item.is_read && (
                       <span className="font-sans font-bold text-emerald-700 text-[10px]">
-                        ● Unread (tap to mark read)
+                        ● {t('alerts.new')}
                       </span>
                     )}
                   </div>

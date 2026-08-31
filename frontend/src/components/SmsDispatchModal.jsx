@@ -12,9 +12,10 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../i18n/LanguageContext.jsx';
+import { formatLogMessage } from '../utils/localizedMessages.js';
 
 export function SmsDispatchModal({ farmerId, onClose }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,14 +31,24 @@ export function SmsDispatchModal({ farmerId, onClose }) {
     fetchLogs();
   }, [farmerId]);
 
+  const footerNotes = {
+    hi: '💡 स्लॉट बुकिंग, काउंटर बुलावा और डीबीटी भुगतान जारी होने पर स्वचालित रूप से संदेश भेजे जाते हैं।',
+    mr: '💡 स्लॉट बुकिंग, काऊंटर बोलावणे आणि डीबीटी पेमेंट मंजुरीवर स्वयंचलित संदेश पाठवले जातात.',
+    pa: '💡 ਸਲਾਟ ਬੁਕਿੰਗ, ਕਾਊਂਟਰ ਬੁਲਾਉਣ ਅਤੇ ਡੀਬੀਟੀ ਭੁਗਤਾਨ ਜਾਰੀ ਹੋਣ ਤੇ ਆਪਣੇ ਆਪ ਸੁਨੇਹੇ ਭੇਜੇ ਜਾਂਦੇ ਹਨ।',
+    gu: '💡 સ્લોટ બુકિંગ, કાઉન્ટર બોલાવવા અને ડીબીટી ચુકવણી રિલીઝ પર આપમેળે સંદેશાઓ મોકલવામાં આવે છે.',
+    te: '💡 స్లాట్ బుకింగ్, కౌంటర్ కాల్ మరియు డిబిటి చెల్లింపు విడుదలపై ఆటోమేటిక్ సందేశాలు పంపబడతాయి.',
+    kn: '💡 ಸ್ಲಾಟ್ ಬುಕಿಂಗ್, ಕೌಂಟರ್ ಕರೆ ಮತ್ತು ಡಿಬಿಟಿ ಪಾವತಿ ಬಿಡುಗಡೆಯಾದಾಗ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸಂದೇಶಗಳು ಕಳುಹಿಸಲ್ಪಡುತ್ತವೆ.',
+    en: '💡 Messages are triggered automatically on Slot Booking, Counter Calling & DBT Payment releases.',
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
       <div className="relative flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-emerald-800/20 bg-gradient-to-r from-emerald-800 to-teal-900 px-5 py-4 text-white">
+        <div className="flex items-center justify-between border-b border-[#0d2a1d] bg-[#133e2b] px-5 py-4 text-white">
           <div className="flex items-center gap-2.5">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/20">
-              <Smartphone className="h-5 w-5 text-white" />
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c563c] border border-[#2b7956] text-[#a3e635]">
+              <Smartphone className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-sm font-extrabold">{t('smsModal.title')}</h3>
@@ -73,7 +84,11 @@ export function SmsDispatchModal({ farmerId, onClose }) {
               <MessageSquare className="mx-auto h-10 w-10 text-slate-300 mb-2" />
               <p className="font-bold text-sm text-slate-700">{t('smsModal.empty')}</p>
               <p className="text-xs text-slate-400 mt-1">
-                Book a slot or advance queue to trigger automated SMS dispatches.
+                {lang === 'mr'
+                  ? 'स्लॉट बुक केल्यावर किंवा रांग पुढे सरकल्यावर स्वयंचलित SMS संदेश येथे दिसतील.'
+                  : lang === 'hi'
+                  ? 'स्लॉट बुक करने या कतार आगे बढ़ने पर स्वचालित SMS संदेश यहाँ दिखाई देंगे।'
+                  : 'Book a slot or advance queue to trigger automated SMS dispatches.'}
               </p>
             </div>
           )}
@@ -107,9 +122,9 @@ export function SmsDispatchModal({ farmerId, onClose }) {
                 </div>
               </div>
 
-              {/* Message text */}
+              {/* Message text - Localized in active language */}
               <p className="text-xs text-slate-800 leading-relaxed font-sans whitespace-pre-line">
-                {log.message}
+                {formatLogMessage(log, lang, t)}
               </p>
 
               <div className="mt-2.5 flex items-center justify-between text-[10px] text-slate-400 font-mono">
@@ -122,7 +137,7 @@ export function SmsDispatchModal({ farmerId, onClose }) {
 
         {/* Footer info note */}
         <div className="border-t border-slate-200 bg-white p-3.5 text-center text-xs text-slate-500 font-medium">
-          💡 Messages are triggered automatically on Slot Booking, Counter Calling & DBT Payment releases.
+          {footerNotes[lang] || footerNotes.en}
         </div>
       </div>
     </div>
