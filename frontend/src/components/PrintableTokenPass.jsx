@@ -47,22 +47,22 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white print:fixed-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white print:fixed-none">
       <div
         ref={printRef}
-        className="relative my-auto w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl print:shadow-none print:max-w-none print:w-full border border-slate-200"
+        className="relative my-auto w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl print:shadow-none print:max-w-none print:w-full border border-[#d5ead8]"
       >
         {/* Action Header - Hidden on Print */}
-        <div className="flex items-center justify-between border-b border-emerald-800/20 bg-gradient-to-r from-emerald-800 to-teal-800 px-5 py-3 text-white print:hidden">
-          <div className="flex items-center gap-2 font-bold text-sm">
-            <ShieldCheck className="h-5 w-5 text-emerald-300" />
-            <span>{t('pass.title')}</span>
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 border-b border-[#d5ead8] bg-[#2d6a4f] px-4 py-3 text-white print:hidden">
+          <div className="flex items-center gap-2 font-bold text-xs sm:text-sm truncate">
+            <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-[#52b788] shrink-0" />
+            <span className="truncate">{t('pass.title')}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={handleWhatsAppShare}
-              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-xs"
+              className="flex items-center gap-1 rounded-xl bg-[#25D366] px-2.5 py-1.5 text-xs font-bold text-white hover:brightness-110 transition shadow-2xs"
             >
               <Share2 className="h-3.5 w-3.5" />
               <span>WhatsApp</span>
@@ -70,9 +70,9 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-emerald-950 hover:bg-slate-100 transition shadow-xs"
+              className="flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-bold text-[#1b4332] hover:bg-[#eef7f0] transition shadow-2xs"
             >
-              <Printer className="h-3.5 w-3.5 text-emerald-800" />
+              <Printer className="h-3.5 w-3.5 text-[#2d6a4f]" />
               <span>{t('common.print')}</span>
             </button>
             <button
@@ -86,7 +86,7 @@ export function PrintableTokenPass({ booking, farmer, onClose }) {
         </div>
 
         {/* Printable Pass Body */}
-        <div className="p-6 sm:p-8 space-y-6">
+        <div className="p-5 sm:p-8 space-y-5 sm:space-y-6">
           {/* Govt & APMC Header */}
           <div className="flex items-center justify-between border-b-2 border-dashed border-slate-200 pb-4">
             <div className="flex items-center gap-3">

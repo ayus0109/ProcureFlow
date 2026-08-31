@@ -3,15 +3,16 @@ import React from 'react';
 /**
  * Handcrafted KisanSathi Brand Emblem & Typography Logo.
  * Features a golden harvest wheat sheaf, rising morning sun, and flourishing emerald leaves.
+ * Fully responsive on all mobile and desktop viewports.
  */
-export function KisanLogoMark({ className = 'h-9 w-9', variant = 'default' }) {
+export function KisanLogoMark({ className = 'h-8 w-8 sm:h-9 sm:w-9' }) {
   return (
     <div className={`relative shrink-0 flex items-center justify-center ${className}`}>
       <svg
         viewBox="0 0 48 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-xs"
+        className="w-full h-full drop-shadow-2xs"
       >
         <defs>
           <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -119,28 +120,36 @@ export function KisanLogoMark({ className = 'h-9 w-9', variant = 'default' }) {
 export default function KisanLogo({
   size = 'md',
   showTagline = true,
-  theme = 'dark', // 'dark' (on green header) or 'light' (on white page)
+  theme = 'light',
   subtitleText,
 }) {
   const isLg = size === 'lg';
   const isSm = size === 'sm';
 
-  const markSize = isLg ? 'h-13 w-13' : isSm ? 'h-8 w-8' : 'h-10 w-10';
+  const markSize = isLg
+    ? 'h-11 w-11 sm:h-13 sm:w-13'
+    : isSm
+    ? 'h-7 w-7 sm:h-8 sm:w-8'
+    : 'h-8 w-8 sm:h-9 sm:w-9';
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
       <KisanLogoMark className={markSize} />
       <div className="min-w-0">
         <div className="flex items-center gap-1.5">
           <span
             className={`font-black tracking-tight leading-none ${
-              isLg ? 'text-2xl sm:text-3xl' : isSm ? 'text-base' : 'text-lg sm:text-xl'
+              isLg
+                ? 'text-2xl sm:text-3xl'
+                : isSm
+                ? 'text-sm sm:text-base'
+                : 'text-base sm:text-lg'
             } ${theme === 'dark' ? 'text-white' : 'text-[#1b4332]'}`}
           >
             Kisan<span className="text-[#52b788]">Sathi</span>
           </span>
           <span
-            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+            className={`rounded-md px-1.5 py-0.5 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-wider shrink-0 ${
               theme === 'dark'
                 ? 'bg-[#1b4332] text-[#95d5b2] border border-[#2d6a4f]'
                 : 'bg-[#e8f5e9] text-[#1b5e20] border border-[#c8e6c9]'
@@ -151,7 +160,7 @@ export default function KisanLogo({
         </div>
         {showTagline && (
           <p
-            className={`mt-0.5 text-[10px] sm:text-[11px] font-medium leading-tight truncate ${
+            className={`mt-0.5 text-[10px] sm:text-[11px] font-medium leading-tight truncate hidden sm:block ${
               theme === 'dark' ? 'text-[#95d5b2]' : 'text-slate-500'
             }`}
           >
