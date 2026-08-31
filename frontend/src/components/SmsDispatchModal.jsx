@@ -45,7 +45,7 @@ export function SmsDispatchModal({ farmerId, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
       <div className="relative flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#0d2a1d] bg-[#133e2b] px-5 py-4 text-white">
+        <div className="flex items-center justify-between border-b border-[#0d2a1d] bg-[#2d6a4f] px-5 py-4 text-white">
           <div className="flex items-center gap-2.5">
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c563c] border border-[#2b7956] text-[#a3e635]">
               <Smartphone className="h-5 w-5" />

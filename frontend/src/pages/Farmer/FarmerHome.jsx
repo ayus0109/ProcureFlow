@@ -221,11 +221,11 @@ function BookingCard({ booking, t, onOpenPass }) {
   const closed = booking.status === 'CONFIRMED' || booking.status === 'REJECTED';
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[#e2e8e0] bg-white p-5 shadow-xs sm:p-6">
+    <section className="relative overflow-hidden rounded-3xl border border-[#d5ead8] bg-white p-5 shadow-2xs sm:p-6">
       {/* Top Pass Brand Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e4eee5] pb-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#f0f7f2] text-[#156637] border border-[#d1e7dd]">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#eef7f0] text-[#2d6a4f] border border-[#d5ead8]">
             <Wheat className="h-6 w-6" />
           </div>
           <div>
@@ -233,12 +233,12 @@ function BookingCard({ booking, t, onOpenPass }) {
               <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
                 {t('booking.token')}
               </p>
-              <span className="rounded-md bg-[#f0f7f2] border border-[#d1e7dd] px-2 py-0.5 text-xs font-bold text-[#133e2b]">
+              <span className="rounded-md bg-[#eef7f0] border border-[#d5ead8] px-2 py-0.5 text-xs font-bold text-[#1b4332]">
                 {t('booking.passBadge')}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <p className="font-mono text-2xl font-black tracking-tight text-[#133e2b] sm:text-3xl">
+              <p className="font-mono text-2xl font-black tracking-tight text-[#1b4332] sm:text-3xl">
                 {booking.token}
               </p>
               <SpeakButton
@@ -269,53 +269,47 @@ function BookingCard({ booking, t, onOpenPass }) {
           <button
             type="button"
             onClick={onOpenPass}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#156637] hover:text-[#0d2a1d] hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2d6a4f] hover:text-[#1b4332] hover:underline"
           >
-            <Printer className="h-4 w-4 text-[#156637]" />
+            <Printer className="h-4 w-4 text-[#2d6a4f]" />
             <span>{t('booking.printPass')}</span>
           </button>
         </div>
       </div>
 
       {/* Interactive Stage Stepper */}
-      <div className="mt-4 border-b border-slate-100 pb-4">
-        <StageStepper currentStatus={booking.status} />
+      <div className="py-4">
+        <StageStepper currentStatus={booking.status} t={t} />
       </div>
 
-      {/* Live Stats: Queue Position, Estimated Wait, Advised Arrival */}
+      {/* Queue Rank & Arrival Info */}
       {!closed && (
-        <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-[#e4eee5]">
           <Stat
-            label={t('booking.position')}
-            value={booking.position ?? '—'}
-            sub={`${booking.farmersAhead || 0} ${t('booking.ahead')}`}
-            icon={Clock}
-          />
-          <Stat
-            label={t('booking.wait')}
-            value={booking.waitLabel}
-            sub={t('booking.waitSub')}
-            icon={Clock}
+            label={t('booking.rank')}
+            value={booking.position ? `#${booking.position}` : '—'}
+            sub={booking.waitLabel ? `~${booking.waitLabel} ${t('booking.wait')}` : undefined}
+            icon={Users}
           />
           <Stat
             label={t('booking.arriveBy')}
             value={booking.arriveBy || '—'}
-            sub={t('booking.arriveBySub')}
+            sub={`Slot: ${booking.slot_time}`}
             icon={Clock}
           />
         </div>
       )}
 
       {/* Booking Particulars */}
-      <div className="mt-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60">
-        <dl className="divide-y divide-slate-200/60 text-sm">
+      <div className="mt-4 rounded-2xl bg-[#f6fbf7] p-4 border border-[#d5ead8]">
+        <dl className="divide-y divide-[#e4eee5] text-xs sm:text-sm">
           <div className="flex justify-between py-2">
             <dt className="text-slate-500 font-medium">{t('booking.centre')}</dt>
             <dd className="font-bold text-slate-900">{t(`centre.${booking.centre_id}`) || booking.centre_name}</dd>
           </div>
           <div className="flex justify-between py-2">
             <dt className="text-slate-500 font-medium">{t('booking.crop')}</dt>
-            <dd className="font-bold text-slate-900">{t(`crop.${booking.crop}`)}</dd>
+            <dd className="font-bold text-slate-900">{t(`crop.${booking.crop}`) || booking.crop}</dd>
           </div>
           <div className="flex justify-between py-2">
             <dt className="text-slate-500 font-medium">{t('booking.quantity')}</dt>
@@ -344,7 +338,7 @@ function BookingCard({ booking, t, onOpenPass }) {
       {closed && (
         <Link
           to="/farmer/book"
-          className="mt-5 inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-6 text-base font-bold text-white shadow-md shadow-emerald-800/20 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+          className="mt-5 inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#2d6a4f] hover:bg-[#1b4332] px-6 text-base font-bold text-white shadow-xs shadow-[#1b4332]/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
         >
           <CalendarPlus className="h-5 w-5" />
           {t('farmer.bookAnother')}
@@ -356,17 +350,17 @@ function BookingCard({ booking, t, onOpenPass }) {
 
 function EmptyState({ t }) {
   return (
-    <section className="relative overflow-hidden rounded-3xl border-2 border-dashed border-emerald-300 bg-gradient-to-b from-emerald-50/50 via-white to-white p-8 text-center shadow-xs">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-700/20 ring-4 ring-emerald-100">
+    <section className="relative overflow-hidden rounded-3xl border-2 border-dashed border-[#b7dfbe] bg-gradient-to-b from-[#eef7f0]/60 via-white to-white p-8 text-center shadow-xs">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#2d6a4f] text-white shadow-sm ring-4 ring-[#d5ead8]">
         <CalendarPlus className="h-8 w-8" aria-hidden="true" />
       </div>
-      <h2 className="mt-4 text-xl font-extrabold text-slate-900">{t('farmer.noSlotTitle')}</h2>
+      <h2 className="mt-4 text-xl font-extrabold text-[#1b4332]">{t('farmer.noSlotTitle')}</h2>
       <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600 leading-relaxed font-medium">
         {t('farmer.noSlotSub')}
       </p>
       <Link
         to="/farmer/book"
-        className="mt-6 inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-7 text-base font-bold text-white shadow-md shadow-emerald-800/20 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+        className="mt-6 inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-[#40916c] hover:bg-[#2d6a4f] px-7 text-base font-bold text-white shadow-md shadow-emerald-800/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
       >
         <Sparkles className="h-5 w-5" />
         {t('farmer.bookSlot')}

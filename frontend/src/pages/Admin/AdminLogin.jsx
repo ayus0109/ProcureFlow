@@ -84,18 +84,18 @@ export default function AdminLogin() {
       <div className="flex items-center justify-between mb-4">
         <Link
           to="/role"
-          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-[#156637] transition hover:bg-[#f0f7f2] hover:text-[#133e2b] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+          className="inline-flex items-center gap-2 rounded-xl py-1 px-2.5 -ml-2.5 text-sm font-bold text-[#2d6a4f] transition hover:bg-[#eef7f0] hover:text-[#1b4332] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
         >
           <ArrowLeft className="h-4.5 w-4.5" aria-hidden="true" />
           <span>{t('role.heading')}</span>
         </Link>
-        <span className="rounded-full bg-[#f0f7f2] border border-[#d1e7dd] px-3 py-1 text-xs font-bold text-[#133e2b]">
+        <span className="rounded-full bg-[#eef7f0] border border-[#d5ead8] px-3 py-1 text-xs font-bold text-[#1b4332]">
           APMC Staff Portal
         </span>
       </div>
 
-      <div className="border-b border-slate-100 pb-3">
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{t('auth.adminTitle')}</h1>
+      <div className="border-b border-[#e4eee5] pb-3">
+        <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] sm:text-3xl">{t('auth.adminTitle')}</h1>
         <p className="mt-1 text-xs text-slate-600">{t('auth.adminSub')}</p>
       </div>
 
@@ -103,20 +103,20 @@ export default function AdminLogin() {
       <button
         type="button"
         onClick={fillDemo}
-        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-[#d1e7dd] bg-[#f0f7f2] p-3 text-left transition hover:border-[#156637] hover:shadow-2xs focus:outline-none"
+        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-[#d5ead8] bg-[#eef7f0] p-3 text-left transition hover:border-[#52b788] hover:shadow-2xs focus:outline-none"
       >
         <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-[#156637] shrink-0" />
+          <Sparkles className="h-4 w-4 text-[#2d6a4f] shrink-0" />
           <div>
-            <span className="block text-xs font-black text-[#133e2b]">
+            <span className="block text-xs font-black text-[#1b4332]">
               Demo Account: Suresh Kale (Pune APMC)
             </span>
-            <span className="block text-[11px] font-mono text-[#156637]">
+            <span className="block text-[11px] font-mono text-[#2d6a4f]">
               ADMIN001 • admin123
             </span>
           </div>
         </div>
-        <span className="rounded-lg bg-[#156637] px-2.5 py-1 text-[11px] font-extrabold text-white shadow-2xs">
+        <span className="rounded-lg bg-[#2d6a4f] px-2.5 py-1 text-[11px] font-extrabold text-white shadow-2xs">
           Auto-Fill
         </span>
       </button>
@@ -155,7 +155,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={busy}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#156637] hover:bg-[#133e2b] text-sm font-bold text-white shadow-md shadow-emerald-950/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#2d6a4f] hover:bg-[#1b4332] text-sm font-bold text-white shadow-xs shadow-[#1b4332]/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
         >
           {busy ? t('auth.working') : t('auth.signIn')}
           {!busy && <ArrowRight className="h-4 w-4" />}
@@ -164,7 +164,7 @@ export default function AdminLogin() {
 
       {/* Divider */}
       <div className="relative my-4 flex items-center justify-center">
-        <div className="w-full border-t border-slate-200" />
+        <div className="w-full border-t border-[#dce8dd]" />
         <span className="absolute bg-white px-2 text-[11px] font-bold text-slate-400 uppercase">
           Or
         </span>
@@ -174,7 +174,7 @@ export default function AdminLogin() {
       <button
         type="button"
         onClick={handleGoogleWorkspaceLogin}
-        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-[#156637] hover:bg-slate-50 focus:outline-none"
+        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-2xl border border-[#dce8dd] bg-white px-4 text-xs font-bold text-[#1b4332] shadow-2xs transition hover:border-[#52b788] hover:bg-[#f6fbf7] focus:outline-none"
       >
         <GoogleIcon />
         <span>Continue with APMC Official Google Account</span>

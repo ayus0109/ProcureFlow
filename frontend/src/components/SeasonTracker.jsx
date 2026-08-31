@@ -27,7 +27,7 @@ export default function SeasonTracker() {
             <Wallet className="h-4 w-4" />
           </span>
           <div>
-            <h2 className="text-xs sm:text-sm font-black tracking-wider text-[#133e2b] uppercase">
+            <h2 className="text-xs sm:text-sm font-black tracking-wider text-[#2d6a4f] uppercase">
               {t('tracker.title')}
             </h2>
             <p className="text-[11px] sm:text-xs text-slate-500">Official seasonal sales & DBT payout ledger</p>
@@ -40,7 +40,7 @@ export default function SeasonTracker() {
 
       <div className="mt-4 space-y-4">
         {/* Total Revenue Hero Card */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#133e2b] border border-[#206346] p-4 sm:p-5 text-white shadow-xs">
+        <div className="relative overflow-hidden rounded-2xl bg-[#2d6a4f] border border-[#206346] p-4 sm:p-5 text-white shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-200 uppercase tracking-wider truncate">
               <TrendingUp className="h-4 w-4 text-[#a3e635] shrink-0" />

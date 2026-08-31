@@ -179,7 +179,7 @@ export default function BookSlot() {
   return (
     <AppShell title={t('book.title')} subtitle={t('book.sub')}>
       {/* 🧭 STEP INDICATOR PROGRESS BAR (1 -> 2 -> 3) */}
-      <div className="rounded-3xl border border-[#e2e8e0] bg-white p-3 sm:p-5 shadow-xs">
+      <div className="rounded-3xl border border-[#dee2e6] bg-white p-3 sm:p-5 shadow-xs">
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {/* Step 1 Pill */}
           <button
@@ -187,14 +187,14 @@ export default function BookSlot() {
             onClick={() => setStep(1)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 1
-                ? 'bg-[#133e2b] text-white shadow-xs'
+                ? 'bg-[#2d6a4f] text-white shadow-xs'
                 : centreId
-                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd] hover:bg-[#e4f2e8]'
+                ? 'bg-[#f1f8f4] text-[#2d6a4f] border border-[#d4edda] hover:bg-[#c3e6cb]'
                 : 'bg-slate-50 text-slate-400'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 1 ? 'bg-white text-[#133e2b]' : centreId ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
+              step === 1 ? 'bg-white text-[#2d6a4f]' : centreId ? 'bg-[#40916c] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {centreId && step !== 1 ? <Check className="h-4 w-4" /> : '1'}
             </div>
@@ -215,14 +215,14 @@ export default function BookSlot() {
             onClick={() => centreId && setStep(2)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 2
-                ? 'bg-[#133e2b] text-white shadow-xs'
+                ? 'bg-[#2d6a4f] text-white shadow-xs'
                 : isStep2Valid
-                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd] hover:bg-[#e4f2e8]'
+                ? 'bg-[#f1f8f4] text-[#2d6a4f] border border-[#d4edda] hover:bg-[#c3e6cb]'
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 2 ? 'bg-white text-[#133e2b]' : isStep2Valid ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
+              step === 2 ? 'bg-white text-[#2d6a4f]' : isStep2Valid ? 'bg-[#40916c] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep2Valid && step !== 2 ? <Check className="h-4 w-4" /> : '2'}
             </div>
@@ -243,14 +243,14 @@ export default function BookSlot() {
             onClick={() => centreId && isStep2Valid && setStep(3)}
             className={`flex items-center gap-2 rounded-2xl p-2.5 sm:p-3 text-left transition-all ${
               step === 3
-                ? 'bg-[#133e2b] text-white shadow-xs'
+                ? 'bg-[#2d6a4f] text-white shadow-xs'
                 : isStep3Valid
-                ? 'bg-[#f0f7f2] text-[#133e2b] border border-[#d1e7dd]'
+                ? 'bg-[#f1f8f4] text-[#2d6a4f] border border-[#d4edda]'
                 : 'bg-slate-50 text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed'
             }`}
           >
             <div className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-xl font-black text-xs sm:text-sm ${
-              step === 3 ? 'bg-white text-[#133e2b]' : isStep3Valid ? 'bg-[#156637] text-white' : 'bg-slate-200 text-slate-600'
+              step === 3 ? 'bg-white text-[#2d6a4f]' : isStep3Valid ? 'bg-[#40916c] text-white' : 'bg-slate-200 text-slate-600'
             }`}>
               {isStep3Valid && step !== 3 ? <Check className="h-4 w-4" /> : '3'}
             </div>
@@ -373,7 +373,7 @@ export default function BookSlot() {
               type="button"
               disabled={!centreId}
               onClick={() => setStep(2)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-6 py-3.5 text-xs sm:text-sm font-black text-white shadow-md hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#40916c] hover:bg-[#2d6a4f] px-6 py-3.5 text-xs sm:text-sm font-black text-white shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{t('book.nextStep')}</span>
               <ChevronRight className="h-4 w-4" />
@@ -526,7 +526,7 @@ export default function BookSlot() {
               type="button"
               disabled={!isStep2Valid}
               onClick={() => setStep(3)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-6 py-3.5 text-xs sm:text-sm font-black text-white shadow-md hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#40916c] hover:bg-[#2d6a4f] px-6 py-3.5 text-xs sm:text-sm font-black text-white shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{t('book.nextStep')}</span>
               <ChevronRight className="h-4 w-4" />
@@ -697,7 +697,7 @@ export default function BookSlot() {
             <button
               type="submit"
               disabled={!isStep3Valid || busy}
-              className="inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-7 py-3.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-900/20 hover:brightness-110 transition disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+              className="inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-[#40916c] hover:bg-[#2d6a4f] px-7 py-3.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-900/20 transition disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
             >
               {busy ? (
                 <span>{t('book.booking')}</span>

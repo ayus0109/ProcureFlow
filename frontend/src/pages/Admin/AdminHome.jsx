@@ -74,7 +74,7 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
             className={`grid h-11 w-11 place-items-center rounded-2xl text-sm font-black shadow-xs ${
               row.atCounter
                 ? 'bg-amber-500 text-white'
-                : 'bg-[#133e2b] text-white'
+                : 'bg-[#2d6a4f] text-white'
             }`}
             title={row.atCounter ? t('admin.atCounter') : `Queue Rank #${row.position}`}
           >
@@ -87,7 +87,7 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-sm font-black text-[#133e2b]">{row.token}</span>
+            <span className="font-mono text-sm font-black text-[#2d6a4f]">{row.token}</span>
             <span
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 border ${
                 STAGE_STYLES[row.status] || 'bg-slate-100 text-slate-700'
@@ -112,10 +112,10 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
             {canCall && (
               <a
                 href={`tel:${row.phone}`}
-                className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#156637] bg-[#f0f7f2] border border-[#d1e7dd] px-2 py-0.5 rounded-md hover:bg-[#d8edd9] transition"
+                className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#40916c] bg-[#f1f8f4] border border-[#d4edda] px-2 py-0.5 rounded-md hover:bg-[#c3e6cb] transition"
                 title={`Call farmer: ${row.phone}`}
               >
-                <Phone className="h-3 w-3 text-[#156637]" />
+                <Phone className="h-3 w-3 text-[#40916c]" />
                 <span>{row.phone}</span>
               </a>
             )}
@@ -132,7 +132,7 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
         {canCall && (
           <a
             href={`tel:${row.phone}`}
-            className="grid h-10 w-10 place-items-center rounded-xl bg-[#f0f7f2] border border-[#d1e7dd] text-[#156637] hover:bg-[#d8edd9] transition shrink-0"
+            className="grid h-10 w-10 place-items-center rounded-xl bg-[#f1f8f4] border border-[#d4edda] text-[#40916c] hover:bg-[#c3e6cb] transition shrink-0"
             title={`Call ${row.farmer_name} (${row.phone})`}
           >
             <Phone className="h-4 w-4" />
@@ -144,7 +144,7 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
             type="button"
             onClick={() => onAdvance(row.id)}
             disabled={busy}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[#156637] hover:bg-[#133e2b] px-4 text-xs font-bold text-white shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[#40916c] hover:bg-[#2d6a4f] px-4 text-xs font-bold text-white shadow-xs transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-50"
           >
             <span>{t(`action.${row.nextStatus}`) || `Advance to ${row.nextStatus}`}</span>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -251,22 +251,22 @@ export default function AdminHome() {
   return (
     <AppShell title={user.centre_name} subtitle={`Officer: ${user.name} • Code: ${user.admin_code}`}>
       {/* 🚀 ENLARGED & DEDUPLICATED EXECUTIVE NAVIGATION TABS (Mobile Swipeable) */}
-      <div className="border-b border-slate-200/80 pb-3 sm:pb-4 overflow-hidden">
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none rounded-2xl bg-slate-100/90 p-1.5 border border-slate-200/80 shadow-2xs w-full">
+      <div className="border-b border-[#dce8dd] pb-3 sm:pb-4 overflow-hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none rounded-2xl bg-[#f0f7f2] p-1.5 border border-[#d5ead8] shadow-2xs w-full">
           {/* 1. Live Queue */}
           <button
             type="button"
             onClick={() => setActiveTab('QUEUE')}
             className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'QUEUE'
-                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
-                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
+                ? 'bg-white text-[#1b4332] shadow-xs border border-[#d5ead8]'
+                : 'text-slate-600 hover:text-[#1b4332] hover:bg-white/60'
             }`}
           >
-            <Users className="h-4 w-4 text-emerald-700" />
+            <Users className="h-4 w-4 text-[#2d6a4f]" />
             <span>Live Queue</span>
             {queue.length > 0 && (
-              <span className="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-mono font-black text-emerald-900 border border-emerald-200">
+              <span className="ml-1 rounded-full bg-[#eef7f0] px-2 py-0.5 text-[10px] font-mono font-black text-[#2d6a4f] border border-[#d5ead8]">
                 {queue.length}
               </span>
             )}
@@ -278,11 +278,11 @@ export default function AdminHome() {
             onClick={() => setActiveTab('ANALYTICS')}
             className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'ANALYTICS'
-                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
-                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
+                ? 'bg-white text-[#1b4332] shadow-xs border border-[#d5ead8]'
+                : 'text-slate-600 hover:text-[#1b4332] hover:bg-white/60'
             }`}
           >
-            <BarChart3 className="h-4 w-4 text-emerald-700" />
+            <BarChart3 className="h-4 w-4 text-[#2d6a4f]" />
             <span>APMC Analytics & CSV</span>
           </button>
 
@@ -292,22 +292,26 @@ export default function AdminHome() {
             onClick={() => setActiveTab('PAYMENTS')}
             className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
               activeTab === 'PAYMENTS'
-                ? 'bg-white text-emerald-950 shadow-md ring-1 ring-slate-200/80'
-                : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
+                ? 'bg-white text-[#1b4332] shadow-xs border border-[#d5ead8]'
+                : 'text-slate-600 hover:text-[#1b4332] hover:bg-white/60'
             }`}
           >
-            <CreditCard className="h-4 w-4 text-emerald-700" />
+            <CreditCard className="h-4 w-4 text-[#2d6a4f]" />
             <span>DBT Payments</span>
           </button>
 
-          {/* 4. SMS & WhatsApp Log */}
+          {/* 4. Center Settings */}
           <button
             type="button"
-            onClick={() => setShowSmsModal(true)}
-            className="flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black text-slate-700 hover:text-blue-950 hover:bg-white/60 transition-all"
+            onClick={() => setActiveTab('SETTINGS')}
+            className={`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-xl px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-black transition-all ${
+              activeTab === 'SETTINGS'
+                ? 'bg-white text-[#1b4332] shadow-xs border border-[#d5ead8]'
+                : 'text-slate-600 hover:text-[#1b4332] hover:bg-white/60'
+            }`}
           >
-            <Smartphone className="h-4 w-4 text-blue-700" />
-            <span>SMS & WhatsApp Log</span>
+            <SlidersHorizontal className="h-4 w-4 text-[#2d6a4f]" />
+            <span>Center Settings</span>
           </button>
         </div>
       </div>
@@ -723,7 +727,7 @@ export default function AdminHome() {
                 <button
                   type="submit"
                   disabled={quotaSaving}
-                  className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 py-3 text-xs font-bold text-white shadow-md transition hover:brightness-110 disabled:opacity-60"
+                  className="flex-1 rounded-2xl bg-[#40916c] hover:bg-[#2d6a4f] py-3 text-xs font-bold text-white shadow-md transition disabled:opacity-60"
                 >
                   {quotaSaving ? 'Saving Configuration…' : 'Save Centre Requirements & Quotas'}
                 </button>

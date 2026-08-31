@@ -139,18 +139,18 @@ export default function FarmerLogin() {
       <div className="flex items-center justify-between">
         <Link
           to="/role"
-          className="inline-flex items-center gap-1.5 rounded-xl py-1 px-2 -ml-2 text-xs sm:text-sm font-bold text-emerald-800 transition hover:bg-emerald-50 hover:text-emerald-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+          className="inline-flex items-center gap-1.5 rounded-xl py-1 px-2 -ml-2 text-xs sm:text-sm font-bold text-[#2d6a4f] transition hover:bg-[#eef7f0] hover:text-[#1b4332] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           <span>{t('role.heading')}</span>
         </Link>
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900 border border-emerald-200">
+        <span className="rounded-full bg-[#eef7f0] px-3 py-1 text-xs font-black text-[#1b4332] border border-[#d5ead8]">
           Farmer Portal
         </span>
       </div>
 
       <div className="mt-4">
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1b4332]">
           {isRegister ? (t('auth.registerFarmer') || 'Farmer Registration') : t('auth.farmerTitle')}
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-slate-600 font-medium">
@@ -163,20 +163,20 @@ export default function FarmerLogin() {
         <button
           type="button"
           onClick={fillDemo}
-          className="mt-4 flex w-full items-center justify-between rounded-2xl border border-emerald-300/80 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-emerald-50 p-3 text-left transition hover:border-emerald-500 hover:shadow-2xs focus:outline-none"
+          className="mt-4 flex w-full items-center justify-between rounded-2xl border border-[#d5ead8] bg-[#eef7f0] p-3 text-left transition hover:border-[#52b788] hover:shadow-2xs focus:outline-none"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-emerald-700 shrink-0" />
+            <Sparkles className="h-4 w-4 text-[#2d6a4f] shrink-0" />
             <div>
-              <span className="block text-xs font-black text-emerald-950">
+              <span className="block text-xs font-black text-[#1b4332]">
                 Demo Account: Ramesh Patil (Baramati)
               </span>
-              <span className="block text-[11px] font-mono text-emerald-800">
+              <span className="block text-[11px] font-mono text-[#2d6a4f]">
                 9999990001 • farmer123
               </span>
             </div>
           </div>
-          <span className="rounded-lg bg-emerald-700 px-2.5 py-1 text-[11px] font-extrabold text-white shadow-2xs">
+          <span className="rounded-lg bg-[#2d6a4f] px-2.5 py-1 text-[11px] font-extrabold text-white shadow-2xs">
             Auto-Fill
           </span>
         </button>
@@ -331,7 +331,7 @@ export default function FarmerLogin() {
         <button
           type="submit"
           disabled={busy}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 text-sm font-black text-white shadow-md shadow-emerald-900/20 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#2d6a4f] hover:bg-[#1b4332] text-sm font-black text-white shadow-xs shadow-[#1b4332]/20 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 disabled:opacity-60"
         >
           {busy ? t('auth.working') : (isRegister ? (t('auth.register') || 'Register & Create Account') : t('auth.signIn'))}
           {!busy && <ArrowRight className="h-4 w-4" />}
@@ -342,7 +342,7 @@ export default function FarmerLogin() {
       <button
         type="button"
         onClick={switchMode}
-        className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white py-3 px-4 text-center text-xs sm:text-sm font-extrabold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+        className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-[#dce8dd] bg-white py-3 px-4 text-center text-xs sm:text-sm font-extrabold text-[#1b4332] shadow-2xs transition hover:bg-[#f6fbf7] hover:border-[#52b788] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
       >
         <span>{t(isRegister ? 'auth.haveAccount' : 'auth.noAccount')}</span>
       </button>

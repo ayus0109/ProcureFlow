@@ -4,7 +4,7 @@ import { useLanguage } from '../../i18n/LanguageContext.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import CenteredLayout from '../../layouts/CenteredLayout.jsx';
 
-/** Second screen: Farmer or Centre Admin with persistent session integration */
+/** Second screen: Farmer or Centre Admin with light green humanized styling */
 export default function RoleSelect() {
   const { t } = useLanguage();
   const { user, isFarmer, isAdmin, logout } = useAuth();
@@ -16,7 +16,7 @@ export default function RoleSelect() {
       Icon: Wheat,
       title: t('role.farmer'),
       desc: t('role.farmerDesc'),
-      iconBg: 'bg-[#133e2b] text-[#a3e635] border border-[#206346]',
+      iconBg: 'bg-[#eef7f0] text-[#2d6a4f] border border-[#d5ead8]',
       badge: t('role.farmerBadge'),
       isCurrent: isFarmer,
     },
@@ -25,7 +25,7 @@ export default function RoleSelect() {
       Icon: ClipboardCheck,
       title: t('role.admin'),
       desc: t('role.adminDesc'),
-      iconBg: 'bg-[#1e3a47] text-cyan-300 border border-[#2e5363]',
+      iconBg: 'bg-[#f0f4f8] text-[#1e3a47] border border-[#d2dfeb]',
       badge: t('role.staffBadge'),
       isCurrent: isAdmin,
     },
@@ -39,7 +39,7 @@ export default function RoleSelect() {
   return (
     <CenteredLayout>
       <div className="mb-5">
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#133e2b]">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1b4332]">
           {t('role.heading')}
         </h1>
         <p className="text-sm font-medium text-slate-600 mt-1">
@@ -52,62 +52,60 @@ export default function RoleSelect() {
           <Link
             key={title}
             to={to}
-            className={`group relative flex min-h-22 items-center gap-4 rounded-2xl border p-4 transition-all duration-150 shadow-xs focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
+            className={`group relative flex min-h-22 items-center gap-4 rounded-2xl border-2 p-4 transition-all duration-150 shadow-2xs focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 ${
               isCurrent
-                ? 'border-[#156637] bg-[#f0f7f2] ring-1 ring-[#156637]/30 hover:bg-[#e7f3eb]'
-                : 'border-[#e2e8e0] bg-white hover:border-[#156637] hover:bg-[#fafcfa] hover:shadow-sm'
+                ? 'border-[#52b788] bg-[#eef7f0] ring-1 ring-[#52b788]/20 hover:bg-[#e4f3e7]'
+                : 'border-[#dce8dd] bg-white hover:border-[#52b788] hover:bg-[#f6fbf7] hover:shadow-xs'
             }`}
           >
-            <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${iconBg} shadow-xs`}>
-              <Icon className="h-7 w-7" aria-hidden="true" />
+            <span className={`grid h-13 w-13 shrink-0 place-items-center rounded-2xl ${iconBg} shadow-2xs`}>
+              <Icon className="h-6.5 w-6.5" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
+                <span className="rounded-md bg-[#eef7f0] border border-[#d5ead8] px-1.5 py-0.5 text-[10px] font-bold text-[#2d6a4f] uppercase">
                   {badge}
                 </span>
                 {isCurrent && (
-                  <span className="inline-flex items-center gap-1 rounded bg-[#156637] px-2 py-0.5 text-[10px] font-bold text-white shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#2d6a4f] px-2 py-0.5 text-[10px] font-bold text-white shadow-2xs">
                     <CheckCircle2 className="h-3 w-3" />
                     <span>Signed In ({user?.name?.split(' ')[0]})</span>
                   </span>
                 )}
               </div>
-              <span className="block text-base font-bold text-slate-900 group-hover:text-[#133e2b]">
+              <span className="block text-base font-extrabold text-[#1b4332] group-hover:text-[#081c15]">
                 {title}
               </span>
-              <span className="block text-xs text-slate-500 line-clamp-1">
-                {isCurrent ? `Click to open your active ${title} console` : desc}
+              <span className="block text-xs font-medium text-slate-500">
+                {desc}
               </span>
             </span>
-            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-[#156637]" aria-hidden="true" />
+            <ChevronRight
+              className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#2d6a4f]"
+              aria-hidden="true"
+            />
           </Link>
         ))}
       </div>
 
-      <div className="mt-6 flex items-center justify-between border-t border-slate-200/80 pt-4">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-bold text-[#156637] hover:bg-[#f0f7f2] hover:text-[#133e2b] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+      <div className="mt-6 flex items-center justify-between border-t border-[#e4eee5] pt-4">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 text-xs font-bold text-[#2d6a4f] hover:text-[#1b4332] transition"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           <span>{t('lang.change')}</span>
-        </button>
+        </Link>
 
-        {user ? (
+        {user && (
           <button
             type="button"
             onClick={handleLogout}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 transition"
+            className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-800 transition"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span>Sign Out</span>
           </button>
-        ) : (
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-            {t('common.step')} 2 {t('common.of')} 2
-          </span>
         )}
       </div>
     </CenteredLayout>
