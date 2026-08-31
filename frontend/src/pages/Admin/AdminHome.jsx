@@ -62,6 +62,9 @@ function StatCard({ label, value, sub, icon: Icon, color = 'emerald' }) {
 }
 
 function QueueRow({ row, t, onAdvance, onRecord, busy }) {
+  // Only show phone number and phone call button while the farmer is waiting to be called
+  const canCall = (row.status === 'WAITING' || row.status === 'BOOKED') && Boolean(row.phone);
+
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 p-4 transition hover:bg-slate-50/80 border-b border-slate-100 last:border-b-0">
       <div className="flex items-start sm:items-center gap-3 min-w-0">
@@ -99,14 +102,14 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
             )}
           </div>
 
-          {/* Farmer Name, Village, and Phone Number */}
+          {/* Farmer Name, Village, and Phone Number (only visible while waiting in queue) */}
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <p className="text-sm font-bold text-slate-900">
               {row.farmer_name}
               {row.village && <span className="text-xs font-normal text-slate-500"> ({row.village})</span>}
             </p>
 
-            {row.phone && (
+            {canCall && (
               <a
                 href={`tel:${row.phone}`}
                 className="inline-flex items-center gap-1 font-mono text-xs font-bold text-[#156637] bg-[#f0f7f2] border border-[#d1e7dd] px-2 py-0.5 rounded-md hover:bg-[#d8edd9] transition"
@@ -124,9 +127,9 @@ function QueueRow({ row, t, onAdvance, onRecord, busy }) {
         </div>
       </div>
 
-      {/* Action Controls + Direct Phone Call Button */}
+      {/* Action Controls + Direct Phone Call Button (only visible while waiting in queue) */}
       <div className="flex items-center gap-2">
-        {row.phone && (
+        {canCall && (
           <a
             href={`tel:${row.phone}`}
             className="grid h-10 w-10 place-items-center rounded-xl bg-[#f0f7f2] border border-[#d1e7dd] text-[#156637] hover:bg-[#d8edd9] transition shrink-0"
