@@ -85,19 +85,19 @@ export default function JudgeDemoBar() {
   }
 
   return (
-    <aside aria-label="Demo Controls" className="fixed bottom-3 right-3 z-50 max-w-sm sm:bottom-4 sm:right-4">
-      <div className="overflow-hidden rounded-2xl border border-emerald-300/80 bg-white/95 shadow-xl backdrop-blur-md ring-1 ring-emerald-950/10">
+    <aside aria-label="Demo Controls" className="fixed bottom-3 left-3 z-50 max-w-xs sm:max-w-sm sm:bottom-4 sm:left-4 sm:right-auto touch-manipulation">
+      <div className="overflow-hidden rounded-2xl border border-emerald-300/80 bg-white/95 shadow-xl backdrop-blur-md ring-1 ring-emerald-950/10 max-h-[85vh] flex flex-col">
         {/* Bar Header / Toggle */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center justify-between gap-3 bg-gradient-to-r from-emerald-900 to-teal-900 px-3.5 py-2.5 text-left text-xs font-semibold text-white transition hover:brightness-110"
+          className="flex w-full items-center justify-between gap-3 bg-gradient-to-r from-emerald-900 to-teal-900 px-3.5 py-2.5 text-left text-xs font-semibold text-white transition hover:brightness-110 shrink-0"
         >
           <span className="flex items-center gap-1.5 font-mono tracking-wide">
             <Sparkles className="h-4 w-4 text-emerald-300 animate-pulse" />
-            <span>JUDGE / DEMO TOOLKIT</span>
+            <span className="truncate">JUDGE TOOLKIT</span>
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 shrink-0">
             <span className="rounded bg-emerald-700/80 px-1.5 py-0.5 text-[10px] text-emerald-100 uppercase">
               {role ? `${role}: ${user?.name?.split(' ')[0]}` : 'Guest'}
             </span>
@@ -107,7 +107,7 @@ export default function JudgeDemoBar() {
 
         {/* Expanded Panel */}
         {isOpen && (
-          <div className="p-3.5 space-y-3 text-xs">
+          <div className="p-3.5 space-y-3 text-xs overflow-y-auto max-h-[70vh]">
             {msg && (
               <div className="rounded-lg bg-emerald-50 px-2.5 py-1.5 font-medium text-emerald-900 ring-1 ring-emerald-200 animate-fadeIn">
                 {msg}
