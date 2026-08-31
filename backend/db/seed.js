@@ -29,6 +29,13 @@ const CENTRES = [
   ['Nagpur Procurement Center', 'Nagpur', 80, 2, 3, 6, 10, 30, 900, 10, 'SOYBEAN,COTTON', 11.5, 'FAQ'],
   ['Aurangabad Procurement Center', 'Aurangabad', 112, 3, 3, 4, 0, 50, 1400, 14, 'COTTON,TUR,SOYBEAN', 12.0, 'FAQ'],
   ['Kolhapur Procurement Center', 'Kolhapur', 80, 2, 2, 5, 5, 25, 600, 10, 'PADDY,SOYBEAN', 13.0, 'FAQ'],
+  ['Baramati Procurement Center', 'Pune', 100, 2, 3, 4, 0, 45, 1200, 12, 'WHEAT,SOYBEAN,TUR', 12.0, 'FAQ'],
+  ['Shirur Procurement Center', 'Pune', 90, 2, 2, 5, 0, 40, 1000, 11, 'WHEAT,SOYBEAN,PADDY', 12.0, 'FAQ'],
+  ['Niphad Procurement Center', 'Nashik', 105, 3, 3, 4, 0, 50, 1300, 13, 'WHEAT,SOYBEAN,TUR', 12.0, 'FAQ'],
+  ['Sinnar Procurement Center', 'Nashik', 88, 2, 2, 5, 0, 35, 950, 11, 'SOYBEAN,PADDY,TUR', 12.0, 'FAQ'],
+  ['Jalna Procurement Center', 'Jalna', 95, 2, 3, 5, 0, 45, 1100, 12, 'COTTON,TUR,SOYBEAN', 12.0, 'FAQ'],
+  ['Sangli Procurement Center', 'Sangli', 85, 2, 2, 5, 0, 40, 900, 10, 'PADDY,SOYBEAN,TUR', 12.5, 'FAQ'],
+  ['Wardha Procurement Center', 'Wardha', 80, 2, 2, 6, 0, 35, 850, 10, 'COTTON,SOYBEAN', 11.5, 'FAQ'],
 ];
 
 // Farmer 1 is the demo account and is intentionally left booking-free.
@@ -167,6 +174,13 @@ function seed() {
     { centreId: 3, total: 78 }, // Nagpur  -> HIGH (78 booked across 80 capacity -> 2 left)
     { centreId: 4, total: 28 }, // Aurangabad -> LOW
     { centreId: 5, total: 55 }, // Kolhapur -> MODERATE
+    { centreId: 6, total: 22 }, // Baramati -> LOW
+    { centreId: 7, total: 42 }, // Shirur -> MODERATE
+    { centreId: 8, total: 32 }, // Niphad -> LOW
+    { centreId: 9, total: 56 }, // Sinnar -> MODERATE
+    { centreId: 10, total: 68 }, // Jalna -> HIGH
+    { centreId: 11, total: 36 }, // Sangli -> LOW
+    { centreId: 12, total: 50 }, // Wardha -> MODERATE
   ];
   load.forEach(({ centreId, total }) => {
     for (let i = 0; i < total; i += 1) {
@@ -185,11 +199,18 @@ function seed() {
   // --- Advance bookings for TOMORROW and DAY 3 (Realistic slot availability) ---
   // Tomorrow: moderate advance bookings
   [
-    { centreId: 1, count: 25 }, // Pune tomorrow: 25 booked, 95 left
-    { centreId: 2, count: 32 }, // Nashik tomorrow: 32 booked, 64 left
-    { centreId: 3, count: 48 }, // Nagpur tomorrow: 48 booked (approx 6 per slot, 4 left each), 32 left
-    { centreId: 4, count: 18 }, // Aurangabad tomorrow: 18 booked, 94 left
-    { centreId: 5, count: 22 }, // Kolhapur tomorrow: 22 booked, 58 left
+    { centreId: 1, count: 25 },
+    { centreId: 2, count: 32 },
+    { centreId: 3, count: 48 },
+    { centreId: 4, count: 18 },
+    { centreId: 5, count: 22 },
+    { centreId: 6, count: 15 },
+    { centreId: 7, count: 20 },
+    { centreId: 8, count: 18 },
+    { centreId: 9, count: 24 },
+    { centreId: 10, count: 30 },
+    { centreId: 11, count: 16 },
+    { centreId: 12, count: 22 },
   ].forEach(({ centreId, count }) => {
     for (let i = 0; i < count; i += 1) {
       insBooking.run(
@@ -211,6 +232,13 @@ function seed() {
     { centreId: 3, count: 20 },
     { centreId: 4, count: 8 },
     { centreId: 5, count: 10 },
+    { centreId: 6, count: 8 },
+    { centreId: 7, count: 10 },
+    { centreId: 8, count: 9 },
+    { centreId: 9, count: 11 },
+    { centreId: 10, count: 14 },
+    { centreId: 11, count: 7 },
+    { centreId: 12, count: 10 },
   ].forEach(({ centreId, count }) => {
     for (let i = 0; i < count; i += 1) {
       insBooking.run(
