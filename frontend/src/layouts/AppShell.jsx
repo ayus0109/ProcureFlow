@@ -96,10 +96,6 @@ export default function AppShell({ title, subtitle, children }) {
             <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{title}</h1>
             {subtitle && <p className="mt-0.5 text-sm font-medium text-slate-600">{subtitle}</p>}
           </div>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>{t('app.realtimeSync')}</span>
-          </div>
         </div>
 
         <div className="space-y-5">{children}</div>
