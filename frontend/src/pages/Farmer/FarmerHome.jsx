@@ -240,7 +240,23 @@ function BookingCard({ booking, t, onOpenPass }) {
               <p className="font-mono text-2xl font-extrabold tracking-tight text-emerald-950 sm:text-3xl">
                 {booking.token}
               </p>
-              <SpeakButton text={`Token ${booking.token}. Position ${booking.position}. Wait time ${booking.waitLabel}.`} />
+              <SpeakButton
+                text={
+                  lang === 'mr'
+                    ? `आपला टोकन क्रमांक ${booking.token}. रांगेतील क्रमांक ${booking.position || 'उपलब्ध नाही'}. अंदाजे वेळ ${booking.waitLabel || 'लवकरच'}.`
+                    : lang === 'hi'
+                    ? `आपका टोकन नंबर ${booking.token}। कतार संख्या ${booking.position || 'उपलब्ध नहीं'}। अनुमानित समय ${booking.waitLabel || 'शीघ्र'}।`
+                    : lang === 'pa'
+                    ? `ਤੁਹਾਡਾ ਟੋਕਨ ਨੰਬਰ ${booking.token}। ਕਤਾਰ ਨੰਬਰ ${booking.position || 'ਉਪਲਬਧ ਨਹੀਂ'}। ਅੰਦਾਜ਼ਨ ਸਮਾਂ ${booking.waitLabel || 'ਜਲਦੀ'}।`
+                    : lang === 'gu'
+                    ? `તમારો ટોકન નંબર ${booking.token}. કતાર નંબર ${booking.position || 'ઉપલબ્ધ નથી'}. અંદાજિત સમય ${booking.waitLabel || 'ટૂંક સમયમાં'}.`
+                    : lang === 'te'
+                    ? `మీ టోకెన్ సంఖ్య ${booking.token}. క్యూ సంఖ్య ${booking.position || 'అందుబాటులో లేదు'}. అంచనా సమయం ${booking.waitLabel || 'త్వరలో'}.`
+                    : lang === 'kn'
+                    ? `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${booking.token}. ಕ್ಯೂ ಸಂಖ್ಯೆ ${booking.position || 'ಲಭ್ಯವಿಲ್ಲ'}. ಅಂದಾಜು ಸಮಯ ${booking.waitLabel || 'ಶೀಘ್ರದಲ್ಲೇ'}.`
+                    : `Your token is ${booking.token}. Queue position is ${booking.position || 'N/A'}. Estimated wait time is ${booking.waitLabel || 'shortly'}.`
+                }
+              />
             </div>
           </div>
         </div>
